@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.19)
+project(jvmplus)
+
+set(CMAKE_CXX_STANDARD 14)
+
+add_executable(jvmplus main.cpp share/vm/oops/klass.cpp share/vm/oops/klass.hpp share/vm/oops/instanceKlass.cpp share/vm/oops/instanceKlass.hpp share/vm/oops/metadata.cpp share/vm/oops/metadata.hpp share/vm/utilities/globalDefinitions.cpp share/vm/utilities/globalDefinitions.hpp share/vm/utilities/globalDefinitions_gcc.hpp share/vm/utilities/accessFlags.cpp share/vm/utilities/accessFlags.hpp share/vm/utilities/array.cpp share/vm/utilities/array.hpp share/vm/classfile/classLoader.cpp share/vm/classfile/classLoader.hpp share/vm/runtime/handles.cpp share/vm/runtime/handles.hpp share/vm/oops/method.cpp share/vm/oops/method.hpp share/vm/oops/constantPool.cpp share/vm/oops/constantPool.hpp share/vm/oops/symbol.cpp share/vm/oops/symbol.hpp share/vm/classfile/classFileStream.cpp share/vm/classfile/classFileStream.hpp share/vm/runtime/os.cpp share/vm/runtime/os.hpp share/vm/classfile/classFileParser.cpp share/vm/classfile/classFileParser.hpp share/vm/utilities/ostream.cpp share/vm/utilities/ostream.hpp share/vm/runtime/timer.cpp share/vm/runtime/timer.hpp share/vm/adlc/adlc.cpp share/vm/adlc/adlc.hpp)
