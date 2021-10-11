@@ -6,6 +6,7 @@
 #define JVM_C___OSTREAM_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
+#include "../../../share/vm/runtime/timer.hpp"
 
 class outputStream {
 protected:

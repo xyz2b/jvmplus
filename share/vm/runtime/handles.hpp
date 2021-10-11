@@ -7,6 +7,10 @@
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 
+class Klass;
+class Method;
+class ConstantPool;
+
 class KlassHandle {
     Klass*      _value;
 };

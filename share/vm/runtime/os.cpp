@@ -59,6 +59,6 @@ size_t os::read(int fd, void* buf, unsigned int nBytes) {
     return ::read(fd, buf, nBytes);
 }
 
-inline int os::close(int fd) {
+int os::close(int fd) {
     return ::close(fd);
 }

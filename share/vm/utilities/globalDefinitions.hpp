@@ -6,14 +6,14 @@
 #define JVMPLUS_GLOBALDEFINITIONS_HPP
 
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <cstring>
 #include <cerrno>
 #include <climits>
 #include <unistd.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include "../../../share/vm/utilities/globalDefinitions_gcc.hpp"
 
@@ -37,45 +37,6 @@ typedef jlong   s8;
 typedef u_char* address;
 
 
-class ClassLoader;
-class ClassFileParser;
-class ClassFileStream;
-
-class ConstantPool;
-class InstanceKlass;
-class Klass;
-class Metadata;
-class Method;
-class Symbol;
-
-class os;
-class TimeStamp;
-
-class AccessFlags;
-class stringStream;
-
 #include "../../../share/vm/utilities/array.hpp"
-
-#include "../../../share/vm/runtime/handles.hpp"
-
-#include "../../../share/vm/adlc/adlc.hpp"
-
-#include "../../../share/vm/classfile/classLoader.hpp"
-#include "../../../share/vm/classfile/classFileStream.hpp"
-#include "../../../share/vm/classfile/classFileParser.hpp"
-
-#include "../../../share/vm/oops/klass.hpp"
-#include "../../../share/vm/oops/instanceKlass.hpp"
-#include "../../../share/vm/oops/metadata.hpp"
-#include "../../../share/vm/oops/constantPool.hpp"
-#include "../../../share/vm/oops/method.hpp"
-#include "../../../share/vm/oops/symbol.hpp"
-
-#include "../../../share/vm/runtime/os.hpp"
-#include "../../../share/vm/runtime/timer.hpp"
-
-#include "../../../share/vm/utilities/accessFlags.hpp"
-
-#include "../../../share/vm/utilities/ostream.hpp"
 
 #endif //JVMPLUS_GLOBALDEFINITIONS_HPP

@@ -7,6 +7,9 @@
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/oops/klass.hpp"
+#include "../../../share/vm/oops/constantPool.hpp"
+#include "../../../share/vm/oops/method.hpp"
+
 
 class InstanceKlass : public Klass {
 public:

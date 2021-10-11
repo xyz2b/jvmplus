@@ -6,7 +6,13 @@
 #define JVMPLUS_CLASSFILEPARSER_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
-#include "../../../share/vm/oops/instanceKlass.hpp"
+#include "../../../share/vm/runtime/handles.hpp"
+
+class Method;
+class ConstantPool;
+class InstanceKlass;
+class ClassFileStream;
+class Symbol;
 
 class ClassFileParser {
 private:

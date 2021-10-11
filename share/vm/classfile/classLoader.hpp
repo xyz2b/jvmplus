@@ -6,6 +6,12 @@
 #define JVMPLUS_CLASSLOADER_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
+#include "../../../share/vm/runtime/handles.hpp"
+#include "../../../share/vm/utilities/ostream.hpp"
+#include "../../../share/vm/runtime/os.hpp"
+#include "../../../share/vm/classfile/classFileParser.hpp"
+#include "../../../share/vm/oops/symbol.hpp"
+#include "../../../share/vm/classfile/classFileStream.hpp"
 
 class ClassLoader {
 public:

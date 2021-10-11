@@ -6,6 +6,7 @@
 #define JVMPLUS_SYMBOL_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
+#include "../../../share/vm/adlc/adlc.hpp"
 
 // 字符串
 class Symbol {

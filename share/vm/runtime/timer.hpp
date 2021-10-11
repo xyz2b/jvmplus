@@ -6,6 +6,7 @@
 #define JVMPLUS_TIMER_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
+#include "../../../share/vm/adlc/adlc.hpp"
 
 class TimeStamp {
 private:
