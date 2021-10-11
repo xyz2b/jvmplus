@@ -8,10 +8,14 @@
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/adlc/adlc.hpp"
 
-// 字符串
-class Symbol {
-private:
+class SymbolBase {
+public:
     unsigned short  _length;
+};
+
+// 字符串
+class Symbol : public SymbolBase {
+public:
     jbyte   _body[1];
 
     // 将字符存到Symbol底层字符串的对应索引位置
@@ -20,12 +24,12 @@ private:
         _body[index] = value;
     }
 
+public:
     Symbol(const u1* name, int length);
     void* operator new(size_t sz, int len) throw();
 
     void operator delete (void* p);
 
-public:
     // 获取Symbol底层字符串首字符的地址
     const jbyte* base() const { return &_body[0]; }
 

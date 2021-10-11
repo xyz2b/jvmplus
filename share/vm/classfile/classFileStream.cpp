@@ -7,7 +7,7 @@
 ClassFileStream::ClassFileStream(u1 *buffer, int length, const char *source) {
     _buffer_start = buffer;
     _buffer_end = buffer + length;
-    _current = 0;
+    _current = buffer;
     _source = source;
 }
 
@@ -19,3 +19,5 @@ u2 ClassFileStream::get_u2_fast() {
 
     return 0;
 }
+
+

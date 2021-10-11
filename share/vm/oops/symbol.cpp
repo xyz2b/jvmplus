@@ -30,9 +30,10 @@ char* Symbol::as_C_string(char *buf, int size) const {
     return buf;
 }
 
+// new --> operator new
 void *Symbol::operator new(size_t sz, int len) throw() {
-
-    return nullptr;
+    char* s = (char *)calloc(1, len);
+    return s;
 }
 
 void Symbol::operator delete(void *p) {

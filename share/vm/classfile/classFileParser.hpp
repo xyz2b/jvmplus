@@ -7,11 +7,11 @@
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/runtime/handles.hpp"
+#include "../../../share/vm/classfile/classFileStream.hpp"
 
 class Method;
 class ConstantPool;
 class InstanceKlass;
-class ClassFileStream;
 class Symbol;
 
 class ClassFileParser {

@@ -1,4 +1,4 @@
-# Install script for directory: /home/xyzjiao/Desktop/project/jvmplus
+# Install script for directory: /home/ziya/Desktop/jvmplus
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/xyzjiao/Desktop/project/jvmplus/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/ziya/Desktop/jvmplus/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -15,15 +15,17 @@ InstanceKlassHandle ClassLoader::load_classfile(Symbol *h_name) {
     ClassFileStream* stream = nullptr;
     InstanceKlassHandle h;
 
-
     stream = open_stream(file_name);
 
     if (stream != nullptr) {
+        printf("start parse class file: %s\n", file_name);
         // class file found, parse it
         ClassFileParser parser(stream);
         InstanceKlassHandle result = parser.parseClassFile(h_name);
 
     }
+
+    return h;
 }
 
 ClassFileStream *ClassLoader::open_stream(const char *name) {

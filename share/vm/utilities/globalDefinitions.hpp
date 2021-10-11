@@ -14,6 +14,7 @@
 #include <climits>
 #include <unistd.h>
 #include <cstdio>
+#include <byteswap.h>
 
 #include "../../../share/vm/utilities/globalDefinitions_gcc.hpp"
 
