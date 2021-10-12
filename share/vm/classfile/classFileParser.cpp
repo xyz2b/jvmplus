@@ -19,7 +19,9 @@ ClassFileParser::parseClassFile(Symbol *name) {
     u2 minion_version = cfs->get_u2_fast();
     u2 major_version = cfs->get_u2_fast();
 
-    printf("%d\n", major_version);
+    printf("major version: %d\n", major_version);
+
+    ConstantPoolHandle cp = parse_constant_pool();
 
 //    InstanceKlass* instanceKlass = new InstanceKlass();
 //    InstanceKlassHandle instanceKlassHandle(instanceKlass);
@@ -28,7 +30,10 @@ ClassFileParser::parseClassFile(Symbol *name) {
 }
 
 ConstantPoolHandle ClassFileParser::parse_constant_pool() {
+    ClassFileStream* cfs = stream();
 
+    u2 length = cfs->get_u2_fast();
+    printf("constant pool size: %d\n", length);
 }
 
 void ClassFileParser::parse_constant_pool_entries(int length) {
