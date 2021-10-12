@@ -23,6 +23,8 @@ InstanceKlassHandle ClassLoader::load_classfile(Symbol *h_name) {
         ClassFileParser parser(stream);
         InstanceKlassHandle result = parser.parseClassFile(h_name);
 
+    } else {
+        printf("open class file failed\n");
     }
 
     return h;
