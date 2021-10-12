@@ -10,6 +10,5 @@ int main() {
     InstanceKlassHandle instanceKlassHandle = classLoader->load_classfile(s);
 
 
-
     return 0;
 }

@@ -39,5 +39,7 @@ typedef u_char* address;
 
 
 #include "../../../share/vm/utilities/array.hpp"
+#include "../../../include/common.h"
+
 
 #endif //JVMPLUS_GLOBALDEFINITIONS_HPP

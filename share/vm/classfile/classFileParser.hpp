@@ -11,12 +11,13 @@
 #include "../../../share/vm/oops/instanceKlass.hpp"
 #include "../../../share/vm/oops/method.hpp"
 #include "../../../share/vm/oops/constantPool.hpp"
-
-class Symbol;
+#include "../../../share/vm/oops/symbol.hpp"
 
 // 解析器
 class ClassFileParser {
 private:
+    ConstantPool* _cp;
+
     ClassFileStream* _stream;
     // Accessors
     ClassFileStream* stream()       { return _stream; }

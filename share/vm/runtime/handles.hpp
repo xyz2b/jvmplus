@@ -48,6 +48,21 @@ public:
   class name##Handle;                            \
   class name##Handle {         \
     type*     _value;                            \
+  protected:                                     \
+    type* obj() const { return _value; }        \
+    type* non_null_obj() const { assert(_value != nullptr, "resolving NULL _value"); return _value; }    \
+  public:                                        \
+    name##Handle () : _value(nullptr) {}                            \
+    name##Handle (type* obj) : _value(obj) {}    \
+                                                 \
+    type* operator() () const { return obj(); }  \
+    type* operator-> () const { return non_null_obj(); }                                                 \
+                                                 \
+    bool operator== (type* o) const { return obj() == o; } \
+    bool operator== (const name##Handle& h) const { return obj() == h.obj(); } \
+                                                 \
+    bool is_null() const { return _value == NULL; } \
+    bool not_null() const { return _value != NULL; }                                             \
   };
 
 DEF_METADATA_HANDLE(Method, Method)

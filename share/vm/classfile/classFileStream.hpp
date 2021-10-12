@@ -23,6 +23,10 @@ public:
     int length() const           { return _buffer_end - _buffer_start; }
     const char* source() const   { return _source; }
 
+    u1* get_u1_buffer() {
+        return _current;
+    }
+
     u1 get_u1_fast() {
         return *_current++;
     }

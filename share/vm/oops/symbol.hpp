@@ -16,7 +16,7 @@ public:
 // 字符串
 class Symbol : public SymbolBase {
 public:
-    jbyte   _body[1];
+    jbyte   _body[0];
 
     // 将字符存到Symbol底层字符串的对应索引位置
     void byte_at_put(int index, int value) {
@@ -26,7 +26,7 @@ public:
 
 public:
     Symbol(const u1* name, int length);
-    void* operator new(size_t sz, int len) throw();
+    void* operator new(size_t sz, int len);
 
     void operator delete (void* p);
 

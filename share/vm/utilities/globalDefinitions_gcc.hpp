@@ -17,4 +17,7 @@ typedef int16_t    jshort;
 typedef int32_t    jint;
 typedef int64_t    jlong;
 
+typedef float jfloat;
+typedef double jdouble;
+
 #endif //JVMPLUS_GLOBALDEFINITIONS_GCC_HPP

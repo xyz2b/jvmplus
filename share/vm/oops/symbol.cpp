@@ -31,8 +31,9 @@ char* Symbol::as_C_string(char *buf, int size) const {
 }
 
 // new --> operator new
-void *Symbol::operator new(size_t sz, int len) throw() {
-    char* s = (char *)calloc(1, len);
+void *Symbol::operator new(size_t sz, int len) {
+    char* s = (char *)malloc(sz + len * sizeof(*_body));
+    memset(s,0, sz + len * sizeof(*_body));
     return s;
 }
 
