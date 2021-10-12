@@ -13,6 +13,7 @@
 #include "../../../share/vm/oops/symbol.hpp"
 #include "../../../share/vm/classfile/classFileStream.hpp"
 
+// 类加载器
 class ClassLoader {
 public:
     static InstanceKlassHandle load_classfile(Symbol* h_name);

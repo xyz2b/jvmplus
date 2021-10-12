@@ -6,8 +6,9 @@
 #define JVMPLUS_CLASSFILESTREAM_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
+#include "../../../cpu/x86/vm/bytes_x86.hpp"
 
-// 读取字节码文件的流信息
+// 字节码文件流
 class ClassFileStream {
 private:
     u1*   _buffer_start; // Buffer bottom
@@ -22,21 +23,38 @@ public:
     int length() const           { return _buffer_end - _buffer_start; }
     const char* source() const   { return _source; }
 
-    u1 get_u1_fast();
-
-    u2 get_u2_fast();
-
-    static inline u4 swap_u4(u4 x) {
-        return bswap_32(x);
+    u1 get_u1_fast() {
+        return *_current++;
     }
-    static inline u4   get_native_u4(address p)         { return *(u4*)p; }
 
-    static inline u4   get_Java_u4(address p)           { return swap_u4(get_native_u4(p)); }
+    u2 get_u2_fast() {
+        u2 res = Bytes::get_java_u2(_current);
+        _current += 2;
+        return res;
+    }
 
     u4 get_u4_fast() {
-        u4 res = get_Java_u4(_current);
+        u4 res = Bytes::get_java_u4(_current);
         _current += 4;
         return res;
+    }
+
+    u8 get_u8_fast() {
+        u8 res = Bytes::get_java_u8(_current);
+        _current += 8;
+        return res;
+    }
+
+    void skip_u1_fast(int length) {
+        _current += length;
+    }
+
+    void skip_u2_fast(int length) {
+        _current += 2 * length;
+    }
+
+    void skip_u4_fast(int length) {
+        _current += 4 * length;
     }
 };
 

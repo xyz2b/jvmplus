@@ -16,7 +16,15 @@ ClassFileParser::parseClassFile(Symbol *name) {
 
     u4 magic = cfs->get_u4_fast();
 
-    printf("%x\n", magic);
+    u2 minion_version = cfs->get_u2_fast();
+    u2 major_version = cfs->get_u2_fast();
+
+    printf("%d\n", major_version);
+
+//    InstanceKlass* instanceKlass = new InstanceKlass();
+//    InstanceKlassHandle instanceKlassHandle(instanceKlass);
+//    instanceKlassHandle->_access_flags;
+
 }
 
 ConstantPoolHandle ClassFileParser::parse_constant_pool() {

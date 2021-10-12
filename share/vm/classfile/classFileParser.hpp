@@ -8,24 +8,15 @@
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/runtime/handles.hpp"
 #include "../../../share/vm/classfile/classFileStream.hpp"
+#include "../../../share/vm/oops/instanceKlass.hpp"
+#include "../../../share/vm/oops/method.hpp"
+#include "../../../share/vm/oops/constantPool.hpp"
 
-class Method;
-class ConstantPool;
-class InstanceKlass;
 class Symbol;
 
+// 解析器
 class ClassFileParser {
 private:
-    u2   _major_version;
-    u2   _minor_version;
-
-    Array<u2>*          _fields;
-    Array<Method*>*     _methods;
-    InstanceKlassHandle* _super_klass;
-    ConstantPool*       _cp;
-    InstanceKlass*      _klass;
-
-
     ClassFileStream* _stream;
     // Accessors
     ClassFileStream* stream()       { return _stream; }
