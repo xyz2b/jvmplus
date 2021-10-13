@@ -13,6 +13,7 @@
 #include "../../../share/vm/oops/constantPool.hpp"
 #include "../../../share/vm/oops/symbol.hpp"
 #include "../../../share/vm/utilities/accessFlags.hpp"
+#include "../../../share/vm/oops/constantValueAttribute.hpp"
 
 // 解析器
 class ClassFileParser {
@@ -34,7 +35,9 @@ public:
 
     Array<u2>* parse_interfaces(int length);
 
-    Array<u2>* parse_fields(int length);
+    Array<FiledInfo*>* parse_fields(int length);
+
+    void parse_field_attributes(u2 attributes_count, FiledInfo* filedInfo);
 
 public:
     ClassFileParser(ClassFileStream* st) { set_stream(st); };

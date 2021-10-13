@@ -30,6 +30,10 @@ public:
 
     void operator delete (void* p);
 
+    bool operator == (const char * s) const {
+        return strcmp(this->as_C_string(), s) == 0;
+    }
+
     // 获取Symbol底层字符串首字符的地址
     const jbyte* base() const { return &_body[0]; }
 

@@ -6,6 +6,7 @@
 #define JVM_C___HASHFUN_HPP
 #include <cstdlib>
 #include <string>
+#include "../../../share/vm/oops/symbol.hpp"
 
 using std::size_t;
 using std::string;
@@ -50,6 +51,14 @@ struct HashCode<const char*>
     size_t
     operator()(const char* s) const
     { return hash_string(s); }
+};
+
+template<>
+struct HashCode<const Symbol*>
+{
+    size_t
+    operator()(const Symbol* s) const
+    { return hash_string(s->as_C_string()); }
 };
 
 template<>

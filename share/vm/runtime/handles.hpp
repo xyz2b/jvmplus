@@ -36,7 +36,7 @@ class InstanceKlassHandle : public KlassHandle {
 public:
     InstanceKlassHandle() : KlassHandle() {}
     InstanceKlassHandle(const Klass* k) : KlassHandle(k) {
-        assert(k == nullptr, "illegal type");
+        assert(k != nullptr, "illegal type");
     }
 
     InstanceKlass* operator() () const { return (InstanceKlass*)obj(); }

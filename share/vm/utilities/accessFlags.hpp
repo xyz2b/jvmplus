@@ -21,6 +21,7 @@ private:
     jint _flags;
 
 public:
+    AccessFlags() {}
     AccessFlags(jint flags) : _flags(flags) {}
 
     bool is_static() const { return (_flags & JVM_ACC_STATIC) != 0; }

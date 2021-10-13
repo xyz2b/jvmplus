@@ -9,10 +9,10 @@
 #include "../../../share/vm/oops/klass.hpp"
 #include "../../../share/vm/oops/constantPool.hpp"
 #include "../../../share/vm/oops/method.hpp"
-
+#include "../../../share/vm/oops/field.hpp"
 
 class InstanceKlass : public Klass {
-public:
+private:
     u4      _magic;
     u2      _minor_version;         // minor version number of class file
     u2      _major_version;         // major version number of class file
@@ -20,7 +20,7 @@ public:
     // Constant pool for this class.
     ConstantPool*   _constants;
 
-    u2 _access_flags;
+    AccessFlags _access_flags;
 
     u2 _this_class;
     u2 _super_class;
@@ -31,13 +31,15 @@ public:
 
     u2 _fields_count;
     // Instance and static variable information.
-    Array<u2>*      _fields;
+    Array<FiledInfo*>*      _fields;
 
     u2 _methods_count;
     // Method Array;
     Array<Method*>* _methods;
 
     u2 _attributes_count;
+
+public:
 };
 
 

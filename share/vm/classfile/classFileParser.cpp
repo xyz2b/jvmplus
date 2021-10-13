@@ -14,6 +14,9 @@ ClassFileParser::parse_class_file(Symbol *name) {
     cfs = new ClassFileStream(ptr, end_ptr - ptr, cfs->source());
     set_stream(cfs);
 
+    InstanceKlass* instance_klass = new InstanceKlass();
+    InstanceKlassHandle ik (instance_klass);
+
     // 魔数
     u4 magic = cfs->get_u4_fast();
 
@@ -53,12 +56,9 @@ ClassFileParser::parse_class_file(Symbol *name) {
     INFO_PRINT("fields length: %d", fields_len);
 
     // 字段列表
+    parse_fields(fields_len);
 
-
-//    InstanceKlass* instanceKlass = new InstanceKlass();
-//    InstanceKlassHandle instanceKlassHandle(instanceKlass);
-//    instanceKlassHandle->_access_flags;
-
+    return ik;
 }
 
 
@@ -198,8 +198,8 @@ void ClassFileParser::parse_constant_pool_entries(int length) {
                 break;
             case JVM_CONSTANT_MethodType:
                 {
-                    u2 descriptor_index = cfs->get_u2_fast();
-                    _cp->method_type_index_at_put(index, descriptor_index);
+                    u2 ref_index = cfs->get_u2_fast();
+                    _cp->method_type_index_at_put(index, ref_index);
 
                     INFO_PRINT("ConstantPool, 第%d项, 类型: MethodType, 值: %X", index, *_cp->int_at_adr(index));
                 }
@@ -225,6 +225,7 @@ ClassFileParser::~ClassFileParser() {
 }
 
 Array<u2>* ClassFileParser::parse_interfaces(int length) {
+    INFO_PRINT("parse interfaces");
     if (length == 0)
         return new Array<u2>();
     ClassFileStream* cfs = stream();
@@ -242,6 +243,51 @@ Array<u2>* ClassFileParser::parse_interfaces(int length) {
     return interfaces_index;
 }
 
-Array<u2> *ClassFileParser::parse_fields(int length) {
-    return nullptr;
+Array<FiledInfo*>* ClassFileParser::parse_fields(int length) {
+    INFO_PRINT("parse fields");
+    if (length == 0)
+        return new Array<FiledInfo*>();
+
+    ClassFileStream* cfs = stream();
+
+    Array<FiledInfo*>* filed_infos = new Array<FiledInfo*>(length);
+
+    for (int index = 0; index < length; index++) {
+        u2 access_flag = cfs->get_u2_fast();
+        u2 name_index = cfs->get_u2_fast();
+        u2 signature_index = cfs->get_u2_fast();
+        u2 attributes_count = cfs->get_u2_fast();
+
+        FiledInfo* filed_info = new FiledInfo(access_flag, name_index, signature_index, attributes_count);
+
+        if (attributes_count > 0) {
+            parse_field_attributes(attributes_count, filed_info);
+        }
+
+        filed_infos->add(filed_info);
+        INFO_PRINT("Filed, 第%d项, name_index: %X，signature_index: %X, attributes_count: %d", index, name_index,signature_index, attributes_count);
+
+    }
+
+    return filed_infos;
+}
+
+void ClassFileParser::parse_field_attributes(u2 attributes_count, FiledInfo* filed_info) {
+    ClassFileStream* cfs = stream();
+
+    u2 attribute_name_index = cfs->get_u2_fast();
+    u4 attribute_length = cfs->get_u4_fast();
+
+    Symbol* attribute_name = _cp->symbol_at(attribute_name_index);
+
+    AttributeInfo* attribute;
+    if (*attribute_name == JVM_ATTRIBUTE_ConstantValue) {
+        u2 constant_value_index = cfs->get_u2_fast();
+
+        attribute = new ConstantValueAttribute(attribute_name_index, attribute_length,constant_value_index);
+
+        INFO_PRINT("Filed Attributes, type: ConstantValue, constant_value_index: %X，", constant_value_index);
+    }
+
+    filed_info->put_attribute(attribute_name, attribute);
 }

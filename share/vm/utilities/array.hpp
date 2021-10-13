@@ -30,6 +30,7 @@ public:
     void set(size_t index, T value);
     void add(T value);
     void set_at(size_t index, T value);
+    bool empty() { return _size == 0; }
 
     void insertLast(T value);
     void insertFirst(T value);
@@ -58,6 +59,7 @@ public:
     void set(size_t index, T* value);
     void add(T* value);
     void set_at(size_t index, T* value);
+    bool empty() { return _size == 0; }
 
     void insertLast(T* value);
     void insertFirst(T* value);

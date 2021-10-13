@@ -3,11 +3,15 @@
 
 int main() {
 
-    const char* file = "/home/xyzjiao/Desktop/project/jvm/target/classes/org/xyz/jvm/example/HelloWorld";
+    const char* file = "/home/ziya/IdeaProjects/java-research/target/classes/org/xyz/test/HelloWorld";
     Symbol* s = new (strlen(file)) Symbol((u1*)file, strlen(file));
 
     ClassLoader* classLoader = new ClassLoader();
     InstanceKlassHandle instanceKlassHandle = classLoader->load_classfile(s);
+
+
+    Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes = new Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>();
+
 
 
     return 0;
