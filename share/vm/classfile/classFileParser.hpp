@@ -12,6 +12,7 @@
 #include "../../../share/vm/oops/method.hpp"
 #include "../../../share/vm/oops/constantPool.hpp"
 #include "../../../share/vm/oops/symbol.hpp"
+#include "../../../share/vm/utilities/accessFlags.hpp"
 
 // 解析器
 class ClassFileParser {
@@ -25,11 +26,15 @@ private:
 
 public:
 
-    InstanceKlassHandle parseClassFile(Symbol* name);
+    InstanceKlassHandle parse_class_file(Symbol* name);
 
     ConstantPoolHandle parse_constant_pool();
 
     void parse_constant_pool_entries(int length);
+
+    Array<u2>* parse_interfaces(int length);
+
+    Array<u2>* parse_fields(int length);
 
 public:
     ClassFileParser(ClassFileStream* st) { set_stream(st); };

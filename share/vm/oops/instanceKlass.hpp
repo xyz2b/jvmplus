@@ -27,7 +27,7 @@ public:
 
     u2 _interfaces_count;
     // Interface (Klass*s) this class declares to implement.
-    Array<Klass*>*  _interfaces;
+    Array<u2>*  _interfaces;
 
     u2 _fields_count;
     // Instance and static variable information.

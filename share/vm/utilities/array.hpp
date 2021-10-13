@@ -28,6 +28,7 @@ public:
     T get_at(size_t index);
     T remove(size_t index);
     void set(size_t index, T value);
+    void add(T value);
     void set_at(size_t index, T value);
 
     void insertLast(T value);
@@ -55,6 +56,7 @@ public:
     T* get_at(size_t index);
     T* remove(size_t index);
     void set(size_t index, T* value);
+    void add(T* value);
     void set_at(size_t index, T* value);
 
     void insertLast(T* value);
@@ -180,6 +182,12 @@ void Array<T>::set(size_t index, T value) {
         exit(-1);
 
     *(_data + index) = value;
+}
+
+template<typename T>
+void Array<T>::add(T value) {
+    *(_data + _size) = value;
+    _size++;
 }
 
 template<typename T>
@@ -316,11 +324,17 @@ T* Array<T*>::remove(size_t index) {
 
 template<typename T>
 void Array<T*>::set(size_t index, T* value) {
-    if(index < 0 || index >= _size)
+    if(index < 0 || index > _size)
         // index索引非法
         exit(-1);
 
     *(_data + index) = value;
+}
+
+template<typename T>
+void Array<T*>::add(T* value) {
+    *(_data + _size) = value;
+    _size++;
 }
 
 template<typename T>

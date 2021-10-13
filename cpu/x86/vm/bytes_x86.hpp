@@ -21,6 +21,10 @@ public:
     static inline u2 swap_u2(u2 x);
     static inline u4 swap_u4(u4 x);
     static inline u8 swap_u8(u8 x);
+
+    static inline void put_native_u2(address p, u2 x) { *(u2*)p = x; }
+    static inline void put_native_u4(address p, u4 x) { *(u4*)p = x; }
+    static inline void put_native_u8(address p, u8 x) { *(u8*)p = x; }
 };
 
 #include "../../../os_cpu/linux_x86/vm/bytes_linux_x86.inline.hpp"

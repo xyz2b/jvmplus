@@ -18,13 +18,14 @@ InstanceKlassHandle ClassLoader::load_classfile(Symbol *h_name) {
     stream = open_stream(file_name);
 
     if (stream != nullptr) {
-        printf("start parse class file: %s\n", file_name);
+        INFO_PRINT("start parse class file: %s", file_name);
         // class file found, parse it
         ClassFileParser parser(stream);
-        InstanceKlassHandle result = parser.parseClassFile(h_name);
+        InstanceKlassHandle result = parser.parse_class_file(h_name);
 
     } else {
-        printf("open class file failed\n");
+        ERROR_PRINT("open class file failed");
+        exit(-1);
     }
 
     return h;

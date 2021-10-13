@@ -13,6 +13,11 @@ private:
     jbyte _tag;
 public:
     bool is_utf8() { return _tag == JVM_CONSTANT_Utf8; }
+    bool is_int() { return _tag == JVM_CONSTANT_Integer; }
+    bool is_long() { return _tag == JVM_CONSTANT_Long; }
+    bool is_float() { return _tag == JVM_CONSTANT_Float; }
+    bool is_double() { return _tag == JVM_CONSTANT_Double; }
+    bool is_class() { return _tag == JVM_CONSTANT_Class; }
 
     ConstantTag() {
         _tag = JVM_CONSTANT_Invalid;
