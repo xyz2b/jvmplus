@@ -76,8 +76,6 @@ ClassFileParser::parse_class_file(Symbol *name) {
     return ik;
 }
 
-
-
 ConstantPoolHandle ClassFileParser::parse_constant_pool() {
     INFO_PRINT("parse constant pool");
     ClassFileStream* cfs = stream();
