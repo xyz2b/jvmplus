@@ -16,6 +16,11 @@
 #include "../../../share/vm/oops/constantValueAttribute.hpp"
 #include "../../../share/vm/oops/method.hpp"
 #include "../../../share/vm/oops/codeAttribute.hpp"
+#include "../../../share/vm/oops/localVariableTableAttribute.hpp"
+#include "../../../share/vm/oops/lineNumberTableAttribute.hpp"
+#include "../../../share/vm/oops/stackMapTableAttribute.hpp"
+#include "../../../share/vm/oops/exceptionAttribute.h"
+#include "../../../share/vm/oops/sourceFileAttribute.hpp"
 
 // 解析器
 class ClassFileParser {
@@ -46,6 +51,12 @@ public:
     void parse_method_attributes(u2 attributes_count, Method* method);
 
     Array<ExceptionHandler*>* parse_exception_table(u2 exception_table_length);
+
+    Array<LocalVariable*>* parse_local_variable_table(u2 local_variable_table_length);
+
+    Array<LineNumber *> *parse_line_number_table(u2 length);
+
+    Hashmap<Symbol *, AttributeInfo *, HashCode<const Symbol *>>* parse_class_attribute(u2 class_attribute_count);
 
 public:
     ClassFileParser(ClassFileStream* st) { set_stream(st); };

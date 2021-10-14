@@ -9,7 +9,7 @@
 
 #define JVM_ATTRIBUTE_ConstantValue "ConstantValue"
 #define JVM_ATTRIBUTE_Code "Code"
-#define JVM_ATTRIBUTE_Exception "Exception"
+#define JVM_ATTRIBUTE_Exceptions "Exceptions"
 #define JVM_ATTRIBUTE_LineNumberTable "LineNumberTable"
 #define JVM_ATTRIBUTE_LocalVariableTable "LocalVariableTable"
 #define JVM_ATTRIBUTE_SourceFile "SourceFile"

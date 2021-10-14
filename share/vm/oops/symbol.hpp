@@ -30,7 +30,7 @@ public:
 
     void operator delete (void* p);
 
-    bool operator == (const char * s) const {
+    bool operator == (const char* s) const {
         return strcmp(this->as_C_string(), s) == 0;
     }
 

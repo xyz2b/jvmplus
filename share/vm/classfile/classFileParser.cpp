@@ -14,9 +14,6 @@ ClassFileParser::parse_class_file(Symbol *name) {
     cfs = new ClassFileStream(ptr, end_ptr - ptr, cfs->source());
     set_stream(cfs);
 
-    InstanceKlass* instance_klass = new InstanceKlass();
-    InstanceKlassHandle ik (instance_klass);
-
     // 魔数
     u4 magic = cfs->get_u4_fast();
 
@@ -56,7 +53,7 @@ ClassFileParser::parse_class_file(Symbol *name) {
     INFO_PRINT("fields length: %d", fields_len);
 
     // 字段列表
-    parse_fields(fields_len);
+    Array<FiledInfo*>* fields = parse_fields(fields_len);
 
     // 成员方法数量
     u2 methods_len = cfs->get_u2_fast();
@@ -64,6 +61,17 @@ ClassFileParser::parse_class_file(Symbol *name) {
 
     // 成员方法列表
     Array<Method*>* methods = parse_methods(methods_len);
+
+    // 类属性数量
+    u2 class_attribute_count = cfs->get_u2_fast();
+    INFO_PRINT("class attribute count: %d", class_attribute_count);
+
+    // 类属性列表
+    Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* class_attributes = parse_class_attribute(class_attribute_count);
+
+    InstanceKlass* instance_klass = new InstanceKlass(magic, minion_version, major_version, cp(), access_flags, this_class_index, super_class_index,
+                                                      interfaces_len, local_interfaces, fields_len, fields, methods_len, methods, class_attribute_count, class_attributes);
+    InstanceKlassHandle ik (instance_klass);
 
     return ik;
 }
@@ -317,6 +325,8 @@ Array<Method*>* ClassFileParser::parse_methods(int length) {
         u2 signature_index = cfs->get_u2_fast();
         u2 method_attributes_count = cfs->get_u2_fast();
 
+        INFO_PRINT("Method, 第%d项, name: %s, name_index: %X，signature_index: %X, attributes_count: %d", index, _cp->symbol_at(name_index)->as_C_string(), name_index, signature_index, method_attributes_count);
+
         Method* method = new Method(access_flag, name_index, signature_index, method_attributes_count);
 
         if (method_attributes_count > 0) {
@@ -324,7 +334,6 @@ Array<Method*>* ClassFileParser::parse_methods(int length) {
         }
 
         methods->add(method);
-        INFO_PRINT("Method, 第%d项, name_index: %X，signature_index: %X, attributes_count: %d", index, name_index, signature_index, method_attributes_count);
     }
     return methods;
 }
@@ -339,6 +348,7 @@ void ClassFileParser::parse_method_attributes(u2 method_attributes_count, Method
         Symbol* method_attribute_name = _cp->symbol_at(method_attribute_name_index);
 
         AttributeInfo *method_attribute = nullptr;
+        INFO_PRINT("method attribute name: %s", method_attribute_name->as_C_string());
         if (*method_attribute_name == JVM_ATTRIBUTE_Code) {
             u2 max_stack = cfs->get_u2_fast();
             u2 max_locals = cfs->get_u2_fast();
@@ -354,28 +364,74 @@ void ClassFileParser::parse_method_attributes(u2 method_attributes_count, Method
             }
 
             u2 code_attributes_count = cfs->get_u2_fast();
-            CodeAttribute* code_attributes = new (code_length) CodeAttribute(method_attribute_name_index, method_attribute_length, exception_table_length, code_attributes_count, max_stack, max_locals, code_length);
+            CodeAttribute* code_attributes = new (code_length) CodeAttribute(method_attribute_name_index, method_attribute_length, code_attributes_count, max_stack, max_locals, code_length, exception_table_length);
             code_attributes->set_code(code_start);
+            code_attributes->set_exception_tables(exception_table);
 
             // 解析code的属性
-            for (int index = 0; index < code_attributes_count; index++) {
+            for (int i = 0; i < code_attributes_count; i++) {
                 u2 code_attribute_name_index = cfs->get_u2_fast();
                 u4 code_attribute_length = cfs->get_u4_fast();
 
                 Symbol* code_attribute_name = _cp->symbol_at(code_attribute_name_index);
 
+                INFO_PRINT("start parse method attribute, type: %s", code_attribute_name->as_C_string());
                 AttributeInfo *code_attribute = nullptr;
                 if (*code_attribute_name == JVM_ATTRIBUTE_LocalVariableTable) {
+                    u2 local_variable_table_length = cfs->get_u2_fast();
 
+                    LocalVariableTableAttribute* local_variable_table_attribute = new LocalVariableTableAttribute(code_attribute_name_index, code_attribute_length, local_variable_table_length);
 
+                    Array<LocalVariable*>* local_variable_table = nullptr;
+                    if (local_variable_table_length > 0) {
+                        local_variable_table = parse_local_variable_table(local_variable_table_length);
+                    }
+                    local_variable_table_attribute->set_local_variable_table(local_variable_table);
 
-//                    code_attribute = ;
-                    INFO_PRINT("Code Attribute, 第%d项, type: LocalVariableTable，", index);
+                    code_attribute = local_variable_table_attribute;
+                    INFO_PRINT("Code Attribute, 第%d项, type: LocalVariableTable，local_variable_table_length: %X", i, local_variable_table_length);
+                } else if (*code_attribute_name == JVM_ATTRIBUTE_LineNumberTable) {
+                    u2 line_number_table_length = cfs->get_u2_fast();
+
+                    LineNumberTableAttribute* line_number_table_attribute = new LineNumberTableAttribute(code_attribute_name_index, code_attribute_length, line_number_table_length);
+
+                    Array<LineNumber*>* line_number_table = nullptr;
+                    if (line_number_table_length > 0) {
+                        line_number_table = parse_line_number_table(line_number_table_length);
+                    }
+                    line_number_table_attribute->set_line_number_table(line_number_table);
+
+                    code_attribute = line_number_table_attribute;
+
+                    INFO_PRINT("Code Attribute, 第%d项, type: LineNumberTable，local_variable_table_length: %X", i, line_number_table_length);
+                } else if (*code_attribute_name == JVM_ATTRIBUTE_StackMapTable) {
+                    // 该属性直接跳过，不做解析
+                    cfs->skip_u1_fast(code_attribute_length);
+
+                    StackMapTableAttribute* stack_map_table_attribute = new StackMapTableAttribute(code_attribute_name_index, code_attribute_length);
+
+                    code_attribute = stack_map_table_attribute;
+
+                    INFO_PRINT("Code Attribute, 第%d项, type: StackMapTable", i);
                 }
                 code_attributes->put_attribute(code_attribute_name, code_attribute);
             }
             method_attribute = code_attributes;
             INFO_PRINT("Method Attribute, 第%d项, type: Code，max_stack: %X, max_locals: %X, code_length: %X, exception_table_length: %X, attributes_count: %X", index, max_stack, max_locals, code_length, exception_table_length, code_attributes_count);
+        } else if (*method_attribute_name == JVM_ATTRIBUTE_Exceptions) {
+            u2 number_of_exceptions = cfs->get_u2_fast();
+
+            ExceptionAttribute* exception_attribute = new ExceptionAttribute(method_attribute_name_index, method_attribute_length, number_of_exceptions);
+
+            Array<u2>* exception_index_table = new Array<u2>(number_of_exceptions);
+            for (int i = 0; i < number_of_exceptions; i++) {
+                u2 exception_index = cfs->get_u2_fast();
+                exception_index_table->add(exception_index);
+            }
+            exception_attribute->set_exception_index_table(exception_index_table);
+
+            method_attribute = exception_attribute;
+            INFO_PRINT("Method Attribute, 第%d项, type: Exception, number_of_exceptions: %X", index, number_of_exceptions);
         }
         method->put_attribute(method_attribute_name, method_attribute);
     }
@@ -400,4 +456,71 @@ Array<ExceptionHandler*>* ClassFileParser::parse_exception_table(u2 exception_ta
     }
 
     return exception_table;
+}
+
+Array<LocalVariable*>* ClassFileParser::parse_local_variable_table(u2 local_variable_table_length) {
+    ClassFileStream *cfs = stream();
+
+    Array<LocalVariable*>* local_variable_table = new Array<LocalVariable*>(local_variable_table_length);
+
+    for (int index = 0; index < local_variable_table_length; index++) {
+        u2 start_pc = cfs->get_u2_fast();
+        u2 length = cfs->get_u2_fast();
+        u2 name_index = cfs->get_u2_fast();
+        u2 descriptor_index = cfs->get_u2_fast();
+        u2 local_variable_index = cfs->get_u2_fast();
+
+        LocalVariable* local_variable = new LocalVariable(start_pc, length, name_index, descriptor_index, local_variable_index);
+
+        local_variable_table->add(local_variable);
+        INFO_PRINT("LocalVariable, 第%d项, start_pc: %X，length: %X, name_index: %X, descriptor_index: %X, local_variable_index: %X", index, start_pc, length, name_index, descriptor_index, local_variable_index);
+    }
+
+    return local_variable_table;
+}
+
+Array<LineNumber *> *ClassFileParser::parse_line_number_table(u2 line_number_table_length) {
+    ClassFileStream *cfs = stream();
+
+    Array<LineNumber*>* line_number_table = new Array<LineNumber*>(line_number_table_length);
+
+    for (int index = 0; index < line_number_table_length; index++) {
+        u2 start_pc = cfs->get_u2_fast();
+        u2 line_number = cfs->get_u2_fast();
+
+        LineNumber* line_number_entry = new LineNumber(start_pc, line_number);
+
+        line_number_table->add(line_number_entry);
+        INFO_PRINT("LineNumber, 第%d项, start_pc: %X，line_number: %X", index, start_pc, line_number);
+    }
+
+    return line_number_table;
+}
+
+Hashmap<Symbol *, AttributeInfo *, HashCode<const Symbol *>>*
+ClassFileParser::parse_class_attribute(u2 class_attribute_count) {
+    ClassFileStream *cfs = stream();
+
+    Hashmap<Symbol *, AttributeInfo *, HashCode<const Symbol *>>* class_attributes = new Hashmap<Symbol *, AttributeInfo *, HashCode<const Symbol *>>(class_attribute_count);
+
+    for (int index = 0; index < class_attribute_count; index++) {
+        u2 class_attribute_name_index = cfs->get_u2_fast();
+        u4 class_attribute_length = cfs->get_u4_fast();
+
+        Symbol* class_attribute_name = _cp->symbol_at(class_attribute_name_index);
+
+        AttributeInfo *class_attribute = nullptr;
+        INFO_PRINT("class attribute name: %s", class_attribute_name->as_C_string());
+        if (*class_attribute_name == JVM_ATTRIBUTE_SourceFile) {
+            u2 source_file_index = cfs->get_u2_fast();
+
+            SourceFileAttribute* source_file_attribute = new SourceFileAttribute(class_attribute_name_index, class_attribute_length, source_file_index);
+
+            class_attribute = source_file_attribute;
+            INFO_PRINT("Class Attribute, 第%d项, type: SourceFile，source_file_index: %X", index, source_file_index);
+        }
+        class_attributes->put(class_attribute_name, class_attribute);
+    }
+
+    return class_attributes;
 }

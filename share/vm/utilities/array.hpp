@@ -31,6 +31,7 @@ public:
     void add(T value);
     void set_at(size_t index, T value);
     bool empty() { return _size == 0; }
+    size_t size() { return _size; }
 
     void insertLast(T value);
     void insertFirst(T value);
@@ -60,6 +61,7 @@ public:
     void add(T* value);
     void set_at(size_t index, T* value);
     bool empty() { return _size == 0; }
+    size_t size() { return _size; }
 
     void insertLast(T* value);
     void insertFirst(T* value);
