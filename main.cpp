@@ -8,7 +8,7 @@ int main() {
 
     ClassLoader* classLoader = new ClassLoader();
     InstanceKlassHandle instanceKlassHandle = classLoader->load_classfile(s);
-
+    INFO_PRINT("version: %d", instanceKlassHandle->get_major_version());
 
     return 0;
 }

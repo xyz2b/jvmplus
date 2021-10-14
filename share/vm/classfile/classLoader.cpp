@@ -21,7 +21,7 @@ InstanceKlassHandle ClassLoader::load_classfile(Symbol *h_name) {
         INFO_PRINT("start parse class file: %s", file_name);
         // class file found, parse it
         ClassFileParser parser(stream);
-        InstanceKlassHandle result = parser.parse_class_file(h_name);
+        h = parser.parse_class_file(h_name);
 
     } else {
         ERROR_PRINT("open class file failed");
