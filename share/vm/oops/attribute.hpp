@@ -14,6 +14,8 @@
 #define JVM_ATTRIBUTE_LocalVariableTable "LocalVariableTable"
 #define JVM_ATTRIBUTE_SourceFile "SourceFile"
 #define JVM_ATTRIBUTE_StackMapTable "StackMapTable"
+#define JVM_ATTRIBUTE_BootstrapMethods "BootstrapMethods"
+#define JVM_ATTRIBUTE_InnerClasses "InnerClasses"
 
 class AttributeInfo {
 private:

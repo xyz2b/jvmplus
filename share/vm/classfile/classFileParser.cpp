@@ -516,9 +516,83 @@ ClassFileParser::parse_class_attribute(u2 class_attribute_count) {
 
             class_attribute = source_file_attribute;
             INFO_PRINT("Class Attribute, 第%d项, type: SourceFile，source_file_index: %X", index, source_file_index);
+        } else if (*class_attribute_name == JVM_ATTRIBUTE_BootstrapMethods) {
+            u2 number_of_bootstrap_methods = cfs->get_u2_fast();
+
+            Array<BootstrapMethod*>* bootstrap_methods_entry = nullptr;
+            if (number_of_bootstrap_methods > 0) {
+                bootstrap_methods_entry = parse_bootstrap_method(number_of_bootstrap_methods);
+            }
+
+            BootstrapMethods* bootstrap_methods = new BootstrapMethods(class_attribute_name_index, class_attribute_length, number_of_bootstrap_methods);
+            bootstrap_methods->set_bootstrap_methods(bootstrap_methods_entry);
+            class_attribute = bootstrap_methods;
+            INFO_PRINT("Class Attribute, 第%d项, type: BootstrapMethods，number_of_bootstrap_methods: %X", index, number_of_bootstrap_methods);
+        } else if (*class_attribute_name == JVM_ATTRIBUTE_InnerClasses) {
+            u2 number_of_classes = cfs->get_u2_fast();
+
+            Array<InnerClass*>* inner_class_entry = nullptr;
+            if (number_of_classes > 0) {
+                inner_class_entry = parse_inner_classes(number_of_classes);
+            }
+
+            InnerClassAttribute* inner_class = new InnerClassAttribute(class_attribute_name_index, class_attribute_length, number_of_classes);
+            inner_class->set_classes(inner_class_entry);
+            class_attribute = inner_class;
+            INFO_PRINT("Class Attribute, 第%d项, type: InnerClasses，number_of_classes: %X", index, number_of_classes);
         }
         class_attributes->put(class_attribute_name, class_attribute);
     }
 
     return class_attributes;
+}
+
+Array<BootstrapMethod *> *ClassFileParser::parse_bootstrap_method(u2 number_of_bootstrap_methods) {
+    ClassFileStream *cfs = stream();
+
+    Array<BootstrapMethod*>* bootstrap_methods_entry = new Array<BootstrapMethod*>(number_of_bootstrap_methods);
+
+    for (int index = 0; index < number_of_bootstrap_methods; index++) {
+        u2 bootstrap_method_ref = cfs->get_u2_fast();
+        u2 num_bootstrap_arguments = cfs->get_u2_fast();
+
+        Array<u2>* bootstrap_arguments = nullptr;
+        if (num_bootstrap_arguments > 0) {
+            bootstrap_arguments = new Array<u2>(num_bootstrap_arguments);
+
+            for (int i = 0; i < num_bootstrap_arguments; i++) {
+                u2 bootstrap_argument = cfs->get_u2_fast();
+                bootstrap_arguments->add(bootstrap_argument);
+
+                INFO_PRINT("Bootstrap Argument, 第%d项，bootstrap_argument: %X", index, bootstrap_argument);
+            }
+        }
+
+        BootstrapMethod* bootstrap_method = new BootstrapMethod(bootstrap_method_ref, num_bootstrap_arguments);
+        bootstrap_method->set_bootstrap_arguments(bootstrap_arguments);
+
+        bootstrap_methods_entry->add(bootstrap_method);
+        INFO_PRINT("Bootstrap Method, 第%d项，bootstrap_method_ref: %X,num_bootstrap_arguments: %X", index, bootstrap_method_ref, num_bootstrap_arguments);
+    }
+
+    return bootstrap_methods_entry;
+}
+
+Array<InnerClass *> *ClassFileParser::parse_inner_classes(u2 number_of_classes) {
+    ClassFileStream *cfs = stream();
+
+    Array<InnerClass*>* classes = new Array<InnerClass*>(number_of_classes);
+
+    for (int index = 0; index < number_of_classes; index++) {
+        u2 inner_class_info_index = cfs->get_u2_fast();
+        u2 outer_class_info_index = cfs->get_u2_fast();
+        u2 inner_name_index = cfs->get_u2_fast();
+        u2 inner_class_access_flags = cfs->get_u2_fast();
+
+        InnerClass* inner_class = new InnerClass(inner_class_info_index, outer_class_info_index, inner_name_index, inner_class_access_flags);
+        classes->add(inner_class);
+        INFO_PRINT("Inner Class, 第%d项，inner_class_info_index: %X, outer_class_info_index: %X, inner_name_index: %X, inner_class_access_flags: %X", index, inner_class_info_index, outer_class_info_index, inner_name_index, inner_class_access_flags);
+    }
+
+    return classes;
 }

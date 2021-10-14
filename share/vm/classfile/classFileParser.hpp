@@ -21,6 +21,8 @@
 #include "../../../share/vm/oops/stackMapTableAttribute.hpp"
 #include "../../../share/vm/oops/exceptionAttribute.h"
 #include "../../../share/vm/oops/sourceFileAttribute.hpp"
+#include "../../../share/vm/oops/bootstrapMethods.hpp"
+#include "../../../share/vm/oops/innerClassAttribute.hpp"
 
 // 解析器
 class ClassFileParser {
@@ -58,9 +60,14 @@ public:
 
     Hashmap<Symbol *, AttributeInfo *, HashCode<const Symbol *>>* parse_class_attribute(u2 class_attribute_count);
 
+    Array<BootstrapMethod *> *parse_bootstrap_method(u2 number_of_bootstrap_methods);
+
+    Array<InnerClass *> *parse_inner_classes(u2 number_of_classes);
+
 public:
     ClassFileParser(ClassFileStream* st) { set_stream(st); };
     ~ClassFileParser();
+
 };
 
 
