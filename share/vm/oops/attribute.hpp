@@ -5,7 +5,15 @@
 #ifndef JVMPLUS_ATTRIBUTE_HPP
 #define JVMPLUS_ATTRIBUTE_HPP
 
+#include "../../../share/vm/utilities/globalDefinitions.hpp"
+
 #define JVM_ATTRIBUTE_ConstantValue "ConstantValue"
+#define JVM_ATTRIBUTE_Code "Code"
+#define JVM_ATTRIBUTE_Exception "Exception"
+#define JVM_ATTRIBUTE_LineNumberTable "LineNumberTable"
+#define JVM_ATTRIBUTE_LocalVariableTable "LocalVariableTable"
+#define JVM_ATTRIBUTE_SourceFile "SourceFile"
+#define JVM_ATTRIBUTE_StackMapTable "StackMapTable"
 
 class AttributeInfo {
 private:

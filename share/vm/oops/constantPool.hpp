@@ -195,7 +195,6 @@ public:
     }
 
     jint int_at(int which) {
-        INFO_PRINT("%d", tag_at(which).value());
         assert(tag_at(which).is_int(), "Corrupted constant pool");
         return *int_at_adr(which);
     }

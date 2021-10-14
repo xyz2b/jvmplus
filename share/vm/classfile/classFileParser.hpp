@@ -14,6 +14,8 @@
 #include "../../../share/vm/oops/symbol.hpp"
 #include "../../../share/vm/utilities/accessFlags.hpp"
 #include "../../../share/vm/oops/constantValueAttribute.hpp"
+#include "../../../share/vm/oops/method.hpp"
+#include "../../../share/vm/oops/codeAttribute.hpp"
 
 // 解析器
 class ClassFileParser {
@@ -38,6 +40,12 @@ public:
     Array<FiledInfo*>* parse_fields(int length);
 
     void parse_field_attributes(u2 attributes_count, FiledInfo* filedInfo);
+
+    Array<Method*>* parse_methods(int length);
+
+    void parse_method_attributes(u2 attributes_count, Method* method);
+
+    Array<ExceptionHandler*>* parse_exception_table(u2 exception_table_length);
 
 public:
     ClassFileParser(ClassFileStream* st) { set_stream(st); };

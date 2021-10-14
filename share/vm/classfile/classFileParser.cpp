@@ -58,6 +58,13 @@ ClassFileParser::parse_class_file(Symbol *name) {
     // 字段列表
     parse_fields(fields_len);
 
+    // 成员方法数量
+    u2 methods_len = cfs->get_u2_fast();
+    INFO_PRINT("methods length: %d", methods_len);
+
+    // 成员方法列表
+    Array<Method*>* methods = parse_methods(methods_len);
+
     return ik;
 }
 
@@ -256,16 +263,16 @@ Array<FiledInfo*>* ClassFileParser::parse_fields(int length) {
         u2 access_flag = cfs->get_u2_fast();
         u2 name_index = cfs->get_u2_fast();
         u2 signature_index = cfs->get_u2_fast();
-        u2 attributes_count = cfs->get_u2_fast();
+        u2 field_attributes_count = cfs->get_u2_fast();
 
-        FiledInfo* filed_info = new FiledInfo(access_flag, name_index, signature_index, attributes_count);
+        FiledInfo* filed_info = new FiledInfo(access_flag, name_index, signature_index, field_attributes_count);
 
-        if (attributes_count > 0) {
-            parse_field_attributes(attributes_count, filed_info);
+        if (field_attributes_count > 0) {
+            parse_field_attributes(field_attributes_count, filed_info);
         }
 
         filed_infos->add(filed_info);
-        INFO_PRINT("Filed, 第%d项, name_index: %X，signature_index: %X, attributes_count: %d", index, name_index,signature_index, attributes_count);
+        INFO_PRINT("Filed, 第%d项, name: %s， name_index: %X，signature_index: %X, attributes_count: %d", index, _cp->symbol_at(name_index)->as_C_string(), name_index,signature_index, field_attributes_count);
 
     }
 
@@ -275,19 +282,122 @@ Array<FiledInfo*>* ClassFileParser::parse_fields(int length) {
 void ClassFileParser::parse_field_attributes(u2 attributes_count, FiledInfo* filed_info) {
     ClassFileStream* cfs = stream();
 
-    u2 attribute_name_index = cfs->get_u2_fast();
-    u4 attribute_length = cfs->get_u4_fast();
+    for (int index = 0; index < attributes_count; index++) {
+        u2 field_attribute_name_index = cfs->get_u2_fast();
+        u4 field_attribute_length = cfs->get_u4_fast();
 
-    Symbol* attribute_name = _cp->symbol_at(attribute_name_index);
+        Symbol* field_attribute_name = _cp->symbol_at(field_attribute_name_index);
 
-    AttributeInfo* attribute;
-    if (*attribute_name == JVM_ATTRIBUTE_ConstantValue) {
-        u2 constant_value_index = cfs->get_u2_fast();
+        AttributeInfo *field_attribute = nullptr;
+        if (*field_attribute_name == JVM_ATTRIBUTE_ConstantValue) {
+            u2 constant_value_index = cfs->get_u2_fast();
 
-        attribute = new ConstantValueAttribute(attribute_name_index, attribute_length,constant_value_index);
+            ConstantValueAttribute* constant_value_attribute = new ConstantValueAttribute(field_attribute_name_index, field_attribute_length,constant_value_index);
 
-        INFO_PRINT("Filed Attributes, type: ConstantValue, constant_value_index: %X，", constant_value_index);
+            field_attribute = constant_value_attribute;
+            INFO_PRINT("Filed Attribute, 第%d项，type: ConstantValue, constant_value_index: %X，", index, constant_value_index);
+        }
+
+        filed_info->put_attribute(field_attribute_name, field_attribute);
+    }
+}
+
+Array<Method*>* ClassFileParser::parse_methods(int length) {
+    INFO_PRINT("parse methods");
+    if (length == 0)
+        return new Array<Method*>();
+
+    ClassFileStream* cfs = stream();
+
+    Array<Method*>* methods = new Array<Method*>(length);
+
+    for (int index = 0; index < length; index++) {
+        u2 access_flag = cfs->get_u2_fast();
+        u2 name_index = cfs->get_u2_fast();
+        u2 signature_index = cfs->get_u2_fast();
+        u2 method_attributes_count = cfs->get_u2_fast();
+
+        Method* method = new Method(access_flag, name_index, signature_index, method_attributes_count);
+
+        if (method_attributes_count > 0) {
+            parse_method_attributes(method_attributes_count, method);
+        }
+
+        methods->add(method);
+        INFO_PRINT("Method, 第%d项, name_index: %X，signature_index: %X, attributes_count: %d", index, name_index, signature_index, method_attributes_count);
+    }
+    return methods;
+}
+
+void ClassFileParser::parse_method_attributes(u2 method_attributes_count, Method* method) {
+    ClassFileStream *cfs = stream();
+
+    for (int index = 0; index < method_attributes_count; index++) {
+        u2 method_attribute_name_index = cfs->get_u2_fast();
+        u4 method_attribute_length = cfs->get_u4_fast();
+
+        Symbol* method_attribute_name = _cp->symbol_at(method_attribute_name_index);
+
+        AttributeInfo *method_attribute = nullptr;
+        if (*method_attribute_name == JVM_ATTRIBUTE_Code) {
+            u2 max_stack = cfs->get_u2_fast();
+            u2 max_locals = cfs->get_u2_fast();
+
+            u4 code_length = cfs->get_u4_fast();
+            u1* code_start = cfs->get_u1_buffer();
+            cfs->skip_u1_fast(code_length);
+
+            u2 exception_table_length = cfs->get_u2_fast();
+            Array<ExceptionHandler*>* exception_table = nullptr;
+            if (exception_table_length > 0) {
+                exception_table = parse_exception_table(exception_table_length);
+            }
+
+            u2 code_attributes_count = cfs->get_u2_fast();
+            CodeAttribute* code_attributes = new (code_length) CodeAttribute(method_attribute_name_index, method_attribute_length, exception_table_length, code_attributes_count, max_stack, max_locals, code_length);
+            code_attributes->set_code(code_start);
+
+            // 解析code的属性
+            for (int index = 0; index < code_attributes_count; index++) {
+                u2 code_attribute_name_index = cfs->get_u2_fast();
+                u4 code_attribute_length = cfs->get_u4_fast();
+
+                Symbol* code_attribute_name = _cp->symbol_at(code_attribute_name_index);
+
+                AttributeInfo *code_attribute = nullptr;
+                if (*code_attribute_name == JVM_ATTRIBUTE_LocalVariableTable) {
+
+
+
+//                    code_attribute = ;
+                    INFO_PRINT("Code Attribute, 第%d项, type: LocalVariableTable，", index);
+                }
+                code_attributes->put_attribute(code_attribute_name, code_attribute);
+            }
+            method_attribute = code_attributes;
+            INFO_PRINT("Method Attribute, 第%d项, type: Code，max_stack: %X, max_locals: %X, code_length: %X, exception_table_length: %X, attributes_count: %X", index, max_stack, max_locals, code_length, exception_table_length, code_attributes_count);
+        }
+        method->put_attribute(method_attribute_name, method_attribute);
+    }
+}
+
+Array<ExceptionHandler*>* ClassFileParser::parse_exception_table(u2 exception_table_length) {
+    ClassFileStream *cfs = stream();
+
+    Array<ExceptionHandler*>* exception_table = new Array<ExceptionHandler*>(exception_table_length);
+
+    for (int index = 0; index < exception_table_length; index++) {
+        u2 start_pc = cfs->get_u2_fast();
+        u2 end_pc = cfs->get_u2_fast();
+        u2 handler_pc = cfs->get_u2_fast();
+        u2 catch_type = cfs->get_u2_fast();
+
+        ExceptionHandler* exception_handler = new ExceptionHandler(start_pc, end_pc, handler_pc, catch_type);
+        exception_table->add(exception_handler);
+
+        INFO_PRINT("ExceptionHandler, 第%d项, start_pc: %X，end_pc: %X, handler_pc: %X, catch_type: %X", index, start_pc, end_pc, handler_pc, catch_type);
+
     }
 
-    filed_info->put_attribute(attribute_name, attribute);
+    return exception_table;
 }

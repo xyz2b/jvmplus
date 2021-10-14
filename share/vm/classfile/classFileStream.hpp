@@ -49,15 +49,15 @@ public:
         return res;
     }
 
-    void skip_u1_fast(int length) {
+    void skip_u1_fast(u4 length) {
         _current += length;
     }
 
-    void skip_u2_fast(int length) {
+    void skip_u2_fast(u4 length) {
         _current += 2 * length;
     }
 
-    void skip_u4_fast(int length) {
+    void skip_u4_fast(u4 length) {
         _current += 4 * length;
     }
 };
