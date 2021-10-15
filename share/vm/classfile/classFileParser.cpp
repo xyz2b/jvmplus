@@ -73,6 +73,10 @@ ClassFileParser::parse_class_file(Symbol *name) {
                                                       interfaces_len, local_interfaces, fields_len, fields, methods_len, methods, class_attribute_count, class_attributes);
     InstanceKlassHandle ik (instance_klass);
 
+    for (int index = 0; index < ik->get_methods()->size(); index++) {
+        ik->get_methods()->get_at(index)->set_belong_klass(instance_klass);
+    }
+
     return ik;
 }
 

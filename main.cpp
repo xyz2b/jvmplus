@@ -10,5 +10,7 @@ int main() {
     InstanceKlassHandle instanceKlassHandle = classLoader->load_classfile(s);
     INFO_PRINT("version: %d", instanceKlassHandle->get_major_version());
 
+    u2 major_version = ((InstanceKlass*) instanceKlassHandle->get_methods()->get_at(0)->get_belong_klass())->get_major_version();
+    INFO_PRINT("%d", major_version);
     return 0;
 }

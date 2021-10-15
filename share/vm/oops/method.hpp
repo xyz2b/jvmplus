@@ -12,11 +12,14 @@
 #include "../../../share/vm/utilities/hashFun.hpp"
 #include "../../../share/vm/utilities/hashMap.hpp"
 
+class Klass;
+
 class Method {
 private:
     AccessFlags _access_flags;
     u2 _name_index;
     u2 _signature_index;
+    Klass* _belong_klass;
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* _attributes;
 
 public:
@@ -34,6 +37,9 @@ public:
 
     AttributeInfo* get_attribute(Symbol* name) { return _attributes->get(name); }
     void put_attribute(Symbol* name, AttributeInfo* attribute) { _attributes->put(name, attribute); }
+
+    void set_belong_klass(Klass* klass) { _belong_klass = klass; }
+    Klass* get_belong_klass() { return _belong_klass; }
 };
 
 

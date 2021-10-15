@@ -95,4 +95,5 @@ add_executable(jvmplus main.cpp
         src/memory/memory_cell.cpp
         src/memory/memory_chunk.cpp
         src/memory/memory_pool.cpp
-)
+        include/jni/Handle.h
+        src/jni/Handle.cpp)
