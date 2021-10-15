@@ -3,4 +3,96 @@ project(jvmplus)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(jvmplus main.cpp share/vm/oops/klass.cpp share/vm/oops/klass.hpp share/vm/oops/instanceKlass.cpp share/vm/oops/instanceKlass.hpp share/vm/oops/metadata.cpp share/vm/oops/metadata.hpp share/vm/utilities/globalDefinitions.cpp share/vm/utilities/globalDefinitions.hpp share/vm/utilities/globalDefinitions_gcc.hpp share/vm/utilities/accessFlags.cpp share/vm/utilities/accessFlags.hpp share/vm/utilities/array.hpp share/vm/classfile/classLoader.cpp share/vm/classfile/classLoader.hpp share/vm/runtime/handles.cpp share/vm/runtime/handles.hpp share/vm/oops/method.cpp share/vm/oops/method.hpp share/vm/oops/constantPool.cpp share/vm/oops/constantPool.hpp share/vm/oops/symbol.cpp share/vm/oops/symbol.hpp share/vm/classfile/classFileStream.cpp share/vm/classfile/classFileStream.hpp share/vm/runtime/os.cpp share/vm/runtime/os.hpp share/vm/classfile/classFileParser.cpp share/vm/classfile/classFileParser.hpp share/vm/utilities/ostream.cpp share/vm/utilities/ostream.hpp share/vm/runtime/timer.cpp share/vm/runtime/timer.hpp share/vm/adlc/adlc.cpp share/vm/adlc/adlc.hpp cpu/x86/vm/bytes_x86.hpp os_cpu/linux_x86/vm/bytes_linux_x86.inline.hpp include/common.h share/vm/prims/jvm.h share/vm/utilities/hashFun.hpp share/vm/utilities/hashMap.hpp share/vm/utilities/constantTag.cpp share/vm/utilities/constantTag.hpp share/vm/oops/field.hpp share/vm/oops/attribute.hpp share/vm/oops/constantValueAttribute.hpp share/vm/oops/codeAttribute.hpp share/vm/oops/localVariableTableAttribute.hpp share/vm/oops/lineNumberTableAttribute.hpp share/vm/oops/stackMapTableAttribute.hpp share/vm/oops/exceptionAttribute.h share/vm/oops/sourceFileAttribute.hpp share/vm/oops/bootstrapMethods.hpp share/vm/oops/innerClassAttribute.hpp)
+include_directories(include)
+include_directories(include/gc)
+include_directories(include/gc/interface)
+include_directories(include/jni)
+include_directories(include/memory)
+include_directories("/home/xyzjiao/Desktop/openjdk/build/linux-x86_64-normal-server-release/jdk/include")
+include_directories("/home/xyzjiao/Desktop/openjdk/build/linux-x86_64-normal-server-release/jdk/include/linux")
+
+add_executable(jvmplus main.cpp
+        share/vm/oops/klass.cpp
+        share/vm/oops/klass.hpp
+        share/vm/oops/instanceKlass.cpp
+        share/vm/oops/instanceKlass.hpp
+        share/vm/oops/metadata.cpp
+        share/vm/oops/metadata.hpp
+        share/vm/utilities/globalDefinitions.cpp
+        share/vm/utilities/globalDefinitions.hpp
+        share/vm/utilities/globalDefinitions_gcc.hpp
+        share/vm/utilities/accessFlags.cpp
+        share/vm/utilities/accessFlags.hpp
+        share/vm/utilities/array.hpp
+        share/vm/classfile/classLoader.cpp
+        share/vm/classfile/classLoader.hpp
+        share/vm/runtime/handles.cpp
+        share/vm/runtime/handles.hpp
+        share/vm/oops/method.cpp
+        share/vm/oops/method.hpp
+        share/vm/oops/constantPool.cpp
+        share/vm/oops/constantPool.hpp
+        share/vm/oops/symbol.cpp
+        share/vm/oops/symbol.hpp
+        share/vm/classfile/classFileStream.cpp
+        share/vm/classfile/classFileStream.hpp
+        share/vm/runtime/os.cpp
+        share/vm/runtime/os.hpp
+        share/vm/classfile/classFileParser.cpp
+        share/vm/classfile/classFileParser.hpp
+        share/vm/utilities/ostream.cpp
+        share/vm/utilities/ostream.hpp
+        share/vm/runtime/timer.cpp
+        share/vm/runtime/timer.hpp
+        share/vm/adlc/adlc.cpp
+        share/vm/adlc/adlc.hpp
+        cpu/x86/vm/bytes_x86.hpp
+        os_cpu/linux_x86/vm/bytes_linux_x86.inline.hpp
+        share/vm/prims/jvm.h
+        share/vm/utilities/hashFun.hpp
+        share/vm/utilities/hashMap.hpp
+        share/vm/utilities/constantTag.cpp
+        share/vm/utilities/constantTag.hpp
+        share/vm/oops/field.hpp
+        share/vm/oops/attribute.hpp
+        share/vm/oops/constantValueAttribute.hpp
+        share/vm/oops/codeAttribute.hpp
+        share/vm/oops/localVariableTableAttribute.hpp
+        share/vm/oops/lineNumberTableAttribute.hpp
+        share/vm/oops/stackMapTableAttribute.hpp
+        share/vm/oops/exceptionAttribute.h
+        share/vm/oops/sourceFileAttribute.hpp
+        share/vm/oops/bootstrapMethods.hpp
+        share/vm/oops/innerClassAttribute.hpp
+
+        include/gc/interface/garbage_collect.h
+        include/gc/gc_factory.h
+        include/gc/mark_clean.h
+        include/gc/mark_compact.h
+        include/gc/mark_copy.h
+        include/jni/JniTools.h
+        include/jni/org_xyz_jvm_example_jni_HelloWorld.h
+        include/jni/org_xyz_jvm_example_jni_JavaThread.h
+        include/jni/org_xyz_jvm_jdk_classes_sun_misc_Unsafe.h
+        include/jni/org_xyz_jvm_jdk_Threads.h
+        include/jni/org_xyz_jvm_example_jni_Hashmap.h
+        include/jni/Hashmap.h
+        include/memory/memory_cell.h
+        include/memory/memory_chunk.h
+        include/memory/memory_pool.h
+        include/common.h
+        src/gc/gc_factory.cpp
+        src/gc/mark_clean.cpp
+        src/gc/mark_compact.cpp
+        src/gc/mark_copy.cpp
+        src/jni/JniTools.cpp
+        src/jni/org_xyz_jvm_example_jni_HelloWorld.cpp
+        src/jni/org_xyz_jvm_example_jni_JavaThread.cpp
+        src/jni/org_xyz_jvm_jdk_classes_sun_misc_Unsafe.cpp
+        src/jni/org_xyz_jvm_jdk_Threads.cpp
+        src/jni/Hashmap.cpp
+        src/jni/org_xyz_jvm_example_jni_Hashmap.cpp
+        src/memory/memory_cell.cpp
+        src/memory/memory_chunk.cpp
+        src/memory/memory_pool.cpp
+)
