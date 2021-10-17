@@ -6,8 +6,9 @@
 #define JVMPLUS_METADATA_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
+#include "../../../share/vm/memory/alloction.hpp"
 
-class Metadata {
+class Metadata : public MetaspaceObj {
 
 };
 

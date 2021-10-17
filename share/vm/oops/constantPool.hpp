@@ -65,6 +65,10 @@ public:
         return s;
     }
 
+    void* allocate_memory(int length) {
+
+    }
+
     void set_klass(Klass* klass) { _klass = klass; }
 
     ConstantTag tag_at(u2 index) const {

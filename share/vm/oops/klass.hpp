@@ -6,8 +6,9 @@
 #define JVMPLUS_KLASS_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
+#include "../../../share/vm/oops/metadata.hpp"
 
-class Klass {
+class Klass : public Metadata {
 
 };
 

@@ -8,6 +8,7 @@
 #include <jni.h>
 #include "../../share/vm/oops/klass.hpp"
 #include "../../share/vm/oops/method.hpp"
+#include "../../share/vm/oops/oopsHierachy.hpp"
 
 class Handle {
 public:
@@ -19,9 +20,11 @@ public:
 public:
     static jobject klassToHandle(JNIEnv* env, Klass* klass);
     static jobject methodToHandle(JNIEnv* env, Method* method);
+    static jobject oopToHandle(JNIEnv *env, oop o);
 
-    static Klass* klass(JNIEnv* env, jobject klass_handle);
-    static Method* method(JNIEnv* env, jobject method_handle);
+    static Klass* handleToKlass(JNIEnv* env, jobject klass_handle);
+    static Method* handleToMethod(JNIEnv* env, jobject method_handle);
+    static oop handleToOop(JNIEnv* env, jobject oop_handle);
 };
 
 #endif //JVMPLUS_HANDLE_H

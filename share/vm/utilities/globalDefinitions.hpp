@@ -17,6 +17,20 @@
 #include <byteswap.h>
 
 #include "../../../share/vm/utilities/globalDefinitions_gcc.hpp"
+#include "../../../include/memory/memory_cell.h"
+
+class HeapWord {
+private:
+    MemoryCell* _cell;
+    void* _i;
+public:
+    HeapWord(MemoryCell* p) {
+        _cell = p;
+        _i = _cell->ptr();
+    }
+
+    char* value() {  return (char*)_i; }
+};
 
 template<class T> inline T MIN2(T a, T b)           { return (a < b) ? a : b; }
 

@@ -55,10 +55,41 @@ jobject Handle::methodToHandle(JNIEnv *env, Method *method) {
     return dataToHandle(env, data, HANDLE_TYPE_METHOD);
 }
 
-Klass *Handle::klass(JNIEnv *env, jobject klass_handle) {
-    return nullptr;
+
+jobject Handle::oopToHandle(JNIEnv *env, oop o) {
+    jlong data = reinterpret_cast<jlong>(o);
+
+    return dataToHandle(env, data, HANDLE_TYPE_OOP);
 }
 
-Method *Handle::method(JNIEnv *env, jobject method_handle) {
-    return nullptr;
+template<class T>
+T* handleToData(JNIEnv *env, jobject handle) {
+    char* handle_class_name = "org/xyz/jvm/jdk/classes/Handle";
+
+    jclass java_handle = env->FindClass(handle_class_name);
+    if (nullptr == java_handle) {
+        ERROR_PRINT("不存在的类: %s", handle_class_name);
+        exit(-1);
+    }
+
+    jfieldID p = env->GetFieldID(java_handle, "p", "J");
+    if (nullptr == p) {
+        ERROR_PRINT("该类不存在属性p: %s", handle_class_name);
+        exit(-1);
+    }
+    jlong data = env->GetLongField(handle, p);
+
+    return (T*) data;
+}
+
+Klass *Handle::handleToKlass(JNIEnv *env, jobject klass_handle) {
+    return handleToData<Klass>(env, klass_handle);
+}
+
+Method* Handle::handleToMethod(JNIEnv* env, jobject method_handle) {
+    return handleToData<Method>(env, method_handle);
+}
+
+oop Handle::handleToOop(JNIEnv *env, jobject oop_handle) {
+    return handleToData<oopDesc>(env, oop_handle);
 }

@@ -15,6 +15,8 @@
 #include "../../../share/vm/utilities/hashFun.hpp"
 #include "../../../share/vm/oops/attribute.hpp"
 #include "../../../share/vm/oops/symbol.hpp"
+#include "../../../share/vm/oops/oopsHierachy.hpp"
+#include "../../../share/vm/gc_interface/collectedHeap.hpp"
 
 class InstanceKlass : public Klass {
 private:
@@ -98,6 +100,8 @@ public:
 
     void set_attributes(Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes) { _attributes = attributes; }
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* get_attributes() { return _attributes; }
+
+    instanceOop allocate_instance(size_t size);
 };
 
 
