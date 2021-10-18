@@ -11,7 +11,7 @@
 #include "../../../share/vm/oops/attribute.hpp"
 #include "../../../share/vm/utilities/hashFun.hpp"
 
-class FiledInfo {
+class FiledInfo : public Metadata {
 private:
     AccessFlags _access_flags;
     u2 _name_index;

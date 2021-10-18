@@ -8,7 +8,7 @@
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/oops/attribute.hpp"
 
-class SourceFileAttribute : public AttributeInfo{
+class SourceFileAttribute : public AttributeInfo {
 private:
     u2 _source_file_index;
 public:

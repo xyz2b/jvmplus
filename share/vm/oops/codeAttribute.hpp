@@ -9,7 +9,7 @@
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/utilities/array.hpp"
 
-class ExceptionHandler {
+class ExceptionHandler : public Metadata {
 private:
     u2 _start_pc;
     u2 _end_pc;

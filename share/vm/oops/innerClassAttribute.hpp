@@ -10,7 +10,7 @@
 #include "../../../share/vm/utilities/array.hpp"
 #include "../../../share/vm/utilities/accessFlags.hpp"
 
-class InnerClass {
+class InnerClass : public Metadata {
 private:
     u2 _inner_class_info_index;
     u2 _outer_class_info_index;

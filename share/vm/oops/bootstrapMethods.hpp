@@ -9,7 +9,7 @@
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/utilities/array.hpp"
 
-class BootstrapMethod {
+class BootstrapMethod : public Metadata {
 private:
     u2 _bootstrap_method_ref;
     u2 _num_of_bootstrap_arguments;

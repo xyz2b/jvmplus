@@ -9,7 +9,7 @@
 #include "../../../share/vm/utilities/array.hpp"
 #include "../../../share/vm/oops/attribute.hpp"
 
-class LocalVariable {
+class LocalVariable : public Metadata {
 private:
     u2 _start_pc;
     u2 _length;
