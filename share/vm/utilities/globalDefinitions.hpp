@@ -32,6 +32,19 @@ public:
     char* value() {  return (char*)_i; }
 };
 
+class MetaWord {
+private:
+    MemoryCell* _cell;
+    void* _i;
+public:
+    MetaWord(MemoryCell* p) {
+        _cell = p;
+        _i = _cell->ptr();
+    }
+
+    char* value() {  return (char*)_i; }
+};
+
 template<class T> inline T MIN2(T a, T b)           { return (a < b) ? a : b; }
 
 typedef jubyte  u1;
@@ -52,7 +65,7 @@ typedef jlong   s8;
 typedef u_char* address;
 
 
-#include "../../../share/vm/utilities/array.hpp"
+#include "../../../share/vm/prims/jvm.h"
 #include "../../../include/common.h"
 
 

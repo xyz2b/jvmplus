@@ -6,7 +6,7 @@
 #define JVMPLUS_ARRAY_HPP
 #include <stdlib.h>
 #include <cstring>
-#include "constantTag.hpp"
+#include "../../../share/vm/memory/alloction.hpp"
 
 template <typename T>
 class Array {
@@ -14,9 +14,15 @@ private:
     const size_t initCapacity = 7;
 
     size_t     _size;        // the number of array elements
-    T*         _data;       // the array memory
     size_t     _capacity;
+    T         _data[0];       // the array memory
+
 public:
+    void* operator new (size_t size, size_t length) {
+        return Metaspace::allocate(size + length * sizeof(T))->value();
+    }
+    void operator delete(void* p) {}
+
     Array();
     ~Array();
     Array(size_t capacity);
@@ -32,6 +38,7 @@ public:
     void set_at(size_t index, T value);
     bool empty() { return _size == 0; }
     size_t size() { return _size; }
+    size_t capacity() { return _capacity; }
 
     void insertLast(T value);
     void insertFirst(T value);
@@ -44,9 +51,14 @@ private:
     const size_t initCapacity = 7;
 
     size_t     _size;        // the number of array elements
-    T**         _data;       // the array memory
     size_t     _capacity;
+    T*         _data[0];       // the array memory
 public:
+    void* operator new (size_t size, size_t length) {
+        return Metaspace::allocate(size + length * sizeof(T*))->value();
+    }
+    void operator delete(void* p) {}
+
     Array();
     ~Array();
     Array(size_t capacity);
@@ -62,6 +74,7 @@ public:
     void set_at(size_t index, T* value);
     bool empty() { return _size == 0; }
     size_t size() { return _size; }
+    size_t capacity() { return _capacity; }
 
     void insertLast(T* value);
     void insertFirst(T* value);
@@ -69,21 +82,15 @@ public:
 
 template<typename T>
 Array<T>::Array(): _size(0), _capacity(initCapacity) {
-    _data = new T[initCapacity];
 }
 
 template<typename T>
 Array<T>::~Array() {
-    if(_data != nullptr) {
-        delete [] _data;
-        _data = nullptr;
-    }
+
 }
 
 template<typename T>
 Array<T>::Array(const Array<T> *array) {
-    _data = new T[array->_size];
-
     for (int i = 0; i < array->_size; ++i) {
         *(_data + i) = array->get(i);
     }
@@ -107,7 +114,6 @@ Array<T> * Array<T>::operator=(const Array<T> *array) {
 
 template<typename T>
 Array<T>::Array(size_t capacity): _size(0), _capacity(capacity) {
-    _data = new T[capacity];
 }
 
 template<typename T>
@@ -116,8 +122,8 @@ void Array<T>::insert(size_t index, T value) {
         // index索引非法
         exit(-1);
 
-    if (_size == _capacity)
-        resize(2 * _capacity);
+//    if (_size == _capacity)
+//        resize(2 * _capacity);
 
     *(_data + index) = value;
 
@@ -125,21 +131,21 @@ void Array<T>::insert(size_t index, T value) {
 
 }
 
-template<typename T>
-void Array<T>::resize(size_t newCapacity) {
-    T* newArray = new T[newCapacity];
-
-//    memcpy(newArray, _data, (_capacity) * sizeof(T));
-
-    for (int i = 0 ; i < _capacity ; ++i) {
-        *(newArray + i) = *(_data + i);
-    }
-
-    delete [] _data;
-
-    _data = newArray;
-    _capacity = newCapacity;
-}
+//template<typename T>
+//void Array<T>::resize(size_t newCapacity) {
+//    T* newArray = new T[newCapacity];
+//
+////    memcpy(newArray, _data, (_capacity) * sizeof(T));
+//
+//    for (int i = 0 ; i < _capacity ; ++i) {
+//        *(newArray + i) = *(_data + i);
+//    }
+//
+//    delete [] _data;
+//
+//    _data = newArray;
+//    _capacity = newCapacity;
+//}
 
 
 template<typename T>
@@ -173,8 +179,8 @@ T Array<T>::remove(size_t index) {
 
     _size--;
 
-    if (_size == _capacity / 4 && _capacity /2 != 0)
-        resize(_capacity / 2);
+//    if (_size == _capacity / 4 && _capacity /2 != 0)
+//        resize(_capacity / 2);
 
     return ret;
 }
@@ -197,6 +203,7 @@ void Array<T>::add(T value) {
 template<typename T>
 void Array<T>::set_at(size_t index, T value) {
     *(_data + index) = value;
+    _size++;
 }
 
 template<typename T>
@@ -214,20 +221,15 @@ void Array<T>::insertFirst(T value) {
 
 template<typename T>
 Array<T*>::Array(): _size(0), _capacity(initCapacity) {
-    _data = new T*[initCapacity];
 }
 
 template<typename T>
 Array<T*>::~Array() {
-    if(_data != nullptr) {
-        delete [] _data;
-        _data = nullptr;
-    }
+
 }
 
 template<typename T>
 Array<T*>::Array(const Array<T*> *array) {
-    _data = new T*[array->_size];
 
     for (int i = 0; i < array->_size; ++i) {
         *(_data + i) = array->get(i);
@@ -252,7 +254,6 @@ Array<T*> * Array<T*>::operator=(const Array<T*> *array) {
 
 template<typename T>
 Array<T*>::Array(size_t capacity): _size(0), _capacity(capacity) {
-    _data = new T*[capacity];
 }
 
 template<typename T>
@@ -261,8 +262,8 @@ void Array<T*>::insert(size_t index, T* value) {
         // index索引非法
         exit(-1);
 
-    if (_size == _capacity)
-        resize(2 * _capacity);
+//    if (_size == _capacity)
+//        resize(2 * _capacity);
 
     *(_data + index) = value;
 
@@ -270,21 +271,21 @@ void Array<T*>::insert(size_t index, T* value) {
 
 }
 
-template<typename T>
-void Array<T*>::resize(size_t newCapacity) {
-    T** newArray = new T*[newCapacity];
-
-//    memcpy(newArray, _data, (_capacity) * sizeof(T));
-
-    for (int i = 0 ; i < _capacity ; ++i) {
-        *(newArray + i) = new T(*(*(_data + i)));
-    }
-
-    delete [] _data;
-
-    _data = newArray;
-    _capacity = newCapacity;
-}
+//template<typename T>
+//void Array<T*>::resize(size_t newCapacity) {
+//    T** newArray = new T*[newCapacity];
+//
+////    memcpy(newArray, _data, (_capacity) * sizeof(T));
+//
+//    for (int i = 0 ; i < _capacity ; ++i) {
+//        *(newArray + i) = new T(*(*(_data + i)));
+//    }
+//
+//    delete [] _data;
+//
+//    _data = newArray;
+//    _capacity = newCapacity;
+//}
 
 
 template<typename T>
@@ -320,8 +321,8 @@ T* Array<T*>::remove(size_t index) {
 
     _size--;
 
-    if (_size == _capacity / 4 && _capacity /2 != 0)
-        resize(_capacity / 2);
+//    if (_size == _capacity / 4 && _capacity /2 != 0)
+//        resize(_capacity / 2);
 
     return ret;
 }

@@ -6,16 +6,19 @@
 #define JVMPLUS_ALLOCTION_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
-#include "../../../share/vm/memory/genCollectedHeap.hpp"
+#include "../../../share/vm/adlc/cHeapObj.hpp"
+#include "../../../share/vm/memory/metaspace.hpp"
 
 // JDK* metaspace在直接内存中
-class MetaspaceObj {
-
+class MetaspaceObj : public CHeapObj {
 public:
-    void* operator new (size_t sz);
-    void* operator new(size_t sz, size_t length);
+    void* operator new (size_t size, size_t length) {
+        return Metaspace::allocate(size + length)->value();
+    }
 
-    void operator delete(void* p) { free(p); }
+    void* operator new (size_t size) {
+        return Metaspace::allocate(size)->value();
+    }
 };
 
 

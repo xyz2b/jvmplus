@@ -56,6 +56,16 @@ public:
                   _this_class(this_class), _super_class(super_class), _interfaces_count(interfaces_count), _interfaces(interfaces), _fields_count(fields_count),
                   _fields(fields), _methods_count(methods_count), _methods(methods), _attributes_count(attributes_count), _attributes(attributes) {}
 
+    static InstanceKlass* allocate_instance_klass() {
+        return new InstanceKlass();
+    }
+
+    static InstanceKlass* allocate_instance_klass(u4 magic, u2 minor_version, u2 major_version, ConstantPool* constant_pool, AccessFlags access_flags,
+                                                  u2 this_class, u2 super_class, u2 interfaces_count, Array<u2>* interfaces, u2 fields_count, Array<FiledInfo*>* fields,
+                                                  u2 methods_count, Array<Method*>* methods, u2 attributes_count, Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes) {
+        return new InstanceKlass(magic, minor_version, major_version, constant_pool, access_flags, this_class, super_class, interfaces_count, interfaces, fields_count, fields, methods_count, methods, attributes_count, attributes);
+    }
+
     void set_magic(u4 magic) { _magic = magic; }
     u4 get_magic() { return _magic; }
 

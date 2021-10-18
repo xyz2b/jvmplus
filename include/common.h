@@ -40,7 +40,8 @@ typedef enum {
 #define UseConcMarkSweepGC false
 #define UseAdaptiveSizePolicy false
 
-#define DEFAULT_GC_TYPE GC_MARK_CLEAN
+// gc算法
+#define DEFAULT_GC_TYPE GC_MARK_COPY
 
 /* ==============================
  * customize print

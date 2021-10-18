@@ -69,7 +69,7 @@ ClassFileParser::parse_class_file(Symbol *name) {
     // 类属性列表
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* class_attributes = parse_class_attribute(class_attribute_count);
 
-    InstanceKlass* instance_klass = new InstanceKlass(magic, minion_version, major_version, cp(), access_flags, this_class_index, super_class_index,
+    InstanceKlass* instance_klass = InstanceKlass::allocate_instance_klass(magic, minion_version, major_version, cp(), access_flags, this_class_index, super_class_index,
                                                       interfaces_len, local_interfaces, fields_len, fields, methods_len, methods, class_attribute_count, class_attributes);
     InstanceKlassHandle ik (instance_klass);
 
@@ -87,7 +87,7 @@ ConstantPoolHandle ClassFileParser::parse_constant_pool() {
     u2 length = cfs->get_u2_fast();
     INFO_PRINT("constant pool size: %d", length);
 
-    ConstantPool* constant_pool = new (length) ConstantPool(length);
+    ConstantPool* constant_pool = ConstantPool::allocate(length);
     _cp = constant_pool;
     ConstantPoolHandle cp (constant_pool);
 
@@ -244,10 +244,10 @@ ClassFileParser::~ClassFileParser() {
 Array<u2>* ClassFileParser::parse_interfaces(int length) {
     INFO_PRINT("parse interfaces");
     if (length == 0)
-        return new Array<u2>();
+        return new (0) Array<u2>();
     ClassFileStream* cfs = stream();
 
-    Array<u2>* interfaces_index = new Array<u2>(length);
+    Array<u2>* interfaces_index = new (length) Array<u2>(length);
 
     for (int index = 0; index < length; index++) {
         u2 interface_index = cfs->get_u2_fast();
@@ -263,11 +263,11 @@ Array<u2>* ClassFileParser::parse_interfaces(int length) {
 Array<FiledInfo*>* ClassFileParser::parse_fields(int length) {
     INFO_PRINT("parse fields");
     if (length == 0)
-        return new Array<FiledInfo*>();
+        return new (0) Array<FiledInfo*>();
 
     ClassFileStream* cfs = stream();
 
-    Array<FiledInfo*>* filed_infos = new Array<FiledInfo*>(length);
+    Array<FiledInfo*>* filed_infos = new (length) Array<FiledInfo*>(length);
 
     for (int index = 0; index < length; index++) {
         u2 access_flag = cfs->get_u2_fast();
@@ -315,11 +315,11 @@ void ClassFileParser::parse_field_attributes(u2 attributes_count, FiledInfo* fil
 Array<Method*>* ClassFileParser::parse_methods(int length) {
     INFO_PRINT("parse methods");
     if (length == 0)
-        return new Array<Method*>();
+        return new (0) Array<Method*>();
 
     ClassFileStream* cfs = stream();
 
-    Array<Method*>* methods = new Array<Method*>(length);
+    Array<Method*>* methods = new (length) Array<Method*>(length);
 
     for (int index = 0; index < length; index++) {
         u2 access_flag = cfs->get_u2_fast();
@@ -425,7 +425,7 @@ void ClassFileParser::parse_method_attributes(u2 method_attributes_count, Method
 
             ExceptionAttribute* exception_attribute = new ExceptionAttribute(method_attribute_name_index, method_attribute_length, number_of_exceptions);
 
-            Array<u2>* exception_index_table = new Array<u2>(number_of_exceptions);
+            Array<u2>* exception_index_table = new (number_of_exceptions) Array<u2>(number_of_exceptions);
             for (int i = 0; i < number_of_exceptions; i++) {
                 u2 exception_index = cfs->get_u2_fast();
                 exception_index_table->add(exception_index);
@@ -442,7 +442,7 @@ void ClassFileParser::parse_method_attributes(u2 method_attributes_count, Method
 Array<ExceptionHandler*>* ClassFileParser::parse_exception_table(u2 exception_table_length) {
     ClassFileStream *cfs = stream();
 
-    Array<ExceptionHandler*>* exception_table = new Array<ExceptionHandler*>(exception_table_length);
+    Array<ExceptionHandler*>* exception_table = new (exception_table_length) Array<ExceptionHandler*>(exception_table_length);
 
     for (int index = 0; index < exception_table_length; index++) {
         u2 start_pc = cfs->get_u2_fast();
@@ -463,7 +463,7 @@ Array<ExceptionHandler*>* ClassFileParser::parse_exception_table(u2 exception_ta
 Array<LocalVariable*>* ClassFileParser::parse_local_variable_table(u2 local_variable_table_length) {
     ClassFileStream *cfs = stream();
 
-    Array<LocalVariable*>* local_variable_table = new Array<LocalVariable*>(local_variable_table_length);
+    Array<LocalVariable*>* local_variable_table = new (local_variable_table_length) Array<LocalVariable*>(local_variable_table_length);
 
     for (int index = 0; index < local_variable_table_length; index++) {
         u2 start_pc = cfs->get_u2_fast();
@@ -484,7 +484,7 @@ Array<LocalVariable*>* ClassFileParser::parse_local_variable_table(u2 local_vari
 Array<LineNumber *> *ClassFileParser::parse_line_number_table(u2 line_number_table_length) {
     ClassFileStream *cfs = stream();
 
-    Array<LineNumber*>* line_number_table = new Array<LineNumber*>(line_number_table_length);
+    Array<LineNumber*>* line_number_table = new (line_number_table_length) Array<LineNumber*>(line_number_table_length);
 
     for (int index = 0; index < line_number_table_length; index++) {
         u2 start_pc = cfs->get_u2_fast();
@@ -554,7 +554,7 @@ ClassFileParser::parse_class_attribute(u2 class_attribute_count) {
 Array<BootstrapMethod *> *ClassFileParser::parse_bootstrap_method(u2 number_of_bootstrap_methods) {
     ClassFileStream *cfs = stream();
 
-    Array<BootstrapMethod*>* bootstrap_methods_entry = new Array<BootstrapMethod*>(number_of_bootstrap_methods);
+    Array<BootstrapMethod*>* bootstrap_methods_entry = new (number_of_bootstrap_methods) Array<BootstrapMethod*>(number_of_bootstrap_methods);
 
     for (int index = 0; index < number_of_bootstrap_methods; index++) {
         u2 bootstrap_method_ref = cfs->get_u2_fast();
@@ -562,7 +562,7 @@ Array<BootstrapMethod *> *ClassFileParser::parse_bootstrap_method(u2 number_of_b
 
         Array<u2>* bootstrap_arguments = nullptr;
         if (num_bootstrap_arguments > 0) {
-            bootstrap_arguments = new Array<u2>(num_bootstrap_arguments);
+            bootstrap_arguments = new (num_bootstrap_arguments) Array<u2>(num_bootstrap_arguments);
 
             for (int i = 0; i < num_bootstrap_arguments; i++) {
                 u2 bootstrap_argument = cfs->get_u2_fast();
@@ -585,7 +585,7 @@ Array<BootstrapMethod *> *ClassFileParser::parse_bootstrap_method(u2 number_of_b
 Array<InnerClass *> *ClassFileParser::parse_inner_classes(u2 number_of_classes) {
     ClassFileStream *cfs = stream();
 
-    Array<InnerClass*>* classes = new Array<InnerClass*>(number_of_classes);
+    Array<InnerClass*>* classes = new (number_of_classes) Array<InnerClass*>(number_of_classes);
 
     for (int index = 0; index < number_of_classes; index++) {
         u2 inner_class_info_index = cfs->get_u2_fast();

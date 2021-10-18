@@ -15,7 +15,7 @@
 
 class Symbol;
 
-class ConstantPool {
+class ConstantPool : public Metadata {
 private:
     u2 _length;
     Array<u1>* _tags;
@@ -32,11 +32,11 @@ public:
     Array<u1>* tags() const { return _tags; }
 
     ConstantPool(u2 length) : _length(length) {
-        _tags = new Array<u1>(length);
+        _tags = new (length) Array<u1>(length);
     }
 
     ConstantPool(Klass* klass, u2 length) : _klass(klass), _length(length) {
-        _tags = new Array<u1>(length);
+        _tags = new (length) Array<u1>(length);
     }
 
     /**
@@ -56,17 +56,17 @@ public:
             // 若allocation失败就不执行constructor
         }
      * */
-    void* operator new(size_t sz, int length) {
-        // 申请存放常量池项的内存，指针存储（64位，整数/浮点数可以直接存储在一个指针所占用的空间）
-        // 常量池有多少项就申请多少个指针的内存空间
-        // 同时需要申请存储常量池对象本身字段的内存（sz）
-        char* s = (char *)malloc(sz + length * sizeof(*_pool));
-        memset(s,0, sz + length * sizeof(*_pool));
-        return s;
-    }
+//    void* operator new(size_t sz, int length) {
+//        // 申请存放常量池项的内存，指针存储（64位，整数/浮点数可以直接存储在一个指针所占用的空间）
+//        // 常量池有多少项就申请多少个指针的内存空间
+//        // 同时需要申请存储常量池对象本身字段的内存（sz）
+//        char* s = (char *)malloc(sz + length * sizeof(*_pool));
+//        memset(s,0, sz + length * sizeof(*_pool));
+//        return s;
+//    }
 
-    void* allocate_memory(int length) {
-
+    static ConstantPool* allocate(int length) {
+        return new (length * sizeof(*_pool)) ConstantPool(length);
     }
 
     void set_klass(Klass* klass) { _klass = klass; }
@@ -145,6 +145,7 @@ public:
 
     void method_at_put(int which, int class_index, int name_and_type_index) {
         tag_at_put(which, JVM_CONSTANT_Methodref);
+        INFO_PRINT("base: %p", int_at_adr(which));
         *int_at_adr(which) = ((jint) name_and_type_index << 16) | class_index;
     }
 
@@ -155,6 +156,7 @@ public:
 
     void field_at_put(int which, int class_index, int name_and_type_index) {
         tag_at_put(which, JVM_CONSTANT_Fieldref);
+        INFO_PRINT("base: %p", int_at_adr(which));
         *int_at_adr(which) = ((jint) name_and_type_index << 16) | class_index;
     }
 

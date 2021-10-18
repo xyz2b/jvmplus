@@ -26,6 +26,10 @@ private:
     size_t  _M;
 
 public:
+    void* operator new (size_t size) {
+        return Metaspace::allocate(size)->value();
+    }
+
     Hashmap(size_t M);
     Hashmap();
     ~Hashmap();
@@ -84,7 +88,7 @@ Hashmap<K, V, HashFn>::Hashmap(const Hashmap<K, V> *hashMap) {
 
 template<class K, class V, class HashFn >
 Hashmap<K, V, HashFn>::Hashmap(size_t M): _M(M), _size(0) {
-    _hashtable = new Array<map<K, V>*>(M);
+    _hashtable = new (M) Array<map<K, V>*>(M);
     for (int i = 0 ; i < M ; ++i) {
         _hashtable->insert(i, new map<K, V>());
     }
@@ -161,7 +165,7 @@ bool Hashmap<K, V, HashFn>::contains(K key) {
 
 template<class K, class V, class HashFn>
 void Hashmap<K, V, HashFn>::resize(size_t newM) {
-    Array<map<K, V>*>* newHashTable = new Array<map<K, V>*>(newM);
+    Array<map<K, V>*>* newHashTable = new (newM) Array<map<K, V>*>(newM);
     for (int i = 0 ; i < newM ; ++i) {
         newHashTable->insert(i, new map<K, V>());
     }

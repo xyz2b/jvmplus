@@ -4,6 +4,7 @@
 
 #include "../../include/jni/org_xyz_jvm_jdk_Threads.h"
 #include "../../../share/vm/memory/universe.hpp"
+#include "../../../share/vm/memory/metaspace.hpp"
 
 
 /*
@@ -14,4 +15,5 @@
 JNIEXPORT void JNICALL Java_org_xyz_jvm_jdk_Threads_createVm
         (JNIEnv * env, jclass clazz) {
     Universe::initialize_heap();
+    Metaspace::initialize();
 }
