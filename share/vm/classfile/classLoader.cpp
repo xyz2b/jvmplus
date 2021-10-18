@@ -28,6 +28,9 @@ InstanceKlassHandle ClassLoader::load_classfile(Symbol *h_name) {
         exit(-1);
     }
 
+    delete stream;
+    stream = nullptr;
+
     return h;
 }
 

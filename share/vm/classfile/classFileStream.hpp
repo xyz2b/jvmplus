@@ -18,6 +18,14 @@ private:
 
 public:
     ClassFileStream(u1* buffer, int length, const char* source);
+    ~ClassFileStream() {
+        free(_buffer_start);
+        _buffer_start = nullptr;
+        _buffer_end = nullptr;
+        _current = nullptr;
+        free((void *) _source);
+        _source = nullptr;
+    }
 
     u1* buffer() const           { return _buffer_start; }
     int length() const           { return _buffer_end - _buffer_start; }

@@ -19,6 +19,7 @@ private:
     AccessFlags _access_flags;
     u2 _name_index;
     u2 _signature_index;
+    // Back pointer to the Klass*
     Klass* _belong_klass;
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* _attributes;
 
