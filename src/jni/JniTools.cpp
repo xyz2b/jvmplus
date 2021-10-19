@@ -65,3 +65,4 @@ jobject JniTools::jstringToJavaString(JNIEnv *env, jstring string, jboolean is_c
     // c string --> java string
     return JniTools::charsToJavaString(cstring);
 }
+

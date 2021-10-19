@@ -25,7 +25,7 @@ public:
     }
 
 public:
-    Symbol(const u1* name, int length);
+    Symbol(const char* name, int length);
     void* operator new(size_t sz, int len);
 
     void operator delete (void* p);

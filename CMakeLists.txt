@@ -76,6 +76,7 @@ add_executable(jvmplus main.cpp
         include/jni/org_xyz_jvm_jdk_classes_sun_misc_Unsafe.h
         include/jni/org_xyz_jvm_jdk_Threads.h
         include/jni/org_xyz_jvm_example_jni_Hashmap.h
+        include/jni/org_xyz_jvm_hotspot_src_share_vm_classfile_AppClassLoader.h
         include/jni/Hashmap.h
         include/memory/memory_cell.h
         include/memory/memory_chunk.h
@@ -96,4 +97,4 @@ add_executable(jvmplus main.cpp
         src/memory/memory_chunk.cpp
         src/memory/memory_pool.cpp
         include/jni/Handle.h
-        src/jni/Handle.cpp share/vm/memory/alloction.cpp share/vm/memory/alloction.hpp share/vm/oops/instanceOop.cpp share/vm/oops/instanceOop.hpp share/vm/oops/oopsHierachy.cpp share/vm/oops/oopsHierachy.hpp share/vm/oops/oop.cpp share/vm/oops/oop.hpp share/vm/gc_interface/collectedHeap.cpp share/vm/gc_interface/collectedHeap.hpp share/vm/memory/universe.cpp share/vm/memory/universe.hpp share/vm/memory/markSweepPolicy.cpp share/vm/memory/markSweepPolicy.hpp share/vm/memory/genCollectorPolicy.cpp share/vm/memory/genCollectorPolicy.hpp share/vm/memory/collectorPolicy.cpp share/vm/memory/collectorPolicy.hpp share/vm/adlc/cHeapObj.cpp share/vm/adlc/cHeapObj.hpp share/vm/memory/twoGenerationCollectorPolicy.cpp share/vm/memory/twoGenerationCollectorPolicy.hpp share/vm/memory/sharedHeap.cpp share/vm/memory/sharedHeap.hpp share/vm/memory/genCollectedHeap.cpp share/vm/memory/genCollectedHeap.hpp share/vm/memory/metaspace.cpp share/vm/memory/metaspace.hpp)
+        src/jni/Handle.cpp share/vm/memory/alloction.cpp share/vm/memory/alloction.hpp share/vm/oops/instanceOop.cpp share/vm/oops/instanceOop.hpp share/vm/oops/oopsHierachy.cpp share/vm/oops/oopsHierachy.hpp share/vm/oops/oop.cpp share/vm/oops/oop.hpp share/vm/gc_interface/collectedHeap.cpp share/vm/gc_interface/collectedHeap.hpp share/vm/memory/universe.cpp share/vm/memory/universe.hpp share/vm/memory/markSweepPolicy.cpp share/vm/memory/markSweepPolicy.hpp share/vm/memory/genCollectorPolicy.cpp share/vm/memory/genCollectorPolicy.hpp share/vm/memory/collectorPolicy.cpp share/vm/memory/collectorPolicy.hpp share/vm/adlc/cHeapObj.cpp share/vm/adlc/cHeapObj.hpp share/vm/memory/twoGenerationCollectorPolicy.cpp share/vm/memory/twoGenerationCollectorPolicy.hpp share/vm/memory/sharedHeap.cpp share/vm/memory/sharedHeap.hpp share/vm/memory/genCollectedHeap.cpp share/vm/memory/genCollectedHeap.hpp share/vm/memory/metaspace.cpp share/vm/memory/metaspace.hpp src/jni/org_xyz_jvm_hotspot_src_share_vm_classfile_AppClassLoader.cpp share/vm/classfile/systemDictionary.cpp share/vm/classfile/systemDictionary.h)

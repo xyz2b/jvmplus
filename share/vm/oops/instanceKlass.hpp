@@ -47,7 +47,17 @@ private:
     u2 _attributes_count;
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* _attributes;
 
+    char init_state;
 public:
+    enum ClassState {
+        allocated,
+        loaded,
+        linked,
+        being_initialized,
+        fully_initialized,
+        initialization_error
+    };
+
     InstanceKlass() {}
     InstanceKlass(u4 magic, u2 minor_version, u2 major_version, ConstantPool* constant_pool, AccessFlags access_flags,
                   u2 this_class, u2 super_class, u2 interfaces_count, Array<u2>* interfaces, u2 fields_count, Array<FiledInfo*>* fields,

@@ -4,7 +4,7 @@
 
 #include "symbol.hpp"
 
-Symbol::Symbol(const u1 *name, int length) {
+Symbol::Symbol(const char *name, int length) {
     _length = length;
     for (int i = 0; i < _length; i ++) {
         byte_at_put(i, name[i]);

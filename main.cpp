@@ -5,7 +5,7 @@
 int main() {
 
     const char* file = "/home/xyzjiao/Desktop/project/jvm/target/classes/org/xyz/jvm/example/HelloWorld";
-    Symbol* s = new (strlen(file)) Symbol((u1*)file, strlen(file));
+    Symbol* s = new (strlen(file)) Symbol(file, strlen(file));
 
     // 初始化堆内存以及元空间
     Universe::initialize_heap();

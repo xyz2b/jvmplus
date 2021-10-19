@@ -109,7 +109,7 @@ void ClassFileParser::parse_constant_pool_entries(int length) {
                     u1* utf8_buffer = cfs->get_u1_buffer();
                     cfs->skip_u1_fast(utf8_length);
 
-                    Symbol* s = new (utf8_length) Symbol(utf8_buffer, utf8_length);
+                    Symbol* s = new (utf8_length) Symbol((const char*)utf8_buffer, utf8_length);
 
                     _cp->symbol_at_put(index, s);
 
