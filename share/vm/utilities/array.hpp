@@ -39,6 +39,9 @@ public:
     bool empty() { return _size == 0; }
     size_t size() { return _size; }
     size_t capacity() { return _capacity; }
+    T pop();
+    void push(T);
+    T peek();
 
     void insertLast(T value);
     void insertFirst(T value);
@@ -99,7 +102,7 @@ Array<T>::Array(const Array<T> *array) {
 template<typename T>
 Array<T> * Array<T>::operator=(const Array<T> *array) {
     if (_data != nullptr) {
-        delete [] _data;
+        delete _data;
         _data = nullptr;
     }
 
@@ -133,7 +136,7 @@ void Array<T>::insert(size_t index, T value) {
 
 //template<typename T>
 //void Array<T>::resize(size_t newCapacity) {
-//    T* newArray = new T[newCapacity];
+//    T* newArray = Metaspace::allocate(newCapacity * sizeof(T*))->value();
 //
 ////    memcpy(newArray, _data, (_capacity) * sizeof(T));
 //
@@ -141,7 +144,7 @@ void Array<T>::insert(size_t index, T value) {
 //        *(newArray + i) = *(_data + i);
 //    }
 //
-//    delete [] _data;
+//    delete _data;
 //
 //    _data = newArray;
 //    _capacity = newCapacity;
@@ -160,6 +163,24 @@ T Array<T>::get(size_t index) {
 template<typename T>
 T Array<T>::get_at(size_t index) {
     return *(_data + index);
+}
+
+template<typename T>
+T Array<T>::peek() {
+    return get_at(_size - 1);
+}
+
+template<typename T>
+T Array<T>::pop() {
+    T res = get_at(_size - 1);
+    remove(_size - 1);
+    return res;
+}
+
+
+template<typename T>
+void Array<T>::push(T value) {
+    add(value);
 }
 
 template<typename T>
@@ -196,8 +217,7 @@ void Array<T>::set(size_t index, T value) {
 
 template<typename T>
 void Array<T>::add(T value) {
-    *(_data + _size) = value;
-    _size++;
+    insert(_size, value);
 }
 
 template<typename T>
