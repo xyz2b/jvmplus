@@ -14,7 +14,7 @@ Symbol::Symbol(const char *name, int length) {
 // 将Symbol底层字符串转成C字符串
 char* Symbol::as_C_string() const {
     int len = utf8_length();
-    char* str = (char*) calloc(len + 1, sizeof(char));
+    char* str = (char*) Metaspace::allocate((len + 1) * sizeof(char))->value();
     return as_C_string(str, len + 1);
 }
 

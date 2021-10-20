@@ -29,19 +29,11 @@ public:
     Symbol(const char* name, int length);
 
     bool operator == (const char* s) const {
-        const char* c = this->as_C_string();
-        bool result = (strcmp(c, s) == 0);
-        free((void*)c);
-        return result;
+        return strcmp(this->as_C_string(), s) == 0;
     }
 
     bool operator == (Symbol* s) const {
-        const char* c = this->as_C_string();
-        const char* s_c = s->as_C_string();
-        bool result = (strcmp(c, s_c) == 0);
-        free((void*)c);
-        free((void*)s_c);
-        return result;
+        return strcmp(this->as_C_string(), s->as_C_string()) == 0;
     }
 
     // 获取Symbol底层字符串首字符的地址
