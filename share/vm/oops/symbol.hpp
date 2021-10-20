@@ -31,7 +31,19 @@ public:
     void operator delete (void* p);
 
     bool operator == (const char* s) const {
-        return strcmp(this->as_C_string(), s) == 0;
+        const char* c = this->as_C_string();
+        bool result = (strcmp(c, s) == 0);
+        free((void*)c);
+        return result;
+    }
+
+    bool operator == (Symbol* s) const {
+        const char* c = this->as_C_string();
+        const char* s_c = this->as_C_string();
+        bool result = (strcmp(c, s_c) == 0);
+        free((void*)c);
+        free((void*)s_c);
+        return result;
     }
 
     // 获取Symbol底层字符串首字符的地址

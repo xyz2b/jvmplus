@@ -15,6 +15,22 @@ extern "C" {
 JNIEXPORT jobject JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_loadClassFile
   (JNIEnv *, jclass, jstring);
 
+/*
+ * Class:     org_xyz_jvm_jdk_classes_JniEnv
+ * Method:    getMethodId
+ * Signature: (Lorg/xyz/jvm/jdk/classes/Handle;Ljava/lang/String;Ljava/lang/String;)Lorg/xyz/jvm/jdk/classes/Handle;
+ */
+JNIEXPORT jobject JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_getMethodId
+        (JNIEnv *, jclass, jobject, jstring, jstring);
+
+/*
+ * Class:     org_xyz_jvm_jdk_classes_JniEnv
+ * Method:    callStaticVoidMethod
+ * Signature: (Lorg/xyz/jvm/jdk/classes/Handle;Lorg/xyz/jvm/jdk/classes/Handle;)V
+ */
+JNIEXPORT void JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_callStaticVoidMethod
+        (JNIEnv *, jclass, jobject, jobject);
+
 #ifdef __cplusplus
 }
 #endif

@@ -144,4 +144,6 @@ add_executable(jvmplus main.cpp
         share/vm/runtime/Threads.hpp
         share/vm/runtime/Thread.cpp
         share/vm/runtime/Thread.hpp
-        src/jni/rg_xyz_jvm_jdk_classes_JniEnv.cpp)
+        src/jni/rg_xyz_jvm_jdk_classes_JniEnv.cpp
+        share/vm/prims/JavaNativeInterface.cpp
+        share/vm/prims/JavaNativeInterface.hpp)

@@ -7,6 +7,7 @@
 
 #include <jni.h>
 #include "../../include/common.h"
+#include "../../share/vm/oops/symbol.hpp"
 
 class JniTools {
 public:
@@ -19,7 +20,8 @@ public:
     static string *charsToString(const char *s);
     static jobject charsToJavaString(const char* s);
     static const char *stringToChars(const string &str);
-    static jobject jstringToJavaString(JNIEnv *env, jstring string, jboolean is_copy);
+    static jobject jstringToJavaString(jstring string, jboolean is_copy);
+    static Symbol* jstringToSymbol(jstring string, jboolean is_copy);
 };
 
 

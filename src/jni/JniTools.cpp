@@ -9,7 +9,6 @@ extern JNIEnv* g_env;
 // jstring (jni) --> c string (char *)
 const char *JniTools::getCharsFromJString(jstring str, jboolean is_copy) {
     const char* c = g_env->GetStringUTFChars(str, &is_copy);
-    INFO_PRINT("%s", c);
     return const_cast<char *>(g_env->GetStringUTFChars(str, &is_copy));
 }
 
@@ -61,10 +60,16 @@ jobject JniTools::charsToJavaString(const char* str) {
 }
 
 // jstring（jni）--> java string
-jobject JniTools::jstringToJavaString(JNIEnv *env, jstring string, jboolean is_copy) {
+jobject JniTools::jstringToJavaString(jstring string, jboolean is_copy) {
     // jstring --> c string
     const char* cstring = JniTools::getCharsFromJString(string, is_copy);
     // c string --> java string
     return JniTools::charsToJavaString(cstring);
+}
+
+Symbol *JniTools::jstringToSymbol(jstring string, jboolean is_copy) {
+    const char* c = JniTools::getCharsFromJString(string, is_copy);
+    Symbol* s = new (strlen(c)) Symbol(c, strlen(c));
+    return s;
 }
 

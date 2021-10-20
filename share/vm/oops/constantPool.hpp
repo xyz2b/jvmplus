@@ -93,6 +93,7 @@ public:
         return (intptr_t*) &base()[which];
     }
 
+    // utf8
     Symbol** symbol_at_adr(int which) const {
         assert(is_within_bounds(which), "index out of bounds");
         return (Symbol**) &base()[which];
@@ -118,6 +119,7 @@ public:
         return (jdouble*) &base()[which];
     }
 
+    // utf8
     void symbol_at_put(int which, Symbol* s) {
         tag_at_put(which, JVM_CONSTANT_Utf8);
         *symbol_at_adr(which) = s;
