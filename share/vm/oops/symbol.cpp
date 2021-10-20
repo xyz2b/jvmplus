@@ -30,13 +30,3 @@ char* Symbol::as_C_string(char *buf, int size) const {
     return buf;
 }
 
-// new --> operator new
-void *Symbol::operator new(size_t sz, int len) {
-    char* s = (char *)malloc(sz + len * sizeof(*_body));
-    memset(s,0, sz + len * sizeof(*_body));
-    return s;
-}
-
-void Symbol::operator delete(void *p) {
-
-}

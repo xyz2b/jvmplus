@@ -49,12 +49,6 @@ public:
         _attributes = new Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>(attribute_count);
     }
 
-    void* operator new(size_t sz, int len) {
-        char* s = (char *)malloc(sz + len * sizeof(*_code));
-        memset(s,0, sz + len * sizeof(*_code));
-        return s;
-    }
-
     address code_base() const { return (address) &_code[0]; }
     address code_end() const { return code_base() + code_size(); }
     u4 code_size() const { return _code_length; }

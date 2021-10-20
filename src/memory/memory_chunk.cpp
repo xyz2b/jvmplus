@@ -174,7 +174,7 @@ MemoryCell* MemoryChunk::malloc(uint size) {
 MemoryCell* MemoryChunk::real_malloc(MemoryCell *cell, uint cell_num) {
     // memory start pointer
     pvoid ret = (pvoid)((ulong)get_data() + cell->get_start() * get_align_size());
-    INFO_PRINT("[real malloc memory]data start address=%X, cell_start=%d, ret=%X", get_data(), cell->get_start(), ret);
+    INFO_PRINT("[real malloc memory]data start address=%X, cell_start=%d, ret=%X, cell_size=%d", get_data(), cell->get_start(), ret, cell_num);
 
     // create used cell, add to used table
     MemoryCell* used_cell = new MemoryCell(cell->get_start(), cell_num);

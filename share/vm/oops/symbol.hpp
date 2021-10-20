@@ -7,8 +7,9 @@
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/adlc/adlc.hpp"
+#include "../../../share/vm/memory/alloction.hpp"
 
-class SymbolBase {
+class SymbolBase : public MetaspaceObj {
 public:
     unsigned short  _length;
 };
@@ -26,9 +27,6 @@ public:
 
 public:
     Symbol(const char* name, int length);
-    void* operator new(size_t sz, int len);
-
-    void operator delete (void* p);
 
     bool operator == (const char* s) const {
         const char* c = this->as_C_string();
@@ -39,7 +37,7 @@ public:
 
     bool operator == (Symbol* s) const {
         const char* c = this->as_C_string();
-        const char* s_c = this->as_C_string();
+        const char* s_c = s->as_C_string();
         bool result = (strcmp(c, s_c) == 0);
         free((void*)c);
         free((void*)s_c);

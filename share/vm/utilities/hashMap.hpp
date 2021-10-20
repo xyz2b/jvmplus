@@ -16,7 +16,7 @@ using std::size_t;
 using std::map;
 
 template <class K, class V, class HashFn = HashCode<K>>
-class Hashmap {
+class Hashmap : public MetaspaceObj {
 private:
     const size_t upperTol = 10;
     const size_t lowerTol = 2;
@@ -26,10 +26,6 @@ private:
     size_t  _M;
 
 public:
-    void* operator new (size_t size) {
-        return Metaspace::allocate(size)->value();
-    }
-
     Hashmap(size_t M);
     Hashmap();
     ~Hashmap();
@@ -76,7 +72,7 @@ Hashmap<K, V, HashFn>::~Hashmap() {
 
 template<class K, class V, class HashFn >
 Hashmap<K, V, HashFn>::Hashmap(const Hashmap<K, V> *hashMap) {
-    _hashtable = new Array<map<K, V>*>(hashMap->_M);
+    _hashtable = new (hashMap->_M) Array<map<K, V>*>(hashMap->_M);
     for (int i = 0 ; i < hashMap->_M; ++i) {
         map<K, V>* m = hashMap->get(i);
         for(auto iterator = m->begin(); iterator != m->end(); iterator++) {
@@ -90,13 +86,14 @@ template<class K, class V, class HashFn >
 Hashmap<K, V, HashFn>::Hashmap(size_t M): _M(M), _size(0) {
     _hashtable = new (M) Array<map<K, V>*>(M);
     for (int i = 0 ; i < M ; ++i) {
-        _hashtable->insert(i, new map<K, V>());
+        map<K, V>* _map = new map<K, V>();
+        _hashtable->insert(i, _map);
     }
 }
 
 template<class K, class V, class HashFn >
 Hashmap<K, V, HashFn>::Hashmap(): _M(initCapacity), _size(0) {
-    _hashtable = new Array<map<K, V>*>(initCapacity);
+    _hashtable = new (initCapacity) Array<map<K, V>*>(initCapacity);
     for (int i = 0 ; i < initCapacity ; ++i) {
         _hashtable->insert(i, new map<K, V>());
     }
@@ -114,7 +111,9 @@ size_t Hashmap<K, V, HashFn>::size() {
 
 template<class K, class V, class HashFn>
 void Hashmap<K, V, HashFn>::put(K key, V value) {
-    map<K, V>* m = _hashtable->get(_hash(key));
+    size_t i = _hash(key);
+    map<K, V>* m = _hashtable->get(i);
+
     if (m->find(key) != m->end()) {
         (*m)[key] = value;
     } else {

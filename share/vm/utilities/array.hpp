@@ -9,7 +9,7 @@
 #include "../../../share/vm/memory/alloction.hpp"
 
 template <typename T>
-class Array {
+class Array : public MetaspaceObj {
 private:
     const size_t initCapacity = 7;
 
@@ -49,7 +49,7 @@ public:
 
 // 特化版本，模板类型为指针类型
 template <typename T>
-class Array<T*> {
+class Array<T*> : public MetaspaceObj {
 private:
     const size_t initCapacity = 7;
 
@@ -58,7 +58,7 @@ private:
     T*         _data[0];       // the array memory
 public:
     void* operator new (size_t size, size_t length) {
-        return Metaspace::allocate(size + length * sizeof(T*))->value();
+        return Metaspace::allocate(size + length * sizeof(T))->value();
     }
     void operator delete(void* p) {}
 
@@ -131,7 +131,6 @@ void Array<T>::insert(size_t index, T value) {
     *(_data + index) = value;
 
     _size++;
-
 }
 
 //template<typename T>

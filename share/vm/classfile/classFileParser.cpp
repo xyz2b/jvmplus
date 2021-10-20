@@ -404,7 +404,6 @@ void ClassFileParser::parse_method_attributes(u2 method_attributes_count, Method
                     line_number_table_attribute->set_line_number_table(line_number_table);
 
                     code_attribute = line_number_table_attribute;
-
                     INFO_PRINT("Code Attribute, 第%d项, type: LineNumberTable，local_variable_table_length: %X", i, line_number_table_length);
                 } else if (*code_attribute_name == JVM_ATTRIBUTE_StackMapTable) {
                     // 该属性直接跳过，不做解析
