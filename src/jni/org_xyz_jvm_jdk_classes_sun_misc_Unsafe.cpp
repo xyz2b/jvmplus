@@ -2,7 +2,7 @@
 // Created by xyzjiao on 8/2/21.
 //
 #include "../../include/jni/org_xyz_jvm_jdk_classes_sun_misc_Unsafe.h"
-#include "../../../share/vm/memory/universe.hpp"
+#include "../../share/vm/memory/universe.hpp"
 
 /*
  * Class:     org_xyz_jvm_jdk_classes_sun_misc_Unsafe

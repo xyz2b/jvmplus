@@ -131,7 +131,7 @@ void ClassFileParser::parse_constant_pool_entries(int length) {
                     // 因为long在常量池中占两个槽位，上面解析是一次解析完成的，所以之后需要将遍历索引自增1
                     index++;
 
-                    INFO_PRINT("ConstantPool, 第%d项, 类型: Long, 值: %ld", index, _cp->long_at(index));
+                    INFO_PRINT("ConstantPool, 第%d项, 类型: Long, 值: %ld", index-1, _cp->long_at(index-1));
                 }
             case JVM_CONSTANT_Float:
                 {
@@ -149,7 +149,7 @@ void ClassFileParser::parse_constant_pool_entries(int length) {
                     // 因为double在常量池中占两个槽位，上面解析是一次解析完成的，所以之后需要将遍历索引自增1
                     index++;
 
-                    INFO_PRINT("ConstantPool, 第%d项, 类型: Double, 值: %lf", index, _cp->double_at(index));
+                    INFO_PRINT("ConstantPool, 第%d项, 类型: Double, 值: %lf", index-1, _cp->double_at(index-1));
                 }
                 break;
             case JVM_CONSTANT_Methodref:

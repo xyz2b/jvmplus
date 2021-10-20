@@ -9,7 +9,7 @@
 #include "../../../share/vm/memory/genCollectorPolicy.hpp"
 #include "../../../include/memory/memory_chunk.h"
 #include "../../../include/memory/memory_pool.h"
-#include "../.././include/gc/gc_factory.h"
+#include "../../../include/gc/gc_factory.h"
 
 class GenCollectedHeap : public SharedHeap {
 protected:

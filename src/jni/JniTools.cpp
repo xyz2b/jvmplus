@@ -8,6 +8,8 @@ extern JNIEnv* g_env;
 
 // jstring (jni) --> c string (char *)
 const char *JniTools::getCharsFromJString(jstring str, jboolean is_copy) {
+    const char* c = g_env->GetStringUTFChars(str, &is_copy);
+    INFO_PRINT("%s", c);
     return const_cast<char *>(g_env->GetStringUTFChars(str, &is_copy));
 }
 

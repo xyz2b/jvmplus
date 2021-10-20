@@ -7,8 +7,6 @@
 #include "../../include/jni/JniTools.h"
 #include "../../include/jni/Hashmap.h"
 
-JNIEnv* g_env;
-
 /*
  * Class:     org_xyz_jvm_example_jni_Hashmap
  * Method:    createHashmap
@@ -16,7 +14,6 @@ JNIEnv* g_env;
  */
 JNIEXPORT jobject JNICALL Java_org_xyz_jvm_example_jni_Hashmap_createHashmap
         (JNIEnv *env, jclass clz) {
-    g_env = env;
 
     Hashmap::initialize();
 

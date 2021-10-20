@@ -74,9 +74,10 @@ add_executable(jvmplus main.cpp
         include/jni/org_xyz_jvm_example_jni_HelloWorld.h
         include/jni/org_xyz_jvm_example_jni_JavaThread.h
         include/jni/org_xyz_jvm_jdk_classes_sun_misc_Unsafe.h
-        include/jni/org_xyz_jvm_jdk_Threads.h
+        include/jni/org_xyz_jvm_jdk_classes_Threads.h
         include/jni/org_xyz_jvm_example_jni_Hashmap.h
-        include/jni/org_xyz_jvm_hotspot_src_share_vm_classfile_AppClassLoader.h
+        include/jni/org_xyz_jvm_jdk_classes_sun_misc_AppClassLoader.h
+        include/jni/org_xyz_jvm_jdk_classes_JniEnv.h
         include/jni/Hashmap.h
         include/memory/memory_cell.h
         include/memory/memory_chunk.h
@@ -90,11 +91,57 @@ add_executable(jvmplus main.cpp
         src/jni/org_xyz_jvm_example_jni_HelloWorld.cpp
         src/jni/org_xyz_jvm_example_jni_JavaThread.cpp
         src/jni/org_xyz_jvm_jdk_classes_sun_misc_Unsafe.cpp
-        src/jni/org_xyz_jvm_jdk_Threads.cpp
+        src/jni/org_xyz_jvm_jdk_classes_Threads.cpp
         src/jni/Hashmap.cpp
         src/jni/org_xyz_jvm_example_jni_Hashmap.cpp
         src/memory/memory_cell.cpp
         src/memory/memory_chunk.cpp
         src/memory/memory_pool.cpp
         include/jni/Handle.h
-        src/jni/Handle.cpp share/vm/memory/alloction.cpp share/vm/memory/alloction.hpp share/vm/oops/instanceOop.cpp share/vm/oops/instanceOop.hpp share/vm/oops/oopsHierachy.cpp share/vm/oops/oopsHierachy.hpp share/vm/oops/oop.cpp share/vm/oops/oop.hpp share/vm/gc_interface/collectedHeap.cpp share/vm/gc_interface/collectedHeap.hpp share/vm/memory/universe.cpp share/vm/memory/universe.hpp share/vm/memory/markSweepPolicy.cpp share/vm/memory/markSweepPolicy.hpp share/vm/memory/genCollectorPolicy.cpp share/vm/memory/genCollectorPolicy.hpp share/vm/memory/collectorPolicy.cpp share/vm/memory/collectorPolicy.hpp share/vm/adlc/cHeapObj.cpp share/vm/adlc/cHeapObj.hpp share/vm/memory/twoGenerationCollectorPolicy.cpp share/vm/memory/twoGenerationCollectorPolicy.hpp share/vm/memory/sharedHeap.cpp share/vm/memory/sharedHeap.hpp share/vm/memory/genCollectedHeap.cpp share/vm/memory/genCollectedHeap.hpp share/vm/memory/metaspace.cpp share/vm/memory/metaspace.hpp src/jni/org_xyz_jvm_hotspot_src_share_vm_classfile_AppClassLoader.cpp share/vm/classfile/systemDictionary.cpp share/vm/classfile/systemDictionary.h share/vm/runtime/stackValue.cpp share/vm/runtime/stackValue.hpp share/vm/interpreter/bytecodeInterpreter.cpp share/vm/interpreter/bytecodeInterpreter.hpp share/vm/runtime/javaThread.cpp share/vm/runtime/javaThread.hpp share/vm/interpreter/baseBytecodeStream.cpp share/vm/interpreter/baseBytecodeStream.hpp share/vm/runtime/javaVFrame.cpp share/vm/runtime/javaVFrame.hpp share/vm/runtime/VFrame.cpp share/vm/runtime/VFrame.hpp share/vm/runtime/Threads.cpp share/vm/runtime/Threads.hpp share/vm/runtime/Thread.cpp share/vm/runtime/Thread.hpp)
+        src/jni/Handle.cpp share/vm/memory/alloction.cpp
+        share/vm/memory/alloction.hpp
+        share/vm/oops/instanceOop.cpp
+        share/vm/oops/instanceOop.hpp
+        share/vm/oops/oopsHierachy.cpp
+        share/vm/oops/oopsHierachy.hpp
+        share/vm/oops/oop.cpp
+        share/vm/oops/oop.hpp
+        share/vm/gc_interface/collectedHeap.cpp
+        share/vm/gc_interface/collectedHeap.hpp
+        share/vm/memory/universe.cpp
+        share/vm/memory/universe.hpp
+        share/vm/memory/markSweepPolicy.cpp
+        share/vm/memory/markSweepPolicy.hpp
+        share/vm/memory/genCollectorPolicy.cpp
+        share/vm/memory/genCollectorPolicy.hpp
+        share/vm/memory/collectorPolicy.cpp
+        share/vm/memory/collectorPolicy.hpp
+        share/vm/adlc/cHeapObj.cpp
+        share/vm/adlc/cHeapObj.hpp
+        share/vm/memory/twoGenerationCollectorPolicy.cpp
+        share/vm/memory/twoGenerationCollectorPolicy.hpp
+        share/vm/memory/sharedHeap.cpp
+        share/vm/memory/sharedHeap.hpp
+        share/vm/memory/genCollectedHeap.cpp
+        share/vm/memory/genCollectedHeap.hpp
+        share/vm/memory/metaspace.cpp
+        share/vm/memory/metaspace.hpp
+        share/vm/classfile/systemDictionary.cpp
+        share/vm/classfile/systemDictionary.h
+        share/vm/runtime/stackValue.cpp
+        share/vm/runtime/stackValue.hpp
+        share/vm/interpreter/bytecodeInterpreter.cpp
+        share/vm/interpreter/bytecodeInterpreter.hpp
+        share/vm/runtime/javaThread.cpp
+        share/vm/runtime/javaThread.hpp
+        share/vm/interpreter/baseBytecodeStream.cpp
+        share/vm/interpreter/baseBytecodeStream.hpp
+        share/vm/runtime/javaVFrame.cpp
+        share/vm/runtime/javaVFrame.hpp
+        share/vm/runtime/VFrame.cpp
+        share/vm/runtime/VFrame.hpp
+        share/vm/runtime/Threads.cpp
+        share/vm/runtime/Threads.hpp
+        share/vm/runtime/Thread.cpp
+        share/vm/runtime/Thread.hpp
+        src/jni/rg_xyz_jvm_jdk_classes_JniEnv.cpp)

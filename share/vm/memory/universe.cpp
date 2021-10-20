@@ -8,7 +8,7 @@
 CollectedHeap*  Universe::_collectedHeap = NULL;
 
 void Universe::initialize_heap() {
-    INFO_PRINT("initialize_heap\n");
+    INFO_PRINT("initialize_heap");
 
     if (UseParallelGC) {
 
