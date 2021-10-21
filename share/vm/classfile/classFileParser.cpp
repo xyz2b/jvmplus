@@ -52,8 +52,10 @@ ClassFileParser::parse_class_file(Symbol *name) {
     u2 fields_len = cfs->get_u2_fast();
     INFO_PRINT("fields length: %d", fields_len);
 
+    int static_filed_count = 0;
     // 字段列表
-    Array<FiledInfo*>* fields = parse_fields(fields_len);
+    Array<FiledInfo*>* fields = parse_fields(fields_len, &static_filed_count);
+    INFO_PRINT("static field count: %d", static_filed_count);
 
     // 成员方法数量
     u2 methods_len = cfs->get_u2_fast();
@@ -70,7 +72,7 @@ ClassFileParser::parse_class_file(Symbol *name) {
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* class_attributes = parse_class_attribute(class_attribute_count);
 
     InstanceKlass* instance_klass = InstanceKlass::allocate_instance_klass(magic, minion_version, major_version, cp(), access_flags, this_class_index, super_class_index,
-                                                      interfaces_len, local_interfaces, fields_len, fields, methods_len, methods, class_attribute_count, class_attributes);
+                                                      interfaces_len, local_interfaces, fields_len, fields, methods_len, methods, class_attribute_count, class_attributes, static_filed_count);
     InstanceKlassHandle ik (instance_klass);
 
     for (int index = 0; index < ik->get_methods()->size(); index++) {
@@ -260,7 +262,7 @@ Array<u2>* ClassFileParser::parse_interfaces(int length) {
     return interfaces_index;
 }
 
-Array<FiledInfo*>* ClassFileParser::parse_fields(int length) {
+Array<FiledInfo*>* ClassFileParser::parse_fields(int length, int* static_filed_count) {
     INFO_PRINT("parse fields");
     if (length == 0)
         return new (0) Array<FiledInfo*>();
@@ -275,7 +277,12 @@ Array<FiledInfo*>* ClassFileParser::parse_fields(int length) {
         u2 signature_index = cfs->get_u2_fast();
         u2 field_attributes_count = cfs->get_u2_fast();
 
-        FiledInfo* filed_info = new FiledInfo(access_flag, name_index, signature_index, field_attributes_count);
+        AccessFlags ac = AccessFlags((jint)access_flag);
+        if (ac.is_static()) {
+            (*static_filed_count)++;
+        }
+
+        FiledInfo* filed_info = new FiledInfo(ac, name_index, signature_index, field_attributes_count);
 
         if (field_attributes_count > 0) {
             parse_field_attributes(field_attributes_count, filed_info);

@@ -7,8 +7,12 @@
 
 #include "../../../share/vm/oops/oop.hpp"
 
+class Klass;
+
 class instanceOopDesc : public oopDesc {
 
+public:
+    instanceOopDesc(Klass* klass) : oopDesc(klass) {}
 };
 
 

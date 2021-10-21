@@ -43,20 +43,20 @@ static jobject dataToHandle(JNIEnv* env, jlong data, int data_type) {
 }
 
 
-jobject Handle::klassToHandle(JNIEnv *env, Klass *klass) {
+jobject JniHandle::klassToHandle(JNIEnv *env, Klass *klass) {
     jlong data = reinterpret_cast<jlong>(klass);
 
     return dataToHandle(env, data, HANDLE_TYPE_KLASS);
 }
 
-jobject Handle::methodToHandle(JNIEnv *env, Method *method) {
+jobject JniHandle::methodToHandle(JNIEnv *env, Method *method) {
     jlong data = reinterpret_cast<jlong>(method);
 
     return dataToHandle(env, data, HANDLE_TYPE_METHOD);
 }
 
 
-jobject Handle::oopToHandle(JNIEnv *env, oop o) {
+jobject JniHandle::oopToHandle(JNIEnv *env, oop o) {
     jlong data = reinterpret_cast<jlong>(o);
 
     return dataToHandle(env, data, HANDLE_TYPE_OOP);
@@ -82,14 +82,14 @@ T* handleToData(JNIEnv *env, jobject handle) {
     return (T*) data;
 }
 
-Klass *Handle::handleToKlass(JNIEnv *env, jobject klass_handle) {
+Klass *JniHandle::handleToKlass(JNIEnv *env, jobject klass_handle) {
     return handleToData<Klass>(env, klass_handle);
 }
 
-Method* Handle::handleToMethod(JNIEnv* env, jobject method_handle) {
+Method* JniHandle::handleToMethod(JNIEnv* env, jobject method_handle) {
     return handleToData<Method>(env, method_handle);
 }
 
-oop Handle::handleToOop(JNIEnv *env, jobject oop_handle) {
+oop JniHandle::handleToOop(JNIEnv *env, jobject oop_handle) {
     return handleToData<oopDesc>(env, oop_handle);
 }

@@ -18,18 +18,18 @@ JNIEXPORT jobject JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_loadClassFile
 
     INFO_PRINT("AppClassLoader load klass, %s : %p", name, klass);
 
-    return Handle::klassToHandle(env, klass);
+    return JniHandle::klassToHandle(env, klass);
 }
 
 JNIEXPORT jobject JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_getMethodId
         (JNIEnv *env, jclass clazz, jobject klass_handle, jstring method_name, jstring descriptor_name) {
-    InstanceKlass* instance_klass = (InstanceKlass*) Handle::handleToKlass(env, klass_handle);
+    InstanceKlass* instance_klass = (InstanceKlass*) JniHandle::handleToKlass(env, klass_handle);
     Symbol* method_n = JniTools::jstringToSymbol(method_name, true);
     Symbol* descriptor_n = JniTools::jstringToSymbol(descriptor_name, true);
 
     Method* method = JavaNativeInterface::get_method(instance_klass, method_n, descriptor_n);
 
-    return Handle::methodToHandle(env, method);
+    return JniHandle::methodToHandle(env, method);
 }
 
 /*

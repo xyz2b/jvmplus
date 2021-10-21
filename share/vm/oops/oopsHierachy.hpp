@@ -11,4 +11,10 @@
 typedef class oopDesc*              oop;
 typedef class instanceOopDesc*      instanceOop;
 
+
+template<class T>
+inline T cast_from_oop(oop o) {
+    return (T) ((void*) o);
+}
+
 #endif //JVMPLUS_OOPSHIERACHY_HPP

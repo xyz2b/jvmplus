@@ -10,7 +10,7 @@
 #include "../../share/vm/oops/method.hpp"
 #include "../../share/vm/oops/oopsHierachy.hpp"
 
-class Handle {
+class JniHandle {
 public:
     enum {
         HANDLE_TYPE_KLASS = 1,

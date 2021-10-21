@@ -7,11 +7,32 @@
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/adlc/adlc.hpp"
+#include "../../../share/vm/oops/oopsHierachy.hpp"
+#include "../../../share/vm/oops/klass.hpp"
 
-class Klass;
 class InstanceKlass;
 class Method;
 class ConstantPool;
+
+class Handle {
+private:
+    oop* _handle;
+public:
+    oop obj() const { return _handle == nullptr ? (oop) nullptr : *_handle; }
+    oop non_null_obj() const { assert(_handle != nullptr, "resolving NULL handle"); return *_handle; }
+
+    Handle() { _handle = nullptr; }
+    Handle(oop obj) { _handle = &obj; }
+
+    oop operator() () const { return obj(); }
+    oop operator-> () const { return non_null_obj(); }
+
+    bool operator== (oop o) const { return obj() == o; }
+    bool operator== (const Handle& h) const { return obj() == h.obj(); }
+
+    bool is_null() const { return _handle == NULL; }
+    bool not_null() const { return _handle != NULL; }
+};
 
 class KlassHandle {
     Klass*      _value;

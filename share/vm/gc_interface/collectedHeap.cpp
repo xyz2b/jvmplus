@@ -6,17 +6,18 @@
 #include "../../../share/vm/memory/genCollectedHeap.hpp"
 #include "../../../share/vm/memory/universe.hpp"
 
-oop CollectedHeap::obj_allocate(size_t size) {
-    HeapWord* obj = common_mem_allocate_init(size);
+oop CollectedHeap::obj_allocate(KlassHandle k, size_t size) {
+    HeapWord* obj = common_mem_allocate_init(k, size);
+    post_allocation_setup_obj(k, obj, size);
     return (oop) (obj->value());
 }
 
-HeapWord *CollectedHeap::common_mem_allocate_init(size_t size) {
-    HeapWord* obj = common_mem_allocate_noinit(size);
+HeapWord *CollectedHeap::common_mem_allocate_init(KlassHandle k, size_t size) {
+    HeapWord* obj = common_mem_allocate_noinit(k, size);
     return obj;
 }
 
-HeapWord *CollectedHeap::common_mem_allocate_noinit(size_t size) {
+HeapWord *CollectedHeap::common_mem_allocate_noinit(KlassHandle k, size_t size) {
     HeapWord* result = nullptr;
 
     // TODO: 先尝试从TLAB中分配内存，后面实现
@@ -31,5 +32,17 @@ HeapWord *CollectedHeap::common_mem_allocate_noinit(size_t size) {
     }
 
     return result;
+}
+
+void CollectedHeap::post_allocation_setup_obj(KlassHandle klass, HeapWord *obj, size_t size) {
+    post_allocation_setup_common(klass, obj);
+}
+
+void CollectedHeap::post_allocation_setup_common(KlassHandle klass, HeapWord *obj) {
+    post_allocation_install_obj_klass(klass, oop(obj));
+}
+
+void CollectedHeap::post_allocation_install_obj_klass(KlassHandle klass, oop obj) {
+    obj->set_klass(klass());
 }
 

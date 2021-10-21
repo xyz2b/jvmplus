@@ -9,6 +9,10 @@
 #include "../../../share/vm/adlc/cHeapObj.hpp"
 #include "../../../share/vm/memory/metaspace.hpp"
 
+class AllStatic {
+
+};
+
 // JDK* metaspace在直接内存中
 class MetaspaceObj : public CHeapObj {
 public:

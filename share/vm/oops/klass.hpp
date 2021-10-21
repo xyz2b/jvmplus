@@ -7,9 +7,16 @@
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/oops/metadata.hpp"
+#include "../../../share/vm/oops/oopsHierachy.hpp"
 
 class Klass : public Metadata {
+private:
+    oop _java_mirror;
 
+
+public:
+    oop java_mirror() const { return _java_mirror; }
+    void set_java_mirror(oop m) { _java_mirror = m; }
 };
 
 
