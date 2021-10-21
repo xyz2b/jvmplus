@@ -3,6 +3,7 @@
 //
 
 #include "classFileParser.hpp"
+#include "../../../share/vm/classfile/javaClasses.hpp"
 
 InstanceKlassHandle
 ClassFileParser::parse_class_file(Symbol *name) {
@@ -78,6 +79,9 @@ ClassFileParser::parse_class_file(Symbol *name) {
     for (int index = 0; index < ik->get_methods()->size(); index++) {
         ik->get_methods()->get_at(index)->set_belong_klass(instance_klass);
     }
+
+    // Allocate mirror and initialize static fields
+    java_lang_Class::create_mirror(ik);
 
     return ik;
 }

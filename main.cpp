@@ -27,5 +27,7 @@ int main() {
     Symbol* descriptor_n = new (strlen(descriptor)) Symbol(descriptor, strlen(descriptor));
 
     Method* method_info = JavaNativeInterface::get_method(instanceKlassHandle(), method_n, descriptor_n);
+
+    instanceKlassHandle->java_mirror();
     return 0;
 }

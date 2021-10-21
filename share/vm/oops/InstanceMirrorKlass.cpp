@@ -13,6 +13,6 @@ instanceOop InstanceMirrorKlass::allocate_instance(KlassHandle k) {
 }
 
 int InstanceMirrorKlass::instance_size(KlassHandle k) {
-
-    return sizeof(instanceOopDesc) + ((InstanceKlass*)k())->static_filed_count();
+    // InstanceMirrorKlass storage static fields
+    return sizeof(oopDesc) + ((InstanceKlass*)k())->static_filed_count() * sizeof(void*);
 }

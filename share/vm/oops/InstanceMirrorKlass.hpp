@@ -18,9 +18,9 @@ public:
         return (InstanceMirrorKlass*) k;
     }
 
-
+    //  the start of static fields in InstanceMirrorKlass oop
     static HeapWord* start_of_static_fields(oop obj) {
-
+        return (HeapWord*)(cast_from_oop<intptr_t>(obj) + sizeof(*obj));
     }
 
     int instance_size(KlassHandle k);

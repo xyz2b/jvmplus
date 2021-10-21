@@ -49,10 +49,14 @@ private:
 
     // 静态属性的数量，可以从解析完成的field中判断
     int _static_filed_count;
+    int _static_field_size;
 
     // static fields，一个指针的大小可以存储任何类型的数据（long double 指针），按照常量池那种写法
     void* _static_fields[0];
 public:
+    int static_field_size() const            { return _static_field_size; }
+    void set_static_field_size(int size)     { _static_field_size = size; }
+
     int static_filed_count() { return _static_filed_count; }
     void set_static_filed_count(int count) { _static_filed_count = count; }
 
@@ -72,6 +76,16 @@ public:
     Symbol** symbol_at_adr(int which) const {
         assert(is_within_bounds(which), "index out of bounds");
         return (Symbol**) &static_fields_base()[which];
+    }
+
+    jbyte* byte_at_adr(int which) const {
+        assert(is_within_bounds(which), "index out of bounds");
+        return (jbyte*) &static_fields_base()[which];
+    }
+
+    jshort* short_at_adr(int which) const {
+        assert(is_within_bounds(which), "index out of bounds");
+        return (jshort*) &static_fields_base()[which];
     }
 
     jint* int_at_adr(int which) const {
