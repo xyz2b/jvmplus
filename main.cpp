@@ -2,11 +2,13 @@
 #include "share/vm/oops/symbol.hpp"
 #include "share/vm/memory/universe.hpp"
 #include "share/vm/prims/JavaNativeInterface.hpp"
+#include "share/vm/classfile/systemDictionary.h"
 
 int main() {
     // 初始化堆内存以及元空间
     Universe::initialize_heap();
     Metaspace::initialize();
+    SystemDictionary::set_dictionary(new Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>());
 
     const char* file = "/home/xyzjiao/Desktop/project/jvm/target/classes/org/xyz/jvm/example/HelloWorld";
     Symbol* s = new (strlen(file)) Symbol(file, strlen(file));

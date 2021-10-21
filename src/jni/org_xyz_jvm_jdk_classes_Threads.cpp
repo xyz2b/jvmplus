@@ -5,6 +5,7 @@
 #include "../../include/jni/org_xyz_jvm_jdk_classes_Threads.h"
 #include "../../share/vm/memory/universe.hpp"
 #include "../../share/vm/memory/metaspace.hpp"
+#include "../../share/vm/classfile/systemDictionary.h"
 
 JNIEnv* g_env;
 
@@ -18,4 +19,5 @@ JNIEXPORT void JNICALL Java_org_xyz_jvm_jdk_classes_Threads_createVm
     g_env = env;
     Universe::initialize_heap();
     Metaspace::initialize();
+    SystemDictionary::set_dictionary(new Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>());
 }
