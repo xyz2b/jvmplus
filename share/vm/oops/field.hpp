@@ -25,6 +25,9 @@ public:
         _attributes = new Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>(attributes_count);
     }
 
+    int offset() { return _offset; }
+    void set_offset(int offset) { _offset  = offset; }
+
     AccessFlags access_flags() { return _access_flags; }
     u2 name_index() { return _name_index; }
     u2 signature_index() { return _signature_index; }

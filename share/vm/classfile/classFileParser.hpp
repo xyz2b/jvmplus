@@ -44,7 +44,7 @@ public:
 
     Array<u2>* parse_interfaces(int length);
 
-    Array<FiledInfo*>* parse_fields(int length, int* static_filed_count);
+    Array<FiledInfo*>* parse_fields(int length, int* static_filed_count, int* non_static_field_count);
 
     void parse_field_attributes(u2 attributes_count, FiledInfo* filedInfo);
 

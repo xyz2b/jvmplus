@@ -54,8 +54,9 @@ ClassFileParser::parse_class_file(Symbol *name) {
     INFO_PRINT("fields length: %d", fields_len);
 
     int static_filed_count = 0;
+    int non_static_field_count = 0;
     // 字段列表
-    Array<FiledInfo*>* fields = parse_fields(fields_len, &static_filed_count);
+    Array<FiledInfo*>* fields = parse_fields(fields_len, &static_filed_count, &non_static_field_count);
     INFO_PRINT("static field count: %d", static_filed_count);
 
     // 成员方法数量
@@ -266,7 +267,7 @@ Array<u2>* ClassFileParser::parse_interfaces(int length) {
     return interfaces_index;
 }
 
-Array<FiledInfo*>* ClassFileParser::parse_fields(int length, int* static_filed_count) {
+Array<FiledInfo*>* ClassFileParser::parse_fields(int length, int* static_filed_count, int* non_static_field_count) {
     INFO_PRINT("parse fields");
     if (length == 0)
         return new (0) Array<FiledInfo*>();
@@ -275,6 +276,7 @@ Array<FiledInfo*>* ClassFileParser::parse_fields(int length, int* static_filed_c
 
     Array<FiledInfo*>* filed_infos = new (length) Array<FiledInfo*>(length);
 
+
     for (int index = 0; index < length; index++) {
         u2 access_flag = cfs->get_u2_fast();
         u2 name_index = cfs->get_u2_fast();
@@ -282,11 +284,16 @@ Array<FiledInfo*>* ClassFileParser::parse_fields(int length, int* static_filed_c
         u2 field_attributes_count = cfs->get_u2_fast();
 
         AccessFlags ac = AccessFlags((jint)access_flag);
-        if (ac.is_static()) {
-            (*static_filed_count)++;
-        }
 
         FiledInfo* filed_info = new FiledInfo(ac, name_index, signature_index, field_attributes_count);
+
+        if (ac.is_static()) {
+            filed_info->set_offset((*static_filed_count));
+            (*static_filed_count)++;
+        } else {
+            filed_info->set_offset((*non_static_field_count));
+            (*non_static_field_count)++;
+        }
 
         if (field_attributes_count > 0) {
             parse_field_attributes(field_attributes_count, filed_info);
