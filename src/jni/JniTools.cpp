@@ -73,3 +73,21 @@ Symbol *JniTools::jstringToSymbol(jstring string, jboolean is_copy) {
     return s;
 }
 
+jmethodID JniTools::get_method(const char *class_name, const char *method_name, const char *descriptor_name) {
+    // 获取HashMap类元信息
+    jclass _clazz = g_env->FindClass(class_name);
+    if (nullptr == _clazz) {
+        ERROR_PRINT("获取%s clz出错", class_name)
+        exit(-1);
+    }
+
+    // 获取方法
+    jmethodID _method = g_env->GetMethodID(_clazz, method_name, descriptor_name);
+    if (nullptr == _method) {
+        ERROR_PRINT("获取%s方法出错", method_name);
+        exit(-1);
+    }
+
+    return _method;
+}
+

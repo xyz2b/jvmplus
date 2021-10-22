@@ -144,6 +144,7 @@ V Hashmap<K, V, HashFn>::get(K key) {
     if (m->find(key) != m->end()) {
         return (*m)[key];
     }
+    return nullptr;
 }
 
 template<class K, class V, class HashFn>

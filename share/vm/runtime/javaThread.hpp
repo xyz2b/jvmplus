@@ -30,6 +30,10 @@ public:
         return _stack->top();
     }
 
+    int frame_size() {
+        return _stack->size();
+    }
+
 };
 
 

@@ -30,3 +30,43 @@ char* Symbol::as_C_string(char *buf, int size) const {
     return buf;
 }
 
+bool Symbol::start_with(Symbol *s) {
+    int min = MIN2(this->size(), s->size());
+    for(int index = 0; index < min; index++) {
+        if (this->byte_at(index) != s->byte_at(index))
+            return false;
+    }
+    return true;
+}
+
+bool Symbol::start_with(const char* s) {
+    int min = MIN2(this->size(), (int)strlen(s));
+    for(int index = 0; index < min; index++) {
+        if (this->byte_at(index) != *(s + index))
+            return false;
+    }
+    return true;
+}
+
+Symbol::Symbol(char name) {
+    _length = 1;
+    byte_at_put(0, name);
+}
+
+int Symbol::find_char_index(char c) {
+    for (int i = 0; i < size(); i++) {
+        if (byte_at(i) == c)
+            return i;
+    }
+    return -1;
+}
+
+Symbol *Symbol::sub_symbol(int start, int end) {
+    Symbol* ret = new (end - start) Symbol();
+    ret->set_length(end - start);
+    for (int i = start; i < start; i ++) {
+        ret->byte_at_put(i, this->byte_at(i));
+    }
+    return ret;
+}
+

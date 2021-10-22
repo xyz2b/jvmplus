@@ -11,6 +11,7 @@
 #include "../../../share/vm/oops/attribute.hpp"
 #include "../../../share/vm/utilities/hashFun.hpp"
 #include "../../../share/vm/utilities/hashMap.hpp"
+#include "../../../share/vm/classfile/DescriptorStream.hpp"
 
 class Klass;
 
@@ -19,11 +20,16 @@ private:
     AccessFlags _access_flags;
     u2 _name_index;
     u2 _signature_index;
+    // 方法描述符
+    DescriptorStream* _descriptor;
     // Back pointer to the Klass*
     Klass* _belong_klass;
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* _attributes;
 
 public:
+    DescriptorStream* descriptor() { return _descriptor; }
+    void set_descriptor(DescriptorStream* stream) { _descriptor = stream; }
+
     Method(AccessFlags access_flags, u2 name_index, u2 signature_index, u2 attributes_count) : _access_flags(access_flags), _name_index(name_index), _signature_index(signature_index) {
         _attributes = new Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>(attributes_count);
     }

@@ -7,7 +7,6 @@
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/utilities/array.hpp"
-#include "../../../share/vm/runtime/Thread.hpp"
 #include "../../../share/vm/runtime/javaThread.hpp"
 #include <vector>
 

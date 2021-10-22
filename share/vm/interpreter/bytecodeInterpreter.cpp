@@ -8,6 +8,8 @@
 #include "../../../share/vm/interpreter/baseBytecodeStream.hpp"
 #include "../../../share/vm/runtime/javaVFrame.hpp"
 
+extern JNIEnv* g_env;
+
 void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
     Symbol* c = new (strlen(JVM_ATTRIBUTE_Code)) Symbol(JVM_ATTRIBUTE_Code, strlen(JVM_ATTRIBUTE_Code));
     CodeAttribute* codeAttribute = (CodeAttribute*) method->get_attribute(c);

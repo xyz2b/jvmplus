@@ -74,7 +74,7 @@ ClassFileParser::parse_class_file(Symbol *name) {
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* class_attributes = parse_class_attribute(class_attribute_count);
 
     InstanceKlass* instance_klass = InstanceKlass::allocate_instance_klass(magic, minion_version, major_version, cp(), access_flags, this_class_index, super_class_index,
-                                                      interfaces_len, local_interfaces, fields_len, fields, methods_len, methods, class_attribute_count, class_attributes, static_filed_count);
+                                                      interfaces_len, local_interfaces, fields_len, fields, methods_len, methods, class_attribute_count, class_attributes, static_filed_count, non_static_field_count);
     InstanceKlassHandle ik (instance_klass);
 
     for (int index = 0; index < ik->get_methods()->size(); index++) {
@@ -345,9 +345,14 @@ Array<Method*>* ClassFileParser::parse_methods(int length) {
         u2 signature_index = cfs->get_u2_fast();
         u2 method_attributes_count = cfs->get_u2_fast();
 
+        Symbol* s = _cp->symbol_at(signature_index);
+        // 解析方法描述符
+        DescriptorStream* descriptorStream = new DescriptorStream(s);
+        descriptorStream->parse_method();
         INFO_PRINT("Method, 第%d项, name: %s, name_index: %X，signature_index: %X, attributes_count: %d", index, _cp->symbol_at(name_index)->as_C_string(), name_index, signature_index, method_attributes_count);
 
         Method* method = new Method(access_flag, name_index, signature_index, method_attributes_count);
+        method->set_descriptor(descriptorStream);
 
         if (method_attributes_count > 0) {
             parse_method_attributes(method_attributes_count, method);

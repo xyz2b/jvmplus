@@ -19,9 +19,19 @@ public:
         *_data = v;
     }
 
+    StackValue(BasicType type, int v) {
+        _type = type;
+        *(int*)_data = v;
+    }
+
     StackValue(BasicType type, long v) {
         _type = type;
         *(jlong*)_data = v;
+    }
+
+    StackValue(BasicType type, double v) {
+        _type = type;
+        *(double*)_data = v;
     }
 
     StackValue(BasicType type, jobject v) {

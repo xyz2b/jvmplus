@@ -22,6 +22,8 @@ public:
     static const char *stringToChars(const string &str);
     static jobject jstringToJavaString(jstring string, jboolean is_copy);
     static Symbol* jstringToSymbol(jstring string, jboolean is_copy);
+
+    static jmethodID get_method(const char* class_name, const char* method_name, const char* descriptor_name);
 };
 
 

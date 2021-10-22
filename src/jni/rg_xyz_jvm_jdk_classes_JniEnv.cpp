@@ -40,4 +40,7 @@ JNIEXPORT jobject JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_getMethodId
 JNIEXPORT void JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_callStaticVoidMethod
         (JNIEnv *env, jclass clazz, jobject klass_handle, jobject method_handle) {
 
+    Method* method = JniHandle::handleToMethod(env, method_handle);
+    InstanceKlass* instance_klass = (InstanceKlass*) JniHandle::handleToKlass(env, klass_handle);
+    JavaNativeInterface::call_static_method(instance_klass, method);
 }

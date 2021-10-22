@@ -29,5 +29,9 @@ int main() {
     Method* method_info = JavaNativeInterface::get_method(instanceKlassHandle(), method_n, descriptor_n);
 
     instanceKlassHandle->java_mirror();
+    INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(0)->offset());
+    INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(1)->offset());
+    INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(2)->offset());
+    INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(3)->offset());
     return 0;
 }

@@ -14,7 +14,6 @@ Klass *SystemDictionary::resolve_or_null(Symbol *class_name) {
 
 Klass* SystemDictionary::resolve_instance_class_or_null(Symbol *class_name) {
     Klass* klass = nullptr;
-
     klass = dictionary()->get(class_name);
     if (klass != nullptr) {
         return klass;

@@ -12,6 +12,8 @@
 class SymbolBase : public MetaspaceObj {
 public:
     unsigned short  _length;
+
+    unsigned short set_length(int length) { _length = length; }
 };
 
 // 字符串
@@ -19,14 +21,17 @@ class Symbol : public SymbolBase {
 public:
     jbyte   _body[0];
 
+public:
     // 将字符存到Symbol底层字符串的对应索引位置
     void byte_at_put(int index, int value) {
         assert(index >=0 && index < _length, "symbol index overflow");
         _body[index] = value;
     }
 
-public:
+    Symbol() {}
     Symbol(const char* name, int length);
+
+    Symbol(char name);
 
     bool operator == (const char* s) const {
         return strcmp(this->as_C_string(), s) == 0;
@@ -35,6 +40,10 @@ public:
     bool operator == (Symbol* s) const {
         return strcmp(this->as_C_string(), s->as_C_string()) == 0;
     }
+
+    int find_char_index(char c);
+
+    Symbol* sub_symbol(int start, int end);
 
     // 获取Symbol底层字符串首字符的地址
     const jbyte* base() const { return &_body[0]; }
@@ -55,6 +64,9 @@ public:
         // 获取底层字符串索引为index处的字符
         return base()[index];
     }
+
+    bool start_with(Symbol* s);
+    bool start_with(const char* s);
 
     char* as_utf8() const { return as_C_string(); }
 };

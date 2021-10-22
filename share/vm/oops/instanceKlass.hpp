@@ -51,6 +51,8 @@ private:
     int _static_filed_count;
     int _static_field_size;
 
+    int _non_static_filed_count;
+
     // static fields，一个指针的大小可以存储任何类型的数据（long double 指针），按照常量池那种写法
     void* _static_fields[0];
 public:
@@ -171,10 +173,10 @@ public:
     InstanceKlass() {}
     InstanceKlass(u4 magic, u2 minor_version, u2 major_version, ConstantPool* constant_pool, AccessFlags access_flags,
                   u2 this_class, u2 super_class, u2 interfaces_count, Array<u2>* interfaces, u2 fields_count, Array<FiledInfo*>* fields,
-                  u2 methods_count, Array<Method*>* methods, u2 attributes_count, Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes, int static_filed_count):
+                  u2 methods_count, Array<Method*>* methods, u2 attributes_count, Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes, int static_filed_count, int non_static_filed_count):
                   _magic(magic), _minor_version(minor_version), _major_version(major_version), _constant_pool(constant_pool), _access_flags(access_flags),
                   _this_class(this_class), _super_class(super_class), _interfaces_count(interfaces_count), _interfaces(interfaces), _fields_count(fields_count),
-                  _fields(fields), _methods_count(methods_count), _methods(methods), _attributes_count(attributes_count), _attributes(attributes), _static_filed_count(static_filed_count) {}
+                  _fields(fields), _methods_count(methods_count), _methods(methods), _attributes_count(attributes_count), _attributes(attributes), _static_filed_count(static_filed_count), _non_static_filed_count(non_static_filed_count) {}
 
     static InstanceKlass* allocate_instance_klass() {
         return new InstanceKlass();
@@ -182,10 +184,10 @@ public:
 
     static InstanceKlass* allocate_instance_klass(u4 magic, u2 minor_version, u2 major_version, ConstantPool* constant_pool, AccessFlags access_flags,
                                                   u2 this_class, u2 super_class, u2 interfaces_count, Array<u2>* interfaces, u2 fields_count, Array<FiledInfo*>* fields,
-                                                  u2 methods_count, Array<Method*>* methods, u2 attributes_count, Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes, int static_filed_count) {
+                                                  u2 methods_count, Array<Method*>* methods, u2 attributes_count, Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes, int static_filed_count, int non_static_filed_count) {
 
         size_t extra_memory_size = (fields_count) * sizeof(void*);
-        return new (extra_memory_size) InstanceKlass(magic, minor_version, major_version, constant_pool, access_flags, this_class, super_class, interfaces_count, interfaces, fields_count, fields, methods_count, methods, attributes_count, attributes, static_filed_count);
+        return new (extra_memory_size) InstanceKlass(magic, minor_version, major_version, constant_pool, access_flags, this_class, super_class, interfaces_count, interfaces, fields_count, fields, methods_count, methods, attributes_count, attributes, static_filed_count, non_static_filed_count);
     }
 
     void set_magic(u4 magic) { _magic = magic; }
