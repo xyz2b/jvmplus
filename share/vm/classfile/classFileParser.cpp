@@ -346,8 +346,9 @@ Array<Method*>* ClassFileParser::parse_methods(int length) {
         u2 method_attributes_count = cfs->get_u2_fast();
 
         Symbol* s = _cp->symbol_at(signature_index);
+        Symbol* method_name = _cp->symbol_at(name_index);
         // 解析方法描述符
-        DescriptorStream* descriptorStream = new DescriptorStream(s);
+        DescriptorStream* descriptorStream = new DescriptorStream(s, method_name);
         descriptorStream->parse_method();
         INFO_PRINT("Method, 第%d项, name: %s, name_index: %X，signature_index: %X, attributes_count: %d", index, _cp->symbol_at(name_index)->as_C_string(), name_index, signature_index, method_attributes_count);
 

@@ -31,6 +31,9 @@ private:
     // 解析完的字段类型
     DescriptorInfo* _field;
 
+    // method name
+    Symbol* _method_name;
+
 private:
     DescriptorInfo* parse_short_type();
 
@@ -56,14 +59,15 @@ private:
      * */
     DescriptorInfo* parse_reference_type();
 
+    DescriptorInfo* parse_array_type();
+
 public:
     int method_params_size() { return _method_params_size; }
     vector<DescriptorInfo*>* parameters() { return _parameters; }
 
-    DescriptorStream(Symbol* descriptor_info) {
-        _descriptor_info = descriptor_info;
-    }
+    DescriptorStream(Symbol* descriptor_info, Symbol* method_name) : _descriptor_info(descriptor_info), _method_name(method_name) {}
 
+    DescriptorStream(Symbol* descriptor_info) : _descriptor_info(descriptor_info) {}
     /**
      * 将不同类型的字段值压入操作数栈中
      * */

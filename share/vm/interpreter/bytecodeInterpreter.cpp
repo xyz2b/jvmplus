@@ -33,6 +33,9 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     frame->push_operand_stack(new StackValue(T_OBJECT, nullptr));
                 }
                 break;
+            default:
+                ERROR_PRINT("not bytecode");
+                exit(-1);
         }
     }
 }

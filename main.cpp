@@ -3,6 +3,7 @@
 #include "share/vm/memory/universe.hpp"
 #include "share/vm/prims/JavaNativeInterface.hpp"
 #include "share/vm/classfile/systemDictionary.h"
+#include "../../../share/vm/runtime/Threads.hpp"
 
 int main() {
     // 初始化堆内存以及元空间
@@ -10,9 +11,17 @@ int main() {
     Metaspace::initialize();
     SystemDictionary::set_dictionary(new Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>());
 
+    // 创建线程，此处仅为模拟
+    JavaThread* thread = new JavaThread();
+
+    // 将新创建的线程存放到线程管理器中
+    Threads::set_threads(new Vector<Thread*>());
+    Threads::add_thread(thread);
+    // 设置线程管理器的当前线程
+    Threads::set_current_thread(thread);
+
     const char* file = "/home/xyzjiao/Desktop/project/jvm/target/classes/org/xyz/jvm/example/HelloWorld";
     Symbol* s = new (strlen(file)) Symbol(file, strlen(file));
-
 
     ClassLoader* classLoader = new ClassLoader();
     InstanceKlassHandle instanceKlassHandle = classLoader->load_classfile(s);
@@ -31,7 +40,7 @@ int main() {
     instanceKlassHandle->java_mirror();
     INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(0)->offset());
     INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(1)->offset());
-    INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(2)->offset());
-    INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(3)->offset());
+
+    JavaNativeInterface::call_static_method(instanceKlassHandle(), method_info);
     return 0;
 }

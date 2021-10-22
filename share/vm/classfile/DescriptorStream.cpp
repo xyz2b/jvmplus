@@ -113,6 +113,137 @@ DescriptorInfo* DescriptorStream::parse_reference_type() {
 
 
 /**
+ * 解析数组类型
+ * @return 解析出来的数组类型的信息
+ * */
+DescriptorInfo* DescriptorStream::parse_array_type() {
+    DescriptorInfo* descriptor = new DescriptorInfo();
+    descriptor->set_type(T_ARRAY);
+    descriptor->inc_array_dimension();
+    // 读取索引+1，因为已经解析过一个'['了
+    index++;
+
+    /**
+     * 用于判断是不是数组结尾的flag，如果是数组结尾，就退出遍历描述符字节流
+     * 数据结尾有两种情况
+     * 1.数组元素类型是基本数据类型，那就是最后一个'['之后的一个字符就是数组元素的类型，就到了数组的结尾
+     * 2.数组元素类型是引用类型，那就是最后一个'['之后是'L'，直到';'结束，中间的是数组元素的类型，然后到了';'就到了数组结尾
+     * */
+    bool flag = false;
+    for (; index < strlen(_descriptor); index++) {
+        switch (*(_descriptor + index)) {
+            // 如果'['后面还是'['，数组维度+1
+            case JVM_SIGNATURE_ARRAY: {
+                descriptor->inc_array_dimension();
+                break;
+            }
+                // 如果'['后面是'L'，标识数组元素是应用类型
+            case JVM_SIGNATURE_CLASS: {
+                INFO_PRINT("解析引用类型");
+                DescriptorInfo* ref = parse_reference_type();
+                INFO_PRINT("T_OBJECT: typeDesc: %s", ref->type_desc()->as_C_string());
+                descriptor->set_array_element_type(ref);
+                flag = true;
+                break;
+            }
+                // 如果'['后面是'Z'，标识数组元素是boolean类型
+            case JVM_SIGNATURE_BOOLEAN: {
+                INFO_PRINT("解析boolean类型");
+
+                DescriptorInfo* booleanType = parse_boolean_type();
+                descriptor->set_array_element_type(booleanType);
+
+                flag = true;
+                break;
+            }
+                // 如果'['后面是'B'，标识数组元素是byte类型
+            case JVM_SIGNATURE_BYTE: {
+                INFO_PRINT("解析byte类型");
+
+                DescriptorInfo* byteType = parse_byte_type();
+                descriptor->set_array_element_type(byteType);
+
+                flag = true;
+                break;
+            }
+                // 如果'['后面是'C'，标识数组元素是char类型
+            case JVM_SIGNATURE_CHAR: {
+                INFO_PRINT("解析char类型");
+
+                DescriptorInfo* charType = parse_char_type();
+                descriptor->set_array_element_type(charType);
+
+                flag = true;
+                break;
+            }
+                // 如果'['后面是'S'，标识数组元素是short类型
+            case JVM_SIGNATURE_SHORT: {
+                INFO_PRINT("解析short类型");
+
+                DescriptorInfo* shortType = parse_short_type();
+                descriptor->set_array_element_type(shortType);
+
+
+                flag = true;
+                break;
+            }
+                // 如果'['后面是'I'，标识数组元素是int类型
+            case JVM_SIGNATURE_INT: {
+                INFO_PRINT("解析int类型");
+
+                DescriptorInfo* intType = parse_int_type();
+                descriptor->set_array_element_type(intType);
+
+                flag = true;
+                break;
+            }
+                // 如果'['后面是'F'，标识数组元素是float类型
+            case JVM_SIGNATURE_FLOAT: {
+                INFO_PRINT("解析float类型");
+
+                DescriptorInfo* floatType = parse_float_type();
+                descriptor->set_array_element_type(floatType);
+
+                flag = true;
+                break;
+            }
+                // 如果'['后面是'J'，标识数组元素是long类型
+            case JVM_SIGNATURE_LONG: {
+                INFO_PRINT("解析long类型");
+
+                DescriptorInfo* longType = parse_long_type();
+                descriptor->set_array_element_type(longType);
+
+                flag = true;
+                break;
+            }
+                // 如果'['后面是'D'，标识数组元素是double类型
+            case JVM_SIGNATURE_DOUBLE: {
+                INFO_PRINT("解析double类型");
+
+                DescriptorInfo* doubleType = parse_double_type();
+                descriptor->set_array_element_type(doubleType);
+
+                flag = true;
+                break;
+            }
+            default: {
+                ERROR_PRINT("无法识别的数组元素类型");
+                exit(-1);
+            }
+        }
+
+        // 如果是数组结尾，就退出遍历描述符字节流
+        if(flag) {
+            break;
+        }
+    }
+    descriptor->set_is_resolved(true);
+
+    return descriptor;
+}
+
+/**
  * 将不同类型的字段值压入操作数栈中
  * */
 void DescriptorStream::push_field(jobject o, JavaVFrame* frame) {
@@ -208,7 +339,7 @@ void DescriptorStream::parse_return() {
     Symbol* return_str = _descriptor_info->sub_symbol(param_end_index + 1, _descriptor_info->size());
 
     // 调用解析方法
-    _return_element = (new DescriptorStream(return_str))->do_parse()->at(0);
+    _return_element = (new DescriptorStream(return_str, _method_name))->do_parse()->at(0);
     INFO_PRINT("该方法的返回值: %s" , return_str->as_C_string());
 }
 
@@ -225,7 +356,7 @@ void DescriptorStream::parse_filed() {
  * 解析方法参数类型
  * */
 void DescriptorStream::parse_method_params() {
-    INFO_PRINT("解析方法描述符");
+    INFO_PRINT("解析%s方法描述符", _method_name->as_C_string());
     // 找到形参列表括号的位置，左括号和右括号中间就是形参列表
     int param_start_index = _descriptor_info->find_char_index(JVM_SIGNATURE_START_FUNC);
     int param_end_index = _descriptor_info->find_char_index(JVM_SIGNATURE_END_FUNC);
@@ -233,7 +364,7 @@ void DescriptorStream::parse_method_params() {
     Symbol* param_str = _descriptor_info->sub_symbol(param_start_index + 1, param_end_index);
 
     // 调用解析方法
-    _parameters = (new DescriptorStream(param_str))->do_parse();
+    _parameters = (new DescriptorStream(param_str, _method_name))->do_parse();
     _method_params_size = _parameters->size();
 
     INFO_PRINT("该方法描述符形参数量: %d", _method_params_size);
@@ -251,6 +382,15 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
     for (; index < strlen(_descriptor); index++) {
         char b = *(_descriptor + index);
         switch (b) {
+            case JVM_SIGNATURE_ARRAY: {
+                INFO_PRINT("解析array类型");
+
+                DescriptorInfo* ref = parse_array_type();
+
+                parse_result->push_back(ref);
+                break;
+                break;
+            }
             case JVM_SIGNATURE_CLASS: {
                 INFO_PRINT("解析reference类型");
 
@@ -341,7 +481,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
                 break;
             }
             default: {
-                ERROR_PRINT("无法识别的元素类型");
+                ERROR_PRINT("无法识别的元素类型: %c", b);
                 exit(-1);
 
             }

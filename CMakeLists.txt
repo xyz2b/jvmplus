@@ -146,4 +146,4 @@ add_executable(jvmplus main.cpp
         share/vm/runtime/Thread.hpp
         src/jni/rg_xyz_jvm_jdk_classes_JniEnv.cpp
         share/vm/prims/JavaNativeInterface.cpp
-        share/vm/prims/JavaNativeInterface.hpp share/vm/oops/InstanceMirrorKlass.cpp share/vm/oops/InstanceMirrorKlass.hpp share/vm/classfile/javaClasses.cpp share/vm/classfile/javaClasses.hpp share/vm/classfile/DescriptorStream.cpp share/vm/classfile/DescriptorStream.hpp share/vm/oops/DescriptorInfo.cpp share/vm/oops/DescriptorInfo.hpp)
+        share/vm/prims/JavaNativeInterface.hpp share/vm/oops/InstanceMirrorKlass.cpp share/vm/oops/InstanceMirrorKlass.hpp share/vm/classfile/javaClasses.cpp share/vm/classfile/javaClasses.hpp share/vm/classfile/DescriptorStream.cpp share/vm/classfile/DescriptorStream.hpp share/vm/oops/DescriptorInfo.cpp share/vm/oops/DescriptorInfo.hpp share/vm/utilities/vector.cpp share/vm/utilities/vector.hpp share/vm/utilities/stack.cpp share/vm/utilities/stack.hpp)

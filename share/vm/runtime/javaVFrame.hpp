@@ -9,7 +9,7 @@
 #include "../../../share/vm/utilities/array.hpp"
 #include "../../../share/vm/runtime/stackValue.hpp"
 #include "../../../share/vm/runtime/VFrame.hpp"
-#include <stack>
+#include "../../../share/vm/utilities/stack.hpp"
 
 class Method;
 
@@ -17,14 +17,14 @@ class JavaVFrame : public VFrame {
 private:
     Array<StackValue*>* _local_variable_table;
 
-    stack<StackValue*>* _operand_stack;
+    Stack<StackValue*>* _operand_stack;
 
     Method* _method;
 
 public:
     JavaVFrame(int max_locals, Method* method) : _method(method) {
         _local_variable_table = new (max_locals) Array<StackValue*>(max_locals);
-        _operand_stack = new stack<StackValue*>;
+        _operand_stack = new Stack<StackValue*>();
     }
 
     Array<StackValue*>* get_local_variable_table() { return _local_variable_table; }

@@ -18,7 +18,7 @@ private:
 
     Method* _method;
 public:
-    BaseBytecodeStream(u1* code_start, u1* code_end, Method* method): _code_start(code_start), _code_end(code_end), _method(method) {}
+    BaseBytecodeStream(u1* code_start, u1* code_end, Method* method): _code_start(code_start), _code_end(code_end), _method(method), _current(code_start) {}
 
     u1 get_u1_code() {
         checkIndex();

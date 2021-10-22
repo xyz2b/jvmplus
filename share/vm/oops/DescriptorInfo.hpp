@@ -30,6 +30,8 @@ public:
         _array_dimension++;
     }
 
+    void set_array_element_type(DescriptorInfo* d) { _array_element_type = d; }
+
     DescriptorInfo() {
     }
 

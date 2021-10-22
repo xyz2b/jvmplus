@@ -152,9 +152,11 @@ void Array<T>::insert(size_t index, T value) {
 
 template<typename T>
 T Array<T>::get(size_t index) {
-    if(index < 0 || index >= _size)
+    if(index < 0 || index >= _size) {
+        ERROR_PRINT("index illegal");
         // index索引非法
         exit(-1);
+    }
 
     return *(_data + index);
 }

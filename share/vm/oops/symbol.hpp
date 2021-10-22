@@ -37,8 +37,13 @@ public:
         return strcmp(this->as_C_string(), s) == 0;
     }
 
-    bool operator == (Symbol* s) const {
+
+    bool operator == (const Symbol* s) const {
         return strcmp(this->as_C_string(), s->as_C_string()) == 0;
+    }
+
+    bool operator< (const Symbol& s) const {
+        return strcmp(this->as_C_string(), s.as_C_string());
     }
 
     int find_char_index(char c);
@@ -71,5 +76,15 @@ public:
     char* as_utf8() const { return as_C_string(); }
 };
 
+using std::less;
+namespace std {
+    template<>
+    struct less<Symbol*> {
+    public:
+        bool operator() (const Symbol* s1, const Symbol* s2) const {
+            return strcmp(s1->as_C_string(), s2->as_C_string());
+        }
+    };
+}
 
 #endif //JVMPLUS_SYMBOL_HPP

@@ -62,10 +62,11 @@ int Symbol::find_char_index(char c) {
 }
 
 Symbol *Symbol::sub_symbol(int start, int end) {
-    Symbol* ret = new (end - start) Symbol();
-    ret->set_length(end - start);
-    for (int i = start; i < start; i ++) {
-        ret->byte_at_put(i, this->byte_at(i));
+    int new_length = end - start;
+    Symbol* ret = new (new_length) Symbol();
+    ret->set_length(new_length);
+    for (int i = start; i < end; i ++) {
+        ret->byte_at_put(i - start, this->byte_at(i));
     }
     return ret;
 }

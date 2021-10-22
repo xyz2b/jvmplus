@@ -19,6 +19,7 @@
 #include "../../../share/vm/utilities/globalDefinitions_gcc.hpp"
 #include "../../../include/memory/memory_cell.h"
 
+
 class HeapWord {
 private:
     MemoryCell* _cell;

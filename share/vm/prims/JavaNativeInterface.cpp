@@ -61,7 +61,8 @@ void JavaNativeInterface::call_static_method(InstanceKlass *klass, Method *metho
     // 使用调用方操作数栈中的实参给被调用方局部变量中的形参赋值
     // 调用方操作数栈栈顶的实参 对应 被调用方局部变量索引最大的形参
     // 同时非静态方法第一个形参是this指针，注意赋值
-    if (nullptr != callee_frame) {
+    // not handle main params
+    if (nullptr != callee_frame && 0 != current_thread->frame_size()) {
         // 由于是静态方法，所以参数在被调用方局部变量表中的位置是从0开始
         for (int i = method->descriptor()->method_params_size() - 1; i >= 0; i--) {
             callee_frame->set_local_variable_table(i, caller_frame->pop_operand_stack());
