@@ -147,19 +147,17 @@ public:
 
     void method_at_put(int which, int class_index, int name_and_type_index) {
         tag_at_put(which, JVM_CONSTANT_Methodref);
-        INFO_PRINT("base: %p", int_at_adr(which));
-        *int_at_adr(which) = ((jint) name_and_type_index << 16) | class_index;
+        *int_at_adr(which) = ((jint) class_index << 16) | name_and_type_index;
     }
 
     void interface_method_at_put(int which, int class_index, int name_and_type_index) {
         tag_at_put(which, JVM_CONSTANT_InterfaceMethodref);
-        *int_at_adr(which) = ((jint) name_and_type_index << 16) | class_index;
+        *int_at_adr(which) = ((jint) class_index << 16) | name_and_type_index;
     }
 
     void field_at_put(int which, int class_index, int name_and_type_index) {
         tag_at_put(which, JVM_CONSTANT_Fieldref);
-        INFO_PRINT("base: %p", int_at_adr(which));
-        *int_at_adr(which) = ((jint) name_and_type_index << 16) | class_index;
+        *int_at_adr(which) = ((jint) class_index << 16) | name_and_type_index;
     }
 
     void string_index_at_put(int which, int string_index) {
@@ -174,7 +172,7 @@ public:
 
     void name_and_type_at_put(int which, int name_index, int signature_index) {
         tag_at_put(which, JVM_CONSTANT_NameAndType);
-        *int_at_adr(which) = ((jint) signature_index << 16) | name_index;
+        *int_at_adr(which) = ((jint) name_index << 16) | signature_index;
     }
 
     void method_type_index_at_put(int which, int ref_index) {
@@ -184,17 +182,12 @@ public:
 
     void method_handle_index_at_put(int which, int ref_kind, int ref_index) {
         tag_at_put(which, JVM_CONSTANT_MethodHandle);
-        *int_at_adr(which) = ((jint) ref_index << 16) | ref_kind;
+        *int_at_adr(which) = ((jint) ref_kind << 16) | ref_index;
     }
 
     void invoke_dynamic_at_put(int which, int bootstrap_specifier_index, int name_and_type_index) {
         tag_at_put(which, JVM_CONSTANT_InvokeDynamic);
-        *int_at_adr(which) = ((jint) name_and_type_index << 16) | bootstrap_specifier_index;
-    }
-
-    jint class_index_at(int which) {
-        assert(tag_at(which).is_class(), "Corrupted constant pool");
-        return *int_at_adr(which);
+        *int_at_adr(which) = ((jint) bootstrap_specifier_index << 16) | name_and_type_index;
     }
 
     Symbol* symbol_at(int which) {
@@ -224,12 +217,141 @@ public:
         return *((jdouble*)&tmp);
     }
 
+    jint class_at(int which) {
+        assert(tag_at(which).is_klass(), "Corrupted constant pool");
+        return *int_at_adr(which);
+    }
+
+    jint field_at(int which) {
+        assert(tag_at(which).is_field(), "Corrupted constant pool");
+        return *int_at_adr(which);
+    }
+
+    jint string_at(int which) {
+        assert(tag_at(which).is_string(), "Corrupted constant pool");
+        return *int_at_adr(which);
+    }
+
+    jint name_and_type_at(int which) {
+        assert(tag_at(which).is_name_and_type(), "Corrupted constant pool");
+        return *int_at_adr(which);
+    }
+
+    jint method_at(int which) {
+        assert(tag_at(which).is_method(), "Corrupted constant pool");
+        return *int_at_adr(which);
+    }
+
+    double get_int_by_int_ref(int which) {
+        return int_at(which);
+    }
+
+    double get_float_by_float_ref(int which) {
+        return float_at(which);
+    }
+
+    double get_long_by_long_ref(int which) {
+        return long_at(which);
+    }
+
+    double get_double_by_double_ref(int which) {
+        return double_at(which);
+    }
+
+    Symbol* get_string_by_string_ref(int which) {
+        return symbol_at(string_at(which));
+    }
+
     // 在常量池中通过class index查找class name
-    Symbol* get_class_name_by_class_index(int which) {
-        return symbol_at(class_index_at(which));
+    Symbol* get_class_name_by_class_ref(int which) {
+        return symbol_at(class_at(which));
+    }
+
+    /**
+    * CONSTANT_Fieldref_info: class_index + nameAndType_index
+    * @param index Fieldref 结构在常量池中的索引
+    * @return 字段所属类的类名
+    * */
+    Symbol* get_class_name_by_field_ref(int which) {
+        // 获取 Fieldref 在常量池中的信息(class_index + nameAndType_index)
+        jint data = field_at(which);
+
+        // 获取 class_index，int的前2个字节
+        jint class_index = data >> 16;
+
+        return get_class_name_by_class_ref(class_index);
+    }
+
+    Symbol* get_filed_name_by_field_ref(int which) {
+        // 获取 Fieldref 在常量池中的信息(class_index + nameAndType_index)
+        jint data = field_at(which);
+
+        // 获取 nameAndType_index，int的后2个字节
+        jint name_and_type_index = data & 0xFF;
+
+        return get_name_by_name_and_type_ref(name_and_type_index);
+    }
+
+    Symbol* get_descriptor_by_field_ref(int which) {
+        // 获取 Fieldref 在常量池中的信息(class_index + nameAndType_index)
+        jint data = field_at(which);
+
+        // 获取 nameAndType_index，int的后2个字节
+        jint name_and_type_index = data & 0xFF;
+
+        return get_descriptor_by_name_and_type_ref(name_and_type_index);
     }
 
 
+    Symbol* get_name_by_name_and_type_ref(int which) {
+        // 获取 NameAndType 在常量池中的信息(name_index + descriptor_index)
+        jint data = name_and_type_at(which);
+
+        // 获取 name_index，int的前2个字节
+        int name_index = data >> 16;
+
+        return symbol_at(name_index);
+    }
+
+    Symbol* get_descriptor_by_name_and_type_ref(int which) {
+        // 获取 NameAndType 在常量池中的信息(name_index + descriptor_index)
+        jint data = name_and_type_at(which);
+
+        // 获取 descriptor_index，int的后2个字节
+        int descriptor_index = data & 0xFF;
+
+        return symbol_at(descriptor_index);
+    }
+
+    Symbol* get_method_name_by_method_ref(int index) {
+        // 获取 Methodref 在常量池中的信息(class_index + nameAndType_index)
+        jint data = name_and_type_at(index);
+
+        // 获取 nameAndType_index，int的后2个字节
+        jint name_and_type_index = data & 0xFF;
+
+        return get_name_by_name_and_type_ref(name_and_type_index);
+    }
+
+    Symbol* get_method_descriptor_by_method_ref(int index) {
+        // 获取 Methodref 在常量池中的信息(class_index + nameAndType_index)
+        jint data = method_at(index);
+
+        // 获取 nameAndType_index，int的后2个字节
+        jint name_and_type_index = data & 0xFF;
+
+        return get_descriptor_by_name_and_type_ref(name_and_type_index);
+    }
+
+    Symbol* get_class_name_by_method_ref(int index) {
+        // 获取 Methodref 在常量池中的信息(class_index + nameAndType_index)
+        jint data = method_at(index);
+
+        // 获取 class_index，int的前2个字节
+        jint class_index = data >> 16;
+
+        return get_class_name_by_class_ref(class_index);
+    }
 };
 
 

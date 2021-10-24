@@ -16,12 +16,17 @@ private:
     AccessFlags _access_flags;
     u2 _name_index;
     u2 _signature_index;
+    Symbol* _name;
+    Symbol* _signature;
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* _attributes;
     // field value in object oop offset (static field in InstanceMirrorKlass oop offset)
     int _offset;
 
 public:
-    FiledInfo(AccessFlags access_flags, u2 name_index, u2 signature_index, u2 attributes_count) : _access_flags(access_flags), _name_index(name_index), _signature_index(signature_index) {
+    Symbol* name() { return _name; }
+    Symbol* descriptor() { return _signature; }
+
+    FiledInfo(AccessFlags access_flags, u2 name_index, u2 signature_index, u2 attributes_count, Symbol* name, Symbol* signature) : _access_flags(access_flags), _name_index(name_index), _signature_index(signature_index), _name(name), _signature(signature) {
         _attributes = new Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>(attributes_count);
     }
 

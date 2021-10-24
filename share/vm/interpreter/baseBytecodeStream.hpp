@@ -23,13 +23,13 @@ public:
     u1 get_u1_code() {
         checkIndex();
 
-        return *_current;
+        return *(_current++);
     }
 
     int8_t get_u1_code2() {
         checkIndex();
 
-        return *(int8_t*)*_current;
+        return *(int8_t*)*(_current++);
     }
 
     u2 get_u2_code() {

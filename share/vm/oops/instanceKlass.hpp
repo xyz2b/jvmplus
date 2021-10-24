@@ -52,9 +52,6 @@ private:
     int _static_field_size;
 
     int _non_static_filed_count;
-
-    // static fields，一个指针的大小可以存储任何类型的数据（long double 指针），按照常量池那种写法
-    void* _static_fields[0];
 public:
     int static_field_size() const            { return _static_field_size; }
     void set_static_field_size(int size)     { _static_field_size = size; }
@@ -62,104 +59,7 @@ public:
     int static_filed_count() { return _static_filed_count; }
     void set_static_filed_count(int count) { _static_filed_count = count; }
 
-    // 存储静态属性值的内存首地址
-    intptr_t* static_fields_base() const { return (intptr_t*) (_static_fields); }
-
-    bool is_within_bounds(int index) const {
-        return 0 <= index && index < _fields_count;
-    }
-
-    intptr_t* obj_at_adr(int which) const {
-        assert(is_within_bounds(which), "index out of bounds");
-        return (intptr_t*) &static_fields_base()[which];
-    }
-
-    // string
-    Symbol** symbol_at_adr(int which) const {
-        assert(is_within_bounds(which), "index out of bounds");
-        return (Symbol**) &static_fields_base()[which];
-    }
-
-    jbyte* byte_at_adr(int which) const {
-        assert(is_within_bounds(which), "index out of bounds");
-        return (jbyte*) &static_fields_base()[which];
-    }
-
-    jshort* short_at_adr(int which) const {
-        assert(is_within_bounds(which), "index out of bounds");
-        return (jshort*) &static_fields_base()[which];
-    }
-
-    jint* int_at_adr(int which) const {
-        assert(is_within_bounds(which), "index out of bounds");
-        return (jint*) &static_fields_base()[which];
-    }
-
-    jlong* long_at_adr(int which) const {
-        assert(is_within_bounds(which), "index out of bounds");
-        return (jlong*) &static_fields_base()[which];
-    }
-
-    jfloat* float_at_adr(int which) const {
-        assert(is_within_bounds(which), "index out of bounds");
-        return (jfloat*) &static_fields_base()[which];
-    }
-
-    jdouble* double_at_adr(int which) const {
-        assert(is_within_bounds(which), "index out of bounds");
-        return (jdouble*) &static_fields_base()[which];
-    }
-
-    void obj_at_put(int which, intptr_t s) {
-        *obj_at_adr(which) = s;
-    }
-
-    // string
-    void symbol_at_put(int which, Symbol* s) {
-        *symbol_at_adr(which) = s;
-    }
-
-    void int_at_put(int which, jint i) {
-        *int_at_adr(which) = i;
-    }
-
-    void long_at_put(int which, jlong l) {
-        Bytes::put_native_u8((address) long_at_adr(which), *((u8*)&l));
-    }
-
-    void float_at_put(int which, jfloat f) {
-        *float_at_adr(which) = f;
-    }
-
-    void double_at_put(int which, jdouble d) {
-        Bytes::put_native_u8((address) double_at_adr(which), *((u8*)&d));
-    }
-
-    intptr_t object_at(int which) {
-        return *obj_at_adr(which);
-    }
-
-    Symbol* symbol_at(int which) {
-        return *symbol_at_adr(which);
-    }
-
-    jint int_at(int which) {
-        return *int_at_adr(which);
-    }
-
-    jlong long_at(int which) {
-        u8 tmp = Bytes::get_native_u8((address) &static_fields_base()[which]);
-        return *((jlong*)&tmp);
-    }
-
-    jfloat float_at(int which) {
-        return *float_at_adr(which);
-    }
-
-    jdouble double_at(int which) {
-        u8 tmp = Bytes::get_native_u8((address) &static_fields_base()[which]);
-        return *((jdouble*)&tmp);
-    }
+    FiledInfo* find_field(Symbol* field_name, Symbol* descriptor_name);
 
     enum ClassState {
         allocated,

@@ -5,6 +5,8 @@
 #ifndef JVMPLUS_OOP_HPP
 #define JVMPLUS_OOP_HPP
 
+#include <jni.h>
+
 class Klass;
 
 class oopDesc {
@@ -16,6 +18,9 @@ public:
 
     Klass* klass() const { return _klass; }
     void set_klass(Klass* klass) { _klass = klass; }
+
+
+    jobject get_field(int type, int offset);
 };
 
 

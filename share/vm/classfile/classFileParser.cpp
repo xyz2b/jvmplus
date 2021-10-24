@@ -34,12 +34,12 @@ ClassFileParser::parse_class_file(Symbol *name) {
 
     // 类名
     u2 this_class_index = cfs->get_u2_fast();
-    Symbol* class_name = cp->get_class_name_by_class_index(this_class_index);
+    Symbol* class_name = cp->get_class_name_by_class_ref(this_class_index);
     INFO_PRINT("class name: %s", class_name->as_C_string());
 
     // 父类名
     u2 super_class_index = cfs->get_u2_fast();
-    Symbol* super_class_name = cp->get_class_name_by_class_index(super_class_index);
+    Symbol* super_class_name = cp->get_class_name_by_class_ref(super_class_index);
     INFO_PRINT("super class name: %s", super_class_name->as_C_string());
 
     // 实现的接口数量
@@ -261,7 +261,7 @@ Array<u2>* ClassFileParser::parse_interfaces(int length) {
 
         interfaces_index->add(interface_index);
 
-        INFO_PRINT("Interface, 第%d项, 值: %X，名称: %s", index, interface_index, _cp->get_class_name_by_class_index(interface_index)->as_C_string());
+        INFO_PRINT("Interface, 第%d项, 值: %X，名称: %s", index, interface_index, _cp->get_class_name_by_class_ref(interface_index)->as_C_string());
     }
 
     return interfaces_index;
@@ -285,7 +285,10 @@ Array<FiledInfo*>* ClassFileParser::parse_fields(int length, int* static_filed_c
 
         AccessFlags ac = AccessFlags((jint)access_flag);
 
-        FiledInfo* filed_info = new FiledInfo(ac, name_index, signature_index, field_attributes_count);
+        Symbol* name = _cp->symbol_at(name_index);
+        Symbol* descriptor = _cp->symbol_at(signature_index);
+
+        FiledInfo* filed_info = new FiledInfo(ac, name_index, signature_index, field_attributes_count, name, descriptor);
 
         if (ac.is_static()) {
             filed_info->set_offset((*static_filed_count));

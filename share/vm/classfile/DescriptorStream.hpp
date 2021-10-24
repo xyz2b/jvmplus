@@ -62,6 +62,10 @@ private:
     DescriptorInfo* parse_array_type();
 
 public:
+    int get_field_type() {
+        return _field->type();
+    }
+
     int method_params_size() { return _method_params_size; }
     vector<DescriptorInfo*>* parameters() { return _parameters; }
 

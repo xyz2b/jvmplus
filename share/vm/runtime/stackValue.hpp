@@ -6,6 +6,7 @@
 #define JVMPLUS_STACKVALUE_HPP
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
+#include "../../../share/vm/oops/symbol.hpp"
 #include <jni.h>
 
 class StackValue {
