@@ -325,7 +325,7 @@ public:
 
     Symbol* get_method_name_by_method_ref(int index) {
         // 获取 Methodref 在常量池中的信息(class_index + nameAndType_index)
-        jint data = name_and_type_at(index);
+        jint data = method_at(index);
 
         // 获取 nameAndType_index，int的后2个字节
         jint name_and_type_index = data & 0xFF;

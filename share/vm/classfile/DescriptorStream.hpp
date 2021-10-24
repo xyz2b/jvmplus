@@ -69,6 +69,8 @@ public:
     int method_params_size() { return _method_params_size; }
     vector<DescriptorInfo*>* parameters() { return _parameters; }
 
+    int return_element_type() { _return_element->type(); }
+
     DescriptorStream(Symbol* descriptor_info, Symbol* method_name) : _descriptor_info(descriptor_info), _method_name(method_name) {}
 
     DescriptorStream(Symbol* descriptor_info) : _descriptor_info(descriptor_info) {}
@@ -86,7 +88,7 @@ public:
      * 根据形参列表的类型，从操作数栈中弹出实参值
      * @return 实参值列表
      * */
-    Array<jobject>* get_params_val(JavaVFrame* frame);
+    jvalue* get_params_val(JavaVFrame* frame);
 
     /**
       * 根据字段的类型，从操作数栈中弹出实参值

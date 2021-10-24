@@ -105,10 +105,16 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                 }
                                 break;
                             case T_LONG:
-                            {
-                                jlong long_val = g_env->GetStaticLongField(clazz, field);
-                                field_val = reinterpret_cast<jobject>(&long_val);
-                            }
+                                {
+                                    jlong long_val = g_env->GetStaticLongField(clazz, field);
+                                    field_val = reinterpret_cast<jobject>(&long_val);
+                                }
+                                break;
+                            case T_FLOAT:
+                                {
+                                    jfloat float_val = g_env->GetStaticFloatField(clazz, field);
+                                    field_val = reinterpret_cast<jobject>(&float_val);
+                                }
                                 break;
                             case T_DOUBLE:
                                 {
@@ -165,7 +171,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         case JVM_CONSTANT_String:
                             {
                                 Symbol* content = constant_pool->get_string_by_string_ref(operand);
-                                operand_stack->push(new StackValue(T_OBJECT, (jobject)content));
+                                operand_stack->push(new StackValue(T_OBJECT, (jobject)(content->as_C_string())));
                             }
                             break;
                         case JVM_CONSTANT_Class:
@@ -202,7 +208,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     Symbol* descriptor_name = constant_pool->get_method_descriptor_by_method_ref(operand);
 
                     // 解析描述符
-                    DescriptorStream* descriptor_stream = new DescriptorStream(descriptor_name);
+                    DescriptorStream* descriptor_stream = new DescriptorStream(descriptor_name, method_name);
                     descriptor_stream->parse_method();
 
                     INFO_PRINT("执行方法: %s:%s#%s", class_name->as_C_string(), method_name->as_C_string(), descriptor_name->as_C_string());
@@ -223,12 +229,100 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                             exit(-1);
                         }
 
-                        // retrun is object
-                        g_env->CallObjectMethod(obj, _get_method, key)
+                        // params
+                        jvalue* params = descriptor_stream->get_params_val(frame);
+
+                        // 从操作数栈中弹出 被调方法所属类的对象，即this指针
+                        jobject obj = (jobject)frame->pop_operand_stack()->data();
+
+                        jobject return_val;
+                        switch (descriptor_stream->return_element_type()) {
+                            case T_BOOLEAN:
+                                {
+                                    jboolean bool_val = g_env->CallBooleanMethodA(obj, method, params);
+                                    return_val = reinterpret_cast<jobject>(&bool_val);
+                                    frame->push_operand_stack(new StackValue(T_INT, return_val));
+                                }
+                                break;
+                            case T_SHORT:
+                                {
+                                    jshort short_val = g_env->CallShortMethodA(obj, method, params);
+                                    return_val = reinterpret_cast<jobject>(&short_val);
+                                    frame->push_operand_stack(new StackValue(T_INT, return_val));
+                                }
+                                break;
+                            case T_CHAR:
+                                {
+                                    jchar char_val = g_env->CallCharMethodA(obj, method, params);
+                                    return_val = reinterpret_cast<jobject>(&char_val);
+                                    frame->push_operand_stack(new StackValue(T_INT, return_val));
+                                }
+                                break;
+                            case T_BYTE:
+                                {
+                                    jbyte byte_val = g_env->CallByteMethodA(obj, method, params);
+                                    return_val = reinterpret_cast<jobject>(&byte_val);
+                                    frame->push_operand_stack(new StackValue(T_INT, return_val));
+                                }
+                                break;
+                            case T_INT:
+                                {
+                                    jint int_val = g_env->CallIntMethodA(obj, method, params);
+                                    return_val = reinterpret_cast<jobject>(&int_val);
+                                    frame->push_operand_stack(new StackValue(T_INT, return_val));
+                                }
+                                break;
+                            case T_LONG:
+                                {
+                                    jlong long_val = g_env->CallLongMethodA(obj, method, params);
+                                    return_val = reinterpret_cast<jobject>(&long_val);
+                                    frame->push_operand_stack(new StackValue(T_LONG, return_val));
+                                }
+                                break;
+                            case T_FLOAT:
+                                {
+                                    jfloat float_val = g_env->CallFloatMethodA(obj, method, params);
+                                    return_val = reinterpret_cast<jobject>(&float_val);
+                                    frame->push_operand_stack(new StackValue(T_FLOAT, return_val));
+                                }
+                                break;
+                            case T_DOUBLE:
+                                {
+                                    jdouble double_val = g_env->CallDoubleMethodA(obj, method, params);
+                                    return_val = reinterpret_cast<jobject>(&double_val);
+                                    frame->push_operand_stack(new StackValue(T_DOUBLE, return_val));
+                                }
+                                break;
+                            case T_OBJECT:
+                                {
+                                    jobject object_val = g_env->CallObjectMethodA(obj, method, params);
+                                    return_val = object_val;
+                                    frame->push_operand_stack(new StackValue(T_OBJECT, return_val));
+                                }
+                                break;
+                            case T_VOID:
+                                {
+                                    INFO_PRINT("params: %s", (char*)(*params).l);
+                                    INFO_PRINT("%p", obj);
+                                    INFO_PRINT("class_name: %s", class_name->as_C_string());
+                                    INFO_PRINT("%p, %s, %s, %d", method, method_name->as_C_string(), descriptor_name->as_C_string(), descriptor_stream->return_element_type());
+                                    g_env->CallVoidMethodA(obj, method, params);
+                                }
+                                break;
+                            default:
+                                ERROR_PRINT("无法识别的return类型%d", descriptor_stream->return_element_type());
+                                exit(-1);
+                        }
                     } else {
 
                     }
                 }
+                break;
+            case RETURN:
+                INFO_PRINT("执行指令: return，该指令功能为: 从方法中返回void，恢复调用者的栈帧，并且把程序的控制权交回调用者");
+                // pop出栈帧
+                current_thread->pop_frame();
+                INFO_PRINT("剩余栈帧数量: %d", current_thread->frame_size());
                 break;
             default:
                 ERROR_PRINT("not bytecode");

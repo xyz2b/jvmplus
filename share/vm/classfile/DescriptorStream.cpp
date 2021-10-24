@@ -291,6 +291,8 @@ void DescriptorStream::push_return_element(jobject o, JavaVFrame* frame) {
         case T_OBJECT:
             frame->push_operand_stack(new StackValue(T_OBJECT, o));
             break;
+        case T_VOID:
+            break;
         default:
             ERROR_PRINT("无法识别的参数类型%d", _field->type());
             exit(-1);
@@ -301,15 +303,71 @@ void DescriptorStream::push_return_element(jobject o, JavaVFrame* frame) {
  * 根据形参列表的类型，从操作数栈中弹出实参值
  * @return 实参值列表
  * */
-Array<jobject>* DescriptorStream::get_params_val(JavaVFrame* frame) {
-    Array<jobject>* values = new Array<jobject>[method_params_size()];
+jvalue* DescriptorStream::get_params_val(JavaVFrame* frame) {
+    jvalue* params_value = (jvalue*)calloc(parameters()->size(), sizeof(jvalue));
 
     for (int i = 0; i < method_params_size(); i++) {
-        DescriptorInfo* info = parameters()->at(i);
-        values->set(i, (jobject) (frame->pop_operand_stack()->data()));
+        switch (parameters()->at(i)->type()) {
+            case T_BOOLEAN:
+                {
+                    jboolean bool_val = (jboolean) frame->pop_operand_stack()->data();
+                    (*(params_value + i)).z = bool_val;
+                }
+                break;
+            case T_SHORT:
+                {
+                    jshort short_val = (jshort) frame->pop_operand_stack()->data();
+                    (*(params_value + i)).s = short_val;
+                }
+                break;
+            case T_CHAR:
+                {
+                    jchar char_val = (jchar) frame->pop_operand_stack()->data();
+                    (*(params_value + i)).c = char_val;
+                }
+                break;
+            case T_BYTE:
+                {
+                    jbyte byte_val = (jbyte) frame->pop_operand_stack()->data();
+                    (*(params_value + i)).b = byte_val;
+                }
+                break;
+            case T_INT:
+                {
+                    jint int_val = (jint) frame->pop_operand_stack()->data();
+                    (*(params_value + i)).i = int_val;
+                }
+                break;
+            case T_LONG:
+                {
+                    jlong long_val = (jlong) frame->pop_operand_stack()->data();
+                    (*(params_value + i)).j = long_val;
+                }
+                break;
+            case T_FLOAT:
+                {
+                    jfloat float_val = (jfloat) frame->pop_operand_stack()->data();
+                    (*(params_value + i)).f = float_val;
+                }
+                break;
+            case T_DOUBLE:
+                {
+                    jdouble double_val = (jdouble) frame->pop_operand_stack()->data();
+                    (*(params_value + i)).d = double_val;
+                }
+                break;
+            case T_OBJECT:
+                {
+                    jobject object_val = (jobject) frame->pop_operand_stack()->data();
+                    (*(params_value + i)).l = object_val;
+                }
+                break;
+            default:
+                ERROR_PRINT("无法识别的params类型%d", parameters()->at(i)->type());
+                exit(-1);
+        }
     }
-
-    return values;
+    return params_value;
 }
 
 /**
