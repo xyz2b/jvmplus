@@ -37,6 +37,38 @@ public:
         return strcmp(this->as_C_string(), s) == 0;
     }
 
+    Symbol* operator + (const Symbol* s) const {
+        size_t new_size = this->size() + s->size();
+        Symbol* new_symbol = new (new_size) Symbol();
+        new_symbol->set_length(new_size);
+
+        for(int i = 0; i < this->size(); i++) {
+            new_symbol->byte_at_put(i, this->byte_at(i));
+        }
+
+        for (int i = 0; i < s->size(); i++) {
+            new_symbol->byte_at_put(i, s->byte_at(i));
+        }
+
+        return new_symbol;
+    }
+
+    Symbol* operator + (const char* s) const {
+        size_t new_size = this->size() + strlen(s);
+        Symbol* new_symbol = new (new_size) Symbol();
+        new_symbol->set_length(new_size);
+
+        for(int i = 0; i < this->size(); i++) {
+            new_symbol->byte_at_put(i, this->byte_at(i));
+        }
+
+        for (int i = 0; i < strlen(s); i++) {
+            new_symbol->byte_at_put(i, *(s + i));
+        }
+
+        return new_symbol;
+    }
+
 
     bool operator == (const Symbol* s) const {
         return strcmp(this->as_C_string(), s->as_C_string()) == 0;
@@ -54,7 +86,7 @@ public:
     const jbyte* base() const { return &_body[0]; }
 
     // 返回经过Symbol包装后的字符串的大小（添加了对象的一些额外信息）
-    int size() { return utf8_length(); }
+    int size() const { return utf8_length(); }
 
     // 返回Symbol底层字符串的长度
     int utf8_length() const { return _length; }

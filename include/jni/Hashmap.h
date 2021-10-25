@@ -7,7 +7,7 @@
 #include "jni.h"
 #include "../../include/common.h"
 
-class Hashmap {
+class hashmap {
 private:
     static jclass _clazz;
     static jmethodID _no_param_construct;

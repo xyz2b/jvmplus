@@ -13,6 +13,8 @@ class JavaNativeInterface {
 public:
     static Method* get_method(InstanceKlass* klass, Symbol* method_name, Symbol* descriptor_name);
     static void call_static_method(InstanceKlass* klass, Method* method);
+    static void call_method(InstanceKlass* klass, Method* method);
+
 };
 
 

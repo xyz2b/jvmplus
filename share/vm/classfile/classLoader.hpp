@@ -18,6 +18,7 @@ class ClassLoader {
 public:
     static InstanceKlassHandle load_classfile(Symbol* h_name);
     static ClassFileStream* open_stream(const char* name);
+    static bool is_load_class(Symbol* class_name);
 };
 
 

@@ -15,9 +15,9 @@
 JNIEXPORT jobject JNICALL Java_org_xyz_jvm_example_jni_Hashmap_createHashmap
         (JNIEnv *env, jclass clz) {
 
-    Hashmap::initialize();
+    hashmap::initialize();
 
-    return Hashmap::object();
+    return hashmap::object();
 }
 
 /*
@@ -29,7 +29,7 @@ JNIEXPORT jobject JNICALL Java_org_xyz_jvm_example_jni_Hashmap_get__Ljava_util_H
         (JNIEnv *env, jclass clz, jobject hp, jstring key) {
     // 调用get方法，并返回结果
     // jstring --> c++ string
-    return Hashmap::get(hp, *JniTools::jstringToString(key, 0));
+    return hashmap::get(hp, *JniTools::jstringToString(key, 0));
 }
 
 /*
@@ -39,7 +39,7 @@ JNIEXPORT jobject JNICALL Java_org_xyz_jvm_example_jni_Hashmap_get__Ljava_util_H
  */
 JNIEXPORT jobject JNICALL Java_org_xyz_jvm_example_jni_Hashmap_get__Ljava_util_HashMap_2Ljava_lang_Object_2
         (JNIEnv *env, jclass clz, jobject hp, jobject key) {
-    return Hashmap::get(hp, key);
+    return hashmap::get(hp, key);
 }
 
 /*
@@ -49,7 +49,7 @@ JNIEXPORT jobject JNICALL Java_org_xyz_jvm_example_jni_Hashmap_get__Ljava_util_H
  */
 JNIEXPORT void JNICALL Java_org_xyz_jvm_example_jni_Hashmap_put__Ljava_util_HashMap_2Ljava_lang_String_2Ljava_lang_Object_2
         (JNIEnv *env, jclass clz, jobject hp, jstring key, jobject value) {
-    Hashmap::put(hp, *JniTools::jstringToString(key, 0), value);
+    hashmap::put(hp, *JniTools::jstringToString(key, 0), value);
 }
 
 /*
@@ -60,6 +60,6 @@ JNIEXPORT void JNICALL Java_org_xyz_jvm_example_jni_Hashmap_put__Ljava_util_Hash
 JNIEXPORT void JNICALL Java_org_xyz_jvm_example_jni_Hashmap_put__Ljava_util_HashMap_2Ljava_lang_Object_2Ljava_lang_Object_2
         (JNIEnv *env, jclass clz, jobject hp, jobject key, jobject value) {
     // jstring --> c++ string
-    Hashmap::put(hp, key, value);
+    hashmap::put(hp, key, value);
 }
 

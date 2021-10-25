@@ -3,6 +3,7 @@
 //
 
 #include "../../include/jni/JniTools.h"
+#include "../../include/jni/Handle.h"
 
 extern JNIEnv* g_env;
 
@@ -91,3 +92,63 @@ jmethodID JniTools::get_method(const char *class_name, const char *method_name, 
     return _method;
 }
 
+
+jboolean JniTools::is_load_class(Symbol* class_name) {
+    // 获取HashMap类元信息
+    jclass _clazz = g_env->FindClass("org/xyz/jvm/jdk/classes/sun/misc/AppClassLoader");
+    if (nullptr == _clazz) {
+        ERROR_PRINT("获取org/xyz/jvm/jdk/classes/sun/misc/AppClassLoader clz出错")
+        exit(-1);
+    }
+
+    // 获取方法
+    jmethodID _method = g_env->GetMethodID(_clazz, "isLoadedKlass", "(Ljava/lang/String;)Z");
+    if (nullptr == _method) {
+        ERROR_PRINT("获取isLoadedKlass方法出错");
+        exit(-1);
+    }
+
+    jboolean is_load = g_env->CallStaticBooleanMethod(_clazz, _method, JniTools::charsToJavaString(class_name->as_C_string()));
+
+    return is_load;
+}
+
+Klass* JniTools::load_class(Symbol *class_name) {
+    // 获取HashMap类元信息
+    jclass _clazz = g_env->FindClass("org/xyz/jvm/jdk/classes/sun/misc/AppClassLoader");
+    if (nullptr == _clazz) {
+        ERROR_PRINT("获取org/xyz/jvm/jdk/classes/sun/misc/AppClassLoader clz出错")
+        exit(-1);
+    }
+
+    // 获取方法
+    jmethodID _method = g_env->GetMethodID(_clazz, "loadKlass", "(Ljava/lang/String;)Lorg/xyz/jvm/jdk/classes/Handle;");
+    if (nullptr == _method) {
+        ERROR_PRINT("获取loadKlass方法出错");
+        exit(-1);
+    }
+
+    jobject klass_handle = g_env->CallStaticObjectMethod(_clazz, _method, JniTools::charsToJavaString(class_name->as_C_string()));
+
+    return JniHandle::handleToKlass(g_env, klass_handle);
+}
+
+Klass* JniTools::find_load_class(Symbol *class_name) {
+    // 获取HashMap类元信息
+    jclass _clazz = g_env->FindClass("org/xyz/jvm/jdk/classes/sun/misc/AppClassLoader");
+    if (nullptr == _clazz) {
+        ERROR_PRINT("获取org/xyz/jvm/jdk/classes/sun/misc/AppClassLoader clz出错")
+        exit(-1);
+    }
+
+    // 获取方法
+    jmethodID _method = g_env->GetMethodID(_clazz, "findLoadedKlass", "(Ljava/lang/String;)Lorg/xyz/jvm/jdk/classes/Handle;");
+    if (nullptr == _method) {
+        ERROR_PRINT("获取findLoadedKlass方法出错");
+        exit(-1);
+    }
+
+    jobject klass_handle = g_env->CallStaticObjectMethod(_clazz, _method, JniTools::charsToJavaString(class_name->as_C_string()));
+
+    return JniHandle::handleToKlass(g_env, klass_handle);
+}

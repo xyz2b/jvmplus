@@ -8,6 +8,7 @@
 #include "../../../share/vm/oops/attribute.hpp"
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/utilities/array.hpp"
+#include "../../../share/vm/interpreter/baseBytecodeStream.hpp"
 
 class ExceptionHandler : public Metadata {
 private:
@@ -39,6 +40,8 @@ private:
     u2 _attribute_count;
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* _attributes;
 
+    BaseBytecodeStream* _code_stream;
+
     jbyte   _code[0];
 
 public:
@@ -59,6 +62,14 @@ public:
         }
     }
 
+    void generate_code_stream(Method* method) {
+        _code_stream = new BaseBytecodeStream(code_base(), code_end(), method);
+    }
+
+    BaseBytecodeStream* code_stream() {
+        return _code_stream;
+    }
+
     void set_exception_tables(Array<ExceptionHandler*>* exception_table) {
         _exception_tables = exception_table;
     }
@@ -73,6 +84,8 @@ public:
 
     AttributeInfo* get_attribute(Symbol* name) { return _attributes->get(name); }
     void put_attribute(Symbol* name, AttributeInfo* attribute) { _attributes->put(name, attribute); }
+
+
 };
 
 

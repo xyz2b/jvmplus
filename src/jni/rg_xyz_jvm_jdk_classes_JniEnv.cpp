@@ -5,7 +5,6 @@
 #include "../../include/jni/org_xyz_jvm_jdk_classes_JniEnv.h"
 #include "../../include/common.h"
 #include "../../include/jni/JniTools.h"
-#include "../../share/vm/oops/klass.hpp"
 #include "../../share/vm/classfile/systemDictionary.h"
 #include "../../include/jni/Handle.h"
 #include "../../share/vm/prims/JavaNativeInterface.hpp"

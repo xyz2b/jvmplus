@@ -38,8 +38,6 @@ int main() {
     Method* method_info = JavaNativeInterface::get_method(instanceKlassHandle(), method_n, descriptor_n);
 
     instanceKlassHandle->java_mirror();
-    INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(0)->offset());
-    INFO_PRINT("%d", instanceKlassHandle->get_fields()->get(1)->offset());
 
     JavaNativeInterface::call_static_method(instanceKlassHandle(), method_info);
     return 0;

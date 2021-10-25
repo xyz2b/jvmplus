@@ -7,7 +7,6 @@
 
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/oops/method.hpp"
-#include "../../../share/vm/oops/codeAttribute.hpp"
 #include "../../../cpu/x86/vm/bytes_x86.hpp"
 
 class BaseBytecodeStream {

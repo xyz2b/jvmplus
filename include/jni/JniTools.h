@@ -8,6 +8,8 @@
 #include <jni.h>
 #include "../../include/common.h"
 #include "../../share/vm/oops/symbol.hpp"
+#include "../../share/vm/oops/klass.hpp"
+
 
 class JniTools {
 public:
@@ -24,6 +26,9 @@ public:
     static Symbol* jstringToSymbol(jstring string, jboolean is_copy);
 
     static jmethodID get_method(const char* class_name, const char* method_name, const char* descriptor_name);
+    static jboolean is_load_class(Symbol* class_name);
+    static Klass* load_class(Symbol* class_name);
+    static Klass* find_load_class(Symbol* class_name);
 };
 
 

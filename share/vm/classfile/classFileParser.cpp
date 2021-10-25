@@ -291,10 +291,8 @@ Array<FiledInfo*>* ClassFileParser::parse_fields(int length, int* static_filed_c
         FiledInfo* filed_info = new FiledInfo(ac, name_index, signature_index, field_attributes_count, name, descriptor);
 
         if (ac.is_static()) {
-            filed_info->set_offset((*static_filed_count));
             (*static_filed_count)++;
         } else {
-            filed_info->set_offset((*non_static_field_count));
             (*non_static_field_count)++;
         }
 
@@ -392,10 +390,12 @@ void ClassFileParser::parse_method_attributes(u2 method_attributes_count, Method
                 exception_table = parse_exception_table(exception_table_length);
             }
 
+
             u2 code_attributes_count = cfs->get_u2_fast();
             CodeAttribute* code_attributes = new (code_length) CodeAttribute(method_attribute_name_index, method_attribute_length, code_attributes_count, max_stack, max_locals, code_length, exception_table_length);
             code_attributes->set_code(code_start);
             code_attributes->set_exception_tables(exception_table);
+            code_attributes->generate_code_stream(method);
 
             // 解析code的属性
             for (int i = 0; i < code_attributes_count; i++) {

@@ -55,3 +55,8 @@ ClassFileStream *ClassLoader::open_stream(const char *name) {
     return nullptr;
 }
 
+bool ClassLoader::is_load_class(Symbol *class_name) {
+    // AppClassLoader
+
+}
+

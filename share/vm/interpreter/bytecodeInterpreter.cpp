@@ -5,11 +5,11 @@
 #include "bytecodeInterpreter.hpp"
 
 #include "../../../share/vm/oops/codeAttribute.hpp"
-#include "../../../share/vm/interpreter/baseBytecodeStream.hpp"
-#include "../../../share/vm/runtime/javaVFrame.hpp"
 #include "../../../share/vm/oops/constantPool.hpp"
 #include "../../../share/vm/oops/instanceKlass.hpp"
 #include "../../../share/vm/prims/unsafe.cpp"
+#include "../../../include/jni/JniTools.h"
+#include "../../../share/vm/prims/JavaNativeInterface.hpp"
 
 extern JNIEnv* g_env;
 
@@ -17,7 +17,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
     Symbol* c = new (strlen(JVM_ATTRIBUTE_Code)) Symbol(JVM_ATTRIBUTE_Code, strlen(JVM_ATTRIBUTE_Code));
     CodeAttribute* codeAttribute = (CodeAttribute*) method->get_attribute(c);
 
-    BaseBytecodeStream* code = new BaseBytecodeStream((u1*)codeAttribute->code_base(), (u1*)codeAttribute->code_end(), method);
+    BaseBytecodeStream* code = codeAttribute->code_stream();
 
     JavaVFrame* frame = (JavaVFrame*) current_thread->top_frame();
     stack<StackValue*>* operand_stack = frame->get_operand_stack();
@@ -134,13 +134,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         }
                     } else {
                         oop mirror = klass->java_mirror();
-                        FiledInfo* f = ((InstanceKlass*)klass)->find_field(field_name, descriptor_name);
-                        if (f == nullptr) {
-                            ERROR_PRINT("can not find static field: %s#%s", field_name->as_C_string(), descriptor_name->as_C_string());
-                            exit(-1);
-                        }
-
-                        field_val = mirror->get_field(*(descriptor_name->as_C_string()), f->offset());
+                        field_val = mirror->get_field(class_name, field_name);
                     }
                     INFO_PRINT("static field: %s, value: %s", field_name->as_C_string(), field_val);
                     descriptor_stream->push_field(field_val, frame);
@@ -171,7 +165,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         case JVM_CONSTANT_String:
                             {
                                 Symbol* content = constant_pool->get_string_by_string_ref(operand);
-                                operand_stack->push(new StackValue(T_OBJECT, (jobject)(content->as_C_string())));
+                                operand_stack->push(new StackValue(T_OBJECT, JniTools::charsToJavaString(content->as_C_string())));
                             }
                             break;
                         case JVM_CONSTANT_Class:
@@ -302,11 +296,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                 break;
                             case T_VOID:
                                 {
-                                    INFO_PRINT("params: %s", (char*)(*params).l);
-                                    INFO_PRINT("%p", obj);
-                                    INFO_PRINT("class_name: %s", class_name->as_C_string());
-                                    INFO_PRINT("%p, %s, %s, %d", method, method_name->as_C_string(), descriptor_name->as_C_string(), descriptor_stream->return_element_type());
-                                    g_env->CallVoidMethodA(obj, method, params);
+                                   g_env->CallVoidMethodA(obj, method, params);
                                 }
                                 break;
                             default:
@@ -314,15 +304,45 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                 exit(-1);
                         }
                     } else {
+                        // 在类加载器的缓存中查找是否有该类，没有就触发加载
+                        if (!JniTools::is_load_class(class_name)) {
+                            INFO_PRINT("类[%s]还未加载，开始加载", class_name->as_C_string());
+                            JniTools::load_class(class_name);
+                        }
 
+                        // 在类加载器的缓存中找到对应的类
+                        InstanceKlass* klass = (InstanceKlass*)JniTools::load_class(class_name);
+                        // 在对应的类中找到对应的方法
+                        Method* method = JavaNativeInterface::get_method(klass, method_name, descriptor_name);
+                        if (nullptr == method) {
+                            ERROR_PRINT("不存在的方法: %s#%s", method_name->as_C_string(), descriptor_name->as_C_string());
+                            exit(-1);
+                        }
+
+                        // 同一个方法重复调用问题: 该方法的程序计数器如果没有重置，会导致下一次调用是从上一次调用完之后的指令位置开始，导致出错
+                        // 调用某一个方法之前，需要重置该方法的程序计数器，避免上面所说的重复调用的问题
+                        Symbol* c = new (strlen(JVM_ATTRIBUTE_Code)) Symbol(JVM_ATTRIBUTE_Code, strlen(JVM_ATTRIBUTE_Code));
+                        CodeAttribute* code_attribute = (CodeAttribute*) method->get_attribute(c);
+                        // 重置程序计数器
+                        code_attribute->code_stream()->reset();
+
+                        JavaNativeInterface::call_method(klass, method);
                     }
                 }
                 break;
             case RETURN:
-                INFO_PRINT("执行指令: return，该指令功能为: 从方法中返回void，恢复调用者的栈帧，并且把程序的控制权交回调用者");
-                // pop出栈帧
-                current_thread->pop_frame();
-                INFO_PRINT("剩余栈帧数量: %d", current_thread->frame_size());
+                {
+                    INFO_PRINT("执行指令: return，该指令功能为: 从方法中返回void，恢复调用者的栈帧，并且把程序的控制权交回调用者");
+                    // pop出栈帧
+                    current_thread->pop_frame();
+                    INFO_PRINT("剩余栈帧数量: %d", current_thread->frame_size());
+                }
+                break;
+            case NEW:
+                {
+                    INFO_PRINT("执行指令: new，该指令功能为: 创建一个对象，并将其引用压入栈顶");
+
+                }
                 break;
             default:
                 ERROR_PRINT("not bytecode");

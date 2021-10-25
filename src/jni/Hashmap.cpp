@@ -7,12 +7,12 @@
 
 extern JNIEnv* g_env;
 
-jclass Hashmap::_clazz = NULL;
-jmethodID Hashmap::_no_param_construct = NULL;
-jmethodID Hashmap::_put_method = NULL;
-jmethodID Hashmap::_get_method = NULL;
+jclass hashmap::_clazz = NULL;
+jmethodID hashmap::_no_param_construct = NULL;
+jmethodID hashmap::_put_method = NULL;
+jmethodID hashmap::_get_method = NULL;
 
-void Hashmap::initialize() {
+void hashmap::initialize() {
     // 获取HashMap类元信息
     _clazz = g_env->FindClass("java/util/HashMap");
     if (nullptr == _clazz) {
@@ -42,7 +42,7 @@ void Hashmap::initialize() {
     }
 }
 
-jobject Hashmap::object() {
+jobject hashmap::object() {
     if (nullptr == _clazz) {
         ERROR_PRINT("未执行初始化")
         exit(-1);
@@ -52,7 +52,7 @@ jobject Hashmap::object() {
     return g_env->NewObject(_clazz, _no_param_construct);
 }
 
-void Hashmap::put(jobject obj, jobject key, jobject value) {
+void hashmap::put(jobject obj, jobject key, jobject value) {
     if (nullptr == _clazz) {
         ERROR_PRINT("未执行初始化")
         exit(-1);
@@ -62,7 +62,7 @@ void Hashmap::put(jobject obj, jobject key, jobject value) {
     g_env->CallObjectMethod(obj, _put_method, key, value);
 }
 
-void Hashmap::put(jobject obj, const string &key, jobject value) {
+void hashmap::put(jobject obj, const string &key, jobject value) {
     if (nullptr == _clazz) {
         ERROR_PRINT("未执行初始化")
         exit(-1);
@@ -72,7 +72,7 @@ void Hashmap::put(jobject obj, const string &key, jobject value) {
     put(obj, JniTools::stringToJavaString(key), value);
 }
 
-jobject Hashmap::get(jobject obj, jobject key) {
+jobject hashmap::get(jobject obj, jobject key) {
     if (nullptr == _clazz) {
         ERROR_PRINT("未执行初始化")
         exit(-1);
@@ -82,7 +82,7 @@ jobject Hashmap::get(jobject obj, jobject key) {
     return g_env->CallObjectMethod(obj, _get_method, key);
 }
 
-jobject Hashmap::get(jobject obj, const string &key) {
+jobject hashmap::get(jobject obj, const string &key) {
     if (nullptr == _clazz) {
         ERROR_PRINT("未执行初始化")
         exit(-1);
