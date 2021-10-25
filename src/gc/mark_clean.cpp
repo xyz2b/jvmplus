@@ -12,7 +12,7 @@ MarkClean::MarkClean(MemoryChunk *mem_chunk): m_mem_chunk(mem_chunk)
 
 MarkClean::~MarkClean()
 {
-    INFO_PRINT("[call destructor %s] release resources", __func__);
+    DEBUG_PRINT("[call destructor %s] release resources", __func__);
 }
 
 MemoryChunk *MarkClean::get_mem_chunk() {
@@ -25,7 +25,7 @@ MarkClean *MarkClean::set_mem_chunk(MemoryChunk *chunk) {
 }
 
 void MarkClean::mark_step() {
-    INFO_PRINT("start mark step")
+    DEBUG_PRINT("start mark step")
 
     list<MemoryCell *> *used_table = get_mem_chunk()->get_used_table();
     for (MemoryCell* cell : *used_table) {
@@ -36,7 +36,7 @@ void MarkClean::mark_step() {
 }
 
 void MarkClean::clean_step() {
-    INFO_PRINT("start clean step");
+    DEBUG_PRINT("start clean step");
 
     bool flag = false;
 
@@ -47,7 +47,7 @@ void MarkClean::clean_step() {
 
         // release not mark cell
         if(!cell->get_mark()) {
-            INFO_PRINT("not mark")
+            DEBUG_PRINT("not mark")
 
             // remove not mark cell from used_table
             // list::erase return is an iterator pointing to the element that followed the last element erased by the function call
@@ -64,7 +64,7 @@ void MarkClean::clean_step() {
 
             flag = true;
         } else {
-            INFO_PRINT("is mark, can't release");
+            DEBUG_PRINT("is mark, can't release");
             iterator++;
         }
     }
@@ -77,7 +77,7 @@ void MarkClean::clean_step() {
 }
 
 void MarkClean::run() {
-    INFO_PRINT("mark clean start");
+    DEBUG_PRINT("mark clean start");
     if (get_mem_chunk() == nullptr) {
         ERROR_PRINT("chunk is null");
         exit(-1);
@@ -87,5 +87,5 @@ void MarkClean::run() {
     clean_step();
     get_mem_chunk()->print_all_table();
 
-    INFO_PRINT("mark clean stop");
+    DEBUG_PRINT("mark clean stop");
 }

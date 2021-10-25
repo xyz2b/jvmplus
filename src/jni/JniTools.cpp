@@ -102,7 +102,7 @@ jboolean JniTools::is_load_class(Symbol* class_name) {
     }
 
     // 获取方法
-    jmethodID _method = g_env->GetMethodID(_clazz, "isLoadedKlass", "(Ljava/lang/String;)Z");
+    jmethodID _method = g_env->GetStaticMethodID(_clazz, "isLoadedKlass", "(Ljava/lang/String;)Z");
     if (nullptr == _method) {
         ERROR_PRINT("获取isLoadedKlass方法出错");
         exit(-1);
@@ -122,7 +122,7 @@ Klass* JniTools::load_class(Symbol *class_name) {
     }
 
     // 获取方法
-    jmethodID _method = g_env->GetMethodID(_clazz, "loadKlass", "(Ljava/lang/String;)Lorg/xyz/jvm/jdk/classes/Handle;");
+    jmethodID _method = g_env->GetStaticMethodID(_clazz, "loadKlass", "(Ljava/lang/String;)Lorg/xyz/jvm/jdk/classes/Handle;");
     if (nullptr == _method) {
         ERROR_PRINT("获取loadKlass方法出错");
         exit(-1);
@@ -142,7 +142,7 @@ Klass* JniTools::find_load_class(Symbol *class_name) {
     }
 
     // 获取方法
-    jmethodID _method = g_env->GetMethodID(_clazz, "findLoadedKlass", "(Ljava/lang/String;)Lorg/xyz/jvm/jdk/classes/Handle;");
+    jmethodID _method = g_env->GetStaticMethodID(_clazz, "findLoadedKlass", "(Ljava/lang/String;)Lorg/xyz/jvm/jdk/classes/Handle;");
     if (nullptr == _method) {
         ERROR_PRINT("获取findLoadedKlass方法出错");
         exit(-1);

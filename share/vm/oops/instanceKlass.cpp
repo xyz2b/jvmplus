@@ -4,8 +4,8 @@
 
 #include "instanceKlass.hpp"
 
-instanceOop InstanceKlass::allocate_instance(KlassHandle k, size_t size) {
-    instanceOop i = (instanceOop) CollectedHeap::obj_allocate(k, size);
+instanceOop InstanceKlass::allocate_instance(KlassHandle k) {
+    instanceOop i = (instanceOop) CollectedHeap::obj_allocate(k, sizeof(instanceOopDesc));
     return i;
 }
 

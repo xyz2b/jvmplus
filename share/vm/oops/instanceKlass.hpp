@@ -135,7 +135,7 @@ public:
     void set_attributes(Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes) { _attributes = attributes; }
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* get_attributes() { return _attributes; }
 
-    instanceOop allocate_instance(KlassHandle k, size_t size);
+    instanceOop allocate_instance(KlassHandle k);
 };
 
 

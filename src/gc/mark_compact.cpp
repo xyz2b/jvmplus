@@ -10,7 +10,7 @@ MarkCompact::MarkCompact(MemoryChunk *chunk): m_mem_chunk(chunk) {
 }
 
 MarkCompact::~MarkCompact() {
-    INFO_PRINT("[call destructor %s] release resources", __func__);
+    DEBUG_PRINT("[call destructor %s] release resources", __func__);
 }
 
 MemoryChunk *MarkCompact::get_mem_chunk() {
@@ -23,7 +23,7 @@ MarkCompact *MarkCompact::set_mem_chunk(MemoryChunk *chunk) {
 }
 
 void MarkCompact::memory_compact_before() {
-    INFO_PRINT("start compact before to head");
+    DEBUG_PRINT("start compact before to head");
 
     list<MemoryCell *>::iterator iterator = get_mem_chunk()->get_available_table()->begin();
     list<MemoryCell *>::iterator tmp_iterator;
@@ -37,11 +37,11 @@ void MarkCompact::memory_compact_before() {
         while ((++tmp_iterator) != get_mem_chunk()->get_available_table()->end()) {
             MemoryCell* next_cell = *tmp_iterator;
 
-            INFO_PRINT("\t 比较current(%d ~ %d)与next(%d ~ %d)",
+            DEBUG_PRINT("\t 比较current(%d ~ %d)与next(%d ~ %d)",
                        cell->get_start(), cell->get_end(), next_cell->get_start(), next_cell->get_end());
 
             if (cell->get_start() == next_cell->get_end()) {
-                INFO_PRINT("\t\t 合并current(%d ~ %d)与next(%d ~ %d)",
+                DEBUG_PRINT("\t\t 合并current(%d ~ %d)与next(%d ~ %d)",
                            cell->get_start(), cell->get_end(), next_cell->get_start(), next_cell->get_end());
 
                 // 合并cell
@@ -69,11 +69,11 @@ void MarkCompact::memory_compact_before() {
         }
     }
 
-    INFO_PRINT("compact before to head end");
+    DEBUG_PRINT("compact before to head end");
 }
 
 void MarkCompact::memory_compact_after() {
-    INFO_PRINT("start compact after to tail");
+    DEBUG_PRINT("start compact after to tail");
 
     list<MemoryCell *>::iterator iterator = get_mem_chunk()->get_available_table()->begin();
     list<MemoryCell *>::iterator tmp_iterator;
@@ -87,11 +87,11 @@ void MarkCompact::memory_compact_after() {
         while ((++tmp_iterator) != get_mem_chunk()->get_available_table()->end()) {
             MemoryCell* next_cell = *tmp_iterator;
 
-            INFO_PRINT("\t 比较current(%d ~ %d)与next(%d ~ %d)",
+            DEBUG_PRINT("\t 比较current(%d ~ %d)与next(%d ~ %d)",
                        cell->get_start(), cell->get_end(), next_cell->get_start(), next_cell->get_end());
 
             if (cell->get_end() == next_cell->get_start()) {
-                INFO_PRINT("\t\t 合并current(%d ~ %d)与next(%d ~ %d)",
+                DEBUG_PRINT("\t\t 合并current(%d ~ %d)与next(%d ~ %d)",
                            cell->get_start(), cell->get_end(), next_cell->get_start(), next_cell->get_end());
 
                 // 合并cell
@@ -118,11 +118,11 @@ void MarkCompact::memory_compact_after() {
             iterator++;
         }
     }
-    INFO_PRINT("compact after to tail end");
+    DEBUG_PRINT("compact after to tail end");
 }
 
 void MarkCompact::mark_step() {
-    INFO_PRINT("start mark");
+    DEBUG_PRINT("start mark");
 
     list<MemoryCell *> *used_table = get_mem_chunk()->get_used_table();
     list<MemoryCell *>::iterator iterator;
@@ -130,7 +130,7 @@ void MarkCompact::mark_step() {
         MemoryCell *cell = *iterator;
         cell->to_string("simulation mark");
         if (cell->get_size() == 4 && !cell->get_transfer_object()) {
-            INFO_PRINT("mark cell");
+            DEBUG_PRINT("mark cell");
             // 将used table中被标记的cell，原样放入transfer表中（即将指向标记cell的指针放入transfer表中），cell的地址不能变，所以被标记的cell对象不能被释放
             // （用户申请内存时返回的对象为cell，用户持有指向cell对象的指针，用户后续操作申请到的内存都是使用cell来操作的，所以cell的地址不能变，即它不能被释放）
             get_mem_chunk()->get_transfer_table()->push_front(cell);
@@ -141,13 +141,13 @@ void MarkCompact::mark_step() {
             *iterator = new MemoryCell(cell);    // for(xx : xx)遍历时，获取的元素是原列表中元素的copy，并不是在原先列表中的元素，所以对它的修改并不会体现到原列表中
 
         } else {
-            INFO_PRINT("not mark");
+            DEBUG_PRINT("not mark");
         }
     }
 }
 
 void MarkCompact::clean_step() {
-    INFO_PRINT("start clean step");
+    DEBUG_PRINT("start clean step");
 
     bool flag = false;
 
@@ -175,7 +175,7 @@ void MarkCompact::clean_step() {
 
             flag = true;
         } else {
-            INFO_PRINT("is mark, can't release");
+            DEBUG_PRINT("is mark, can't release");
             iterator++;
         }
     }
@@ -187,14 +187,14 @@ void MarkCompact::clean_step() {
 }
 
 void MarkCompact::memory_compact_step() {
-    INFO_PRINT("start memory compact");
+    DEBUG_PRINT("start memory compact");
     memory_compact_before();
     memory_compact_after();
-    INFO_PRINT("memory compact end");
+    DEBUG_PRINT("memory compact end");
 }
 
 void MarkCompact::data_compact_step() {
-    INFO_PRINT("start data compact");
+    DEBUG_PRINT("start data compact");
 
     list<MemoryCell*>::iterator transfer_ite = get_mem_chunk()->get_transfer_table()->begin();
     while (transfer_ite != get_mem_chunk()->get_transfer_table()->end()) {
@@ -204,11 +204,11 @@ void MarkCompact::data_compact_step() {
         transfer_ite = get_mem_chunk()->get_transfer_table()->erase(transfer_ite);
     }
 
-    INFO_PRINT("data compact end")
+    DEBUG_PRINT("data compact end")
 }
 
 void MarkCompact::run() {
-    INFO_PRINT("[mark-compact]start");
+    DEBUG_PRINT("[mark-compact]start");
     if (get_mem_chunk() == nullptr) {
         ERROR_PRINT("chunk is null");
         exit(-1);
@@ -219,5 +219,5 @@ void MarkCompact::run() {
     memory_compact_step();
     data_compact_step();
 
-    INFO_PRINT("[mark-compact]end");
+    DEBUG_PRINT("[mark-compact]end");
 }

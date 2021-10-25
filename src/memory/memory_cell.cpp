@@ -14,7 +14,7 @@ MemoryCell::MemoryCell(uint start, uint size) : m_start(start), m_size(size)
 
 MemoryCell::~MemoryCell()
 {
-    INFO_PRINT("[call destructor %s] release resources", __func__);
+    DEBUG_PRINT("[call destructor %s] release resources", __func__);
 }
 
 uint MemoryCell::get_start() const {
@@ -93,11 +93,11 @@ MemoryCell *MemoryCell::set_mark(bool mark) {
 }
 
 void MemoryCell::to_string() const {
-    INFO_PRINT("[cell info]start=%d, end=%d, size=%d", m_start, m_end, m_size)
+    DEBUG_PRINT("[cell info]start=%d, end=%d, size=%d", m_start, m_end, m_size)
 }
 
 void MemoryCell::to_string(char *msg) const {
-    INFO_PRINT("[cell info]%s:start=%d, end=%d, size=%d", msg, m_start, m_end, m_size)
+    DEBUG_PRINT("[cell info]%s:start=%d, end=%d, size=%d", msg, m_start, m_end, m_size)
 }
 
 pvoid MemoryCell::get_belong_chunk() {

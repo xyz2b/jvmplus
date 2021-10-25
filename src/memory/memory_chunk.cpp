@@ -43,10 +43,10 @@ MemoryChunk::MemoryChunk(uint size, char *filename, uint line): m_filename(filen
 }
 
 MemoryChunk::~MemoryChunk() {
-    INFO_PRINT("[调用析构函数%s]释放资源\n", __func__);
+    DEBUG_PRINT("[调用析构函数%s]释放资源\n", __func__);
 
     if (m_data) {
-        INFO_PRINT("\t 释放资源, 申请内存位置( %s:%d )，内存大小:%d 字节\n", m_filename, m_line, m_size);
+        DEBUG_PRINT("\t 释放资源, 申请内存位置( %s:%d )，内存大小:%d 字节\n", m_filename, m_line, m_size);
         free(m_data);
     }
 
@@ -55,7 +55,7 @@ MemoryChunk::~MemoryChunk() {
 }
 
 void MemoryChunk::free_available_table() {
-    INFO_PRINT("release available table");
+    DEBUG_PRINT("release available table");
 
     for (MemoryCell * cell : m_available_table) {
         delete(cell);
@@ -65,7 +65,7 @@ void MemoryChunk::free_available_table() {
 }
 
 void MemoryChunk::free_used_table() {
-    INFO_PRINT("release used table");
+    DEBUG_PRINT("release used table");
 
     for (MemoryCell * cell : m_used_table) {
         delete(cell);
@@ -75,23 +75,23 @@ void MemoryChunk::free_used_table() {
 }
 
 void MemoryChunk::print_available_table() {
-    INFO_PRINT("print available table");
+    DEBUG_PRINT("print available table");
 
     for (MemoryCell * cell : m_available_table) {
-        INFO_PRINT("\t cell_start=%d, cell_end=%d, cell_size=%d", cell->get_start(), cell->get_end(), cell->get_size());
+        DEBUG_PRINT("\t cell_start=%d, cell_end=%d, cell_size=%d", cell->get_start(), cell->get_end(), cell->get_size());
     }
 
-    INFO_PRINT("print available table stop");
+    DEBUG_PRINT("print available table stop");
 }
 
 void MemoryChunk::print_used_table() {
-    INFO_PRINT("print used table");
+    DEBUG_PRINT("print used table");
 
     for (MemoryCell * cell : m_used_table) {
-        INFO_PRINT("\t cell_start=%d, cell_end=%d, cell_size=%d", cell->get_start(), cell->get_end(), cell->get_size());
+        DEBUG_PRINT("\t cell_start=%d, cell_end=%d, cell_size=%d", cell->get_start(), cell->get_end(), cell->get_size());
     }
 
-    INFO_PRINT("print used table stop");
+    DEBUG_PRINT("print used table stop");
 }
 
 void MemoryChunk::print_all_table() {
@@ -151,7 +151,7 @@ MemoryCell* MemoryChunk::malloc(uint size) {
     // 遍历available_table查找满足条件的MemoryCell
     for (MemoryCell* cell : m_available_table) {
         if (cell->get_size() >= cell_num) {
-            INFO_PRINT("find suitable MemoryCell");
+            DEBUG_PRINT("find suitable MemoryCell");
             ret = real_malloc(cell, cell_num);
             break;
         }
@@ -174,7 +174,7 @@ MemoryCell* MemoryChunk::malloc(uint size) {
 MemoryCell* MemoryChunk::real_malloc(MemoryCell *cell, uint cell_num) {
     // memory start pointer
     pvoid ret = (pvoid)((ulong)get_data() + cell->get_start() * get_align_size());
-    INFO_PRINT("[real malloc memory]data start address=%X, cell_start=%d, ret=%X, cell_size=%d", get_data(), cell->get_start(), ret, cell_num);
+    DEBUG_PRINT("[real malloc memory]data start address=%X, cell_start=%d, ret=%X, cell_size=%d", get_data(), cell->get_start(), ret, cell_num);
 
     // create used cell, add to used table
     MemoryCell* used_cell = new MemoryCell(cell->get_start(), cell_num);
@@ -234,7 +234,7 @@ MemoryCell *MemoryChunk::malloc_after_gc(MemoryCell *transfer_cell) {
             // 新地址：新cell数据的位置
             ptr_to = transfer_cell->ptr();
 
-            INFO_PRINT("开始拷贝内存: ptr_from=%X, ptr_to=%X, size=%d\n", ptr_from, ptr_to, transfer_cell->get_size() * get_align_size());
+            DEBUG_PRINT("开始拷贝内存: ptr_from=%X, ptr_to=%X, size=%d\n", ptr_from, ptr_to, transfer_cell->get_size() * get_align_size());
             // copy数据
             memcpy(ptr_to, ptr_from, transfer_cell->get_size() * get_align_size());
 
@@ -272,23 +272,23 @@ list<MemoryCell *> *MemoryChunk::get_idle_table() {
 }
 
 void MemoryChunk::print_idle_table() {
-    INFO_PRINT("print idle table");
+    DEBUG_PRINT("print idle table");
 
     for (MemoryCell * cell : m_idle_table) {
-        INFO_PRINT("\t cell_start=%d, cell_end=%d, cell_size=%d", cell->get_start(), cell->get_end(), cell->get_size());
+        DEBUG_PRINT("\t cell_start=%d, cell_end=%d, cell_size=%d", cell->get_start(), cell->get_end(), cell->get_size());
     }
 
-    INFO_PRINT("print idle table stop");
+    DEBUG_PRINT("print idle table stop");
 }
 
 void MemoryChunk::print_transfer_table() {
-    INFO_PRINT("print transfer table");
+    DEBUG_PRINT("print transfer table");
 
     for (MemoryCell * cell : m_transfer_table) {
-        INFO_PRINT("\t cell_start=%d, cell_end=%d, cell_size=%d", cell->get_start(), cell->get_end(), cell->get_size());
+        DEBUG_PRINT("\t cell_start=%d, cell_end=%d, cell_size=%d", cell->get_start(), cell->get_end(), cell->get_size());
     }
 
-    INFO_PRINT("print transfer table stop");
+    DEBUG_PRINT("print transfer table stop");
 }
 
 uint MemoryChunk::get_cell_start() const {

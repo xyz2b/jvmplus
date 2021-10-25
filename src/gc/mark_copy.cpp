@@ -9,7 +9,7 @@ MarkCopy::MarkCopy(MemoryChunk *chunk): m_mem_chunk(chunk) {
 }
 
 MarkCopy::~MarkCopy() {
-    INFO_PRINT("[call destructor %s] release resources", __func__);
+    DEBUG_PRINT("[call destructor %s] release resources", __func__);
 }
 
 MemoryChunk *MarkCopy::get_mem_chunk() {
@@ -22,7 +22,7 @@ MarkCopy *MarkCopy::set_mem_chunk(MemoryChunk *chunk) {
 }
 
 void MarkCopy::mark_step() {
-    INFO_PRINT("start mark step")
+    DEBUG_PRINT("start mark step")
 
     list<MemoryCell *> *used_table = get_mem_chunk()->get_used_table();
     for (MemoryCell* cell : *used_table) {
@@ -33,7 +33,7 @@ void MarkCopy::mark_step() {
 }
 
 void MarkCopy::stop_the_world() {
-    INFO_PRINT("\t GC中，暂停所有用户线程");
+    DEBUG_PRINT("\t GC中，暂停所有用户线程");
 }
 
 // 将idle_table和available_table置换，然后将used_table中被标记的对象在新的available_table中重新分配
@@ -71,11 +71,11 @@ void MarkCopy::memory_sweep_step() {
         used_cell->to_string();
 
         if (!used_cell->get_mark()) {
-            INFO_PRINT("\t 未打标记，开始释放资源\n");
+            DEBUG_PRINT("\t 未打标记，开始释放资源\n");
 
             delete used_cell;
         } else {
-            INFO_PRINT("\t 打了标记，开始处理\n");
+            DEBUG_PRINT("\t 打了标记，开始处理\n");
             // 将use_table中有标记的cell重新在新的available_table中分配内存
             get_mem_chunk()->malloc_after_gc(used_cell);
         }

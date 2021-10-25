@@ -62,7 +62,7 @@ void JavaNativeInterface::call_static_method(InstanceKlass *klass, Method *metho
     // 调用方操作数栈栈顶的实参 对应 被调用方局部变量索引最大的形参
     // 同时非静态方法第一个形参是this指针，注意赋值
     // not handle main params
-    if (nullptr != callee_frame && 0 != current_thread->frame_size()) {
+    if (nullptr != caller_frame) {
         // 由于是静态方法，所以参数在被调用方局部变量表中的位置是从0开始
         for (int i = method->descriptor()->method_params_size() - 1; i >= 0; i--) {
             callee_frame->set_local_variable_table(i, caller_frame->pop_operand_stack());
@@ -87,8 +87,12 @@ void JavaNativeInterface::call_method(InstanceKlass *klass, Method *method) {
 
     ConstantPool* constant_pool = klass->get_constant_pool();
 
-    // 判断是否有参数
-    if (0 != method->descriptor()->method_params_size()) {
+    /*
+     * 需要获取上一个方法栈帧的情况：
+     * 1.非静态方法。因为需要给this赋值
+     * 2.需要传参
+     */
+    if (!method->access_flags().is_static() || 0 != method->descriptor()->method_params_size()) {
         // 这个判断是为了过滤调用main方法的情况，因为调用main方法时线程虚拟机栈中还是空的，没有任何栈帧，main方法的参数由JVM自动传入
         if (0 != current_thread->frame_size()) {
             // 实参在调用方的操作数栈中，需要将实参存到被调用方的局部变量表中，而不是压到被调用方的操作数栈中
@@ -112,7 +116,7 @@ void JavaNativeInterface::call_method(InstanceKlass *klass, Method *method) {
     // 调用方操作数栈栈顶的实参 对应 被调用方局部变量索引最大的形参
     // 同时非静态方法第一个形参是this指针，注意赋值
     // not handle main params
-    if (nullptr != callee_frame && 0 != current_thread->frame_size()) {
+    if (nullptr != caller_frame) {
         if (method->access_flags().is_static()) {
             // 由于是静态方法，所以参数在被调用方局部变量表中的位置是从0开始
             for (int i = method->descriptor()->method_params_size() - 1; i >= 0; i--) {

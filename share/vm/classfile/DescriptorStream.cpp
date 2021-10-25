@@ -447,7 +447,6 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 parse_result->push_back(ref);
                 break;
-                break;
             }
             case JVM_SIGNATURE_CLASS: {
                 INFO_PRINT("解析reference类型");

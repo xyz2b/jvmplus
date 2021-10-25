@@ -11,7 +11,7 @@ MemoryChunk *MemoryPool::new_chunk(uint mem_size) {
 }
 
 MemoryPool::~MemoryPool() {
-    INFO_PRINT("[call destructor %s] release resources", __func__);
+    DEBUG_PRINT("[call destructor %s] release resources", __func__);
     free_chunks();
 }
 
@@ -24,11 +24,11 @@ void MemoryPool::free_chunks() {
 }
 
 void MemoryPool::print_chunks() {
-    INFO_PRINT("print chunk");
+    DEBUG_PRINT("print chunk");
 
     for (MemoryChunk* chunk : m_chunk) {
-        INFO_PRINT("[chunk]memory size %d bytes", chunk->get_size());
+        DEBUG_PRINT("[chunk]memory size %d bytes", chunk->get_size());
     }
 
-    INFO_PRINT("print chunk end");
+    DEBUG_PRINT("print chunk end");
 }

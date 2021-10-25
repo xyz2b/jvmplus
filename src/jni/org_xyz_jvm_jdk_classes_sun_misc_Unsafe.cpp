@@ -21,7 +21,7 @@ JNIEXPORT jobject JNICALL Java_org_xyz_jvm_jdk_classes_sun_misc_Unsafe_allocateO
         (JNIEnv *env, jclass clazz) {
     InstanceKlass* instanceKlass = new InstanceKlass;
 
-    instanceOop i = instanceKlass->allocate_instance(KlassHandle(instanceKlass), 16);
+    instanceOop i = instanceKlass->allocate_instance(KlassHandle(instanceKlass));
 
     return JniHandle::oopToHandle(env, i);
 }
