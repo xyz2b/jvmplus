@@ -6,6 +6,7 @@
 #define JVM_C___HASHMAP_HPP
 
 #include <cstdlib>
+#include <iostream>
 #include "hashFun.hpp"
 #include <map>
 #include <vector>
@@ -140,7 +141,8 @@ void Hashmap<K, V, HashFn>::put(K key, V value) {
 // get前需要使用contains判断是否存在，否则行为未定义
 template<class K, class V, class HashFn>
 V Hashmap<K, V, HashFn>::get(K key) {
-    Map<K, V>* m = _hashtable->get(_hash(key));
+    size_t i = _hash(key);
+    Map<K, V>* m = _hashtable->get(i);
     if (m->find(key) != m->end()) {
         return (*m)[key];
     }

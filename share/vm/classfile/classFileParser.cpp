@@ -82,6 +82,7 @@ ClassFileParser::parse_class_file(Symbol *name) {
         ik->get_methods()->get_at(index)->set_belong_klass(instance_klass);
     }
 
+    INFO_PRINT("开始创建class %s mirror klass", name->as_C_string());
     // Allocate mirror and initialize static fields
     java_lang_Class::create_mirror(ik);
 
@@ -141,6 +142,7 @@ void ClassFileParser::parse_constant_pool_entries(int length) {
 
                     INFO_PRINT("ConstantPool, 第%d项, 类型: Long, 值: %ld", index-1, _cp->long_at(index-1));
                 }
+                break;
             case JVM_CONSTANT_Float:
                 {
                     u4 bytes = cfs->get_u4_fast();

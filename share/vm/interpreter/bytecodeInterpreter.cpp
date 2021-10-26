@@ -21,6 +21,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
     BaseBytecodeStream* code = codeAttribute->code_stream();
 
     JavaVFrame* frame = (JavaVFrame*) current_thread->top_frame();
+
     stack<StackValue*>* operand_stack = frame->get_operand_stack();
     Array<StackValue*>* local_variable_table = frame->get_local_variable_table();
     Klass* klass = method->get_belong_klass();
@@ -553,6 +554,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
 
                        g_env->CallVoidMethodA(obj, method, params);
                     } else {
+
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
 
                         // 在对应的类中找到对应的方法

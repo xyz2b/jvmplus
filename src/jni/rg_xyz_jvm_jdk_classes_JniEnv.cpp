@@ -42,4 +42,5 @@ JNIEXPORT void JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_callStaticVoidMethod
     Method* method = JniHandle::handleToMethod(env, method_handle);
     InstanceKlass* instance_klass = (InstanceKlass*) JniHandle::handleToKlass(env, klass_handle);
     JavaNativeInterface::call_static_method(instance_klass, method);
+    INFO_PRINT("执行方法%s结束", instance_klass->get_constant_pool()->symbol_at(method->name_index())->as_C_string());
 }

@@ -19,6 +19,9 @@ Klass *SystemDictionary::resolve_or_null(Symbol *class_name) {
 
 Klass* SystemDictionary::resolve_instance_class_or_null(Symbol *class_name) {
     Klass* klass = nullptr;
+
+    INFO_PRINT("resolve instance class %s", class_name->as_C_string());
+
     klass = dictionary()->get(class_name);
     if (klass != nullptr) {
         return klass;
@@ -46,7 +49,8 @@ void SystemDictionary::load_super_class(Klass* klass) {
 
     int index = instance->get_super_class();
     Symbol* super_class_name = instance->get_constant_pool()->get_class_name_by_class_ref(index);
-
+    Symbol* class_name = instance->get_constant_pool()->get_class_name_by_class_ref(instance->get_this_class());
+    INFO_PRINT("%s super_class_name: %s", class_name->as_C_string(), super_class_name->as_C_string());
     if (super_class_name->start_with("java")) {
         INFO_PRINT("不加载java包的类");
         return;
@@ -54,6 +58,4 @@ void SystemDictionary::load_super_class(Klass* klass) {
 
     Klass* super_klass = SystemDictionary::resolve_or_null(super_class_name);
     instance->set_super_klass(super_klass);
-
-    load_super_class(super_klass);
 }

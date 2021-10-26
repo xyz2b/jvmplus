@@ -15,6 +15,8 @@ private:
 
 
 public:
+    Klass() {}
+    Klass(oop java_mirror) { _java_mirror = java_mirror; }
     oop java_mirror() const { return _java_mirror; }
     void set_java_mirror(oop m) { _java_mirror = m; }
 };

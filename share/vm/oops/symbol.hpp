@@ -114,7 +114,10 @@ namespace std {
     struct less<Symbol*> {
     public:
         bool operator() (const Symbol* s1, const Symbol* s2) const {
-            return strcmp(s1->as_C_string(), s2->as_C_string());
+            if (strcmp(s1->as_C_string(), s2->as_C_string()) < 0) {
+                return true;
+            }
+            return false;
         }
     };
 }

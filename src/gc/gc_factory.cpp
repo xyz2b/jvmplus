@@ -18,7 +18,7 @@ GCFactory *GCFactory::set_status(GC_STATUS status) {
 }
 
 void GCFactory::minor_run(GC_Type type, MemoryChunk *mem_chunk) {
-    INFO_PRINT("%s", __func__);
+    DEBUG_PRINT("%s", __func__);
 
     if (get_status() == GC_STATUS_WORKING) {
         WARNING_PRINT("gc is running!!!");

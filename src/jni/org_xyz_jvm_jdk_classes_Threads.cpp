@@ -21,6 +21,7 @@ JNIEXPORT void JNICALL Java_org_xyz_jvm_jdk_classes_Threads_createVm
     g_env = env;
     Universe::initialize_heap();
     Metaspace::initialize();
+    // TODO: Hashmap不能动态扩容
     SystemDictionary::set_dictionary(new Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>());
 
     // 创建线程，此处仅为模拟

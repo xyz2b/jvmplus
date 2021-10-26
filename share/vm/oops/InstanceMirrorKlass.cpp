@@ -21,10 +21,6 @@ int InstanceMirrorKlass::instance_size(KlassHandle k) {
 int InstanceMirrorKlass::static_filed_count(KlassHandle k) {
     // InstanceMirrorKlass storage static fields
     InstanceKlass* instance = (InstanceKlass*)k();
-    int static_filed_count = 0;
-    while (instance != nullptr) {
-        static_filed_count += instance->static_filed_count();
-        instance = (InstanceKlass *)(instance->get_super_klass());
-    }
+    int static_filed_count = instance->static_filed_count();
     return static_filed_count;
 }
