@@ -22,8 +22,23 @@ int main() {
     Metaspace::initialize();
     SystemDictionary::set_dictionary(new Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>);
 
+//    Array<int>* a = new Array<int>();
 //
-//
+//    for (int i = 0; i < 8; i++) {
+//        a->add(i);
+//    }
+//    int r = a->get(7);
+//    int st = a->size();
+//    int c = a->capacity();
+
+//    Hashmap<int ,int>* hp = new Hashmap<int ,int>();
+//    for (int i = 0; i < 8; i++) {
+//        hp->put(i, i);
+//    }
+//    int r = hp->get(7);
+//    int ht = hp->size();
+
+
 //    const char* class_file = "/home/xyzjiao/Desktop/project/jvm/target/classes/org/xyz/jvm/example/HelloWorld";
 //    Symbol* class_files = new (strlen(class_file)) Symbol(class_file, strlen(class_file));
 //

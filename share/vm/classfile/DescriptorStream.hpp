@@ -23,7 +23,7 @@ private:
     int _method_params_size;
 
     // 按顺序存储解析完的方法参数
-    vector<DescriptorInfo*>* _parameters = new vector<DescriptorInfo*>();
+    Array<DescriptorInfo*>* _parameters = new Array<DescriptorInfo*>();
 
     // 解析完的返回参数类型
     DescriptorInfo* _return_element;
@@ -67,7 +67,7 @@ public:
     }
 
     int method_params_size() { return _method_params_size; }
-    vector<DescriptorInfo*>* parameters() { return _parameters; }
+    Array<DescriptorInfo*>* parameters() { return _parameters; }
 
     int return_element_type() { _return_element->type(); }
 
@@ -120,7 +120,7 @@ public:
     * 真正解析描述符方法
     * @return 解析完之后的列表
     * */
-    vector<DescriptorInfo*>* do_parse();
+    Array<DescriptorInfo*>* do_parse();
 
 };
 

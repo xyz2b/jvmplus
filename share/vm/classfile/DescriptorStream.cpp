@@ -329,7 +329,7 @@ jvalue* DescriptorStream::get_params_val(JavaVFrame* frame) {
     jvalue* params_value = (jvalue*)calloc(parameters()->size(), sizeof(jvalue));
 
     for (int i = 0; i < method_params_size(); i++) {
-        switch (parameters()->at(i)->type()) {
+        switch (parameters()->get_at(i)->type()) {
             case T_BOOLEAN:
                 {
                     jboolean bool_val = (jboolean) frame->pop_operand_stack()->data();
@@ -385,7 +385,7 @@ jvalue* DescriptorStream::get_params_val(JavaVFrame* frame) {
                 }
                 break;
             default:
-                ERROR_PRINT("无法识别的params类型%d", parameters()->at(i)->type());
+                ERROR_PRINT("无法识别的params类型%d", parameters()->get_at(i)->type());
                 exit(-1);
         }
     }
@@ -419,7 +419,7 @@ void DescriptorStream::parse_return() {
     Symbol* return_str = _descriptor_info->sub_symbol(param_end_index + 1, _descriptor_info->size());
 
     // 调用解析方法
-    _return_element = (new DescriptorStream(return_str, _method_name))->do_parse()->at(0);
+    _return_element = (new DescriptorStream(return_str, _method_name))->do_parse()->get_at(0);
     INFO_PRINT("该方法的返回值: %s" , return_str->as_C_string());
 }
 
@@ -428,7 +428,7 @@ void DescriptorStream::parse_return() {
  * */
 void DescriptorStream::parse_filed() {
     // 调用解析方法
-    _field = (new DescriptorStream(_descriptor_info))->do_parse()->at(0);
+    _field = (new DescriptorStream(_descriptor_info))->do_parse()->get_at(0);
     INFO_PRINT("字段: %s", _descriptor_info->as_C_string());
 }
 
@@ -454,10 +454,10 @@ void DescriptorStream::parse_method_params() {
 * 真正解析描述符方法
 * @return 解析完之后的列表
 * */
-vector<DescriptorInfo*>* DescriptorStream::do_parse() {
+Array<DescriptorInfo*>* DescriptorStream::do_parse() {
     _descriptor = _descriptor_info->as_C_string();
 
-    vector<DescriptorInfo*>* parse_result = new vector<DescriptorInfo*>();
+    Array<DescriptorInfo*>* parse_result = new Array<DescriptorInfo*>();
 
     for (; index < strlen(_descriptor); index++) {
         char b = *(_descriptor + index);
@@ -467,7 +467,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_array_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
                 break;
             }
             case JVM_SIGNATURE_CLASS: {
@@ -475,7 +475,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_reference_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
                 break;
             }
             case JVM_SIGNATURE_BOOLEAN: {
@@ -483,7 +483,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_boolean_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
 
                 break;
             }
@@ -492,7 +492,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_byte_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
 
                 break;
             }
@@ -501,7 +501,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_char_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
 
                 break;
             }
@@ -510,7 +510,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_short_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
 
                 break;
             }
@@ -519,7 +519,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_int_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
 
                 break;
             }
@@ -528,7 +528,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_float_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
 
                 break;
             }
@@ -537,7 +537,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_long_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
 
                 break;
             }
@@ -546,7 +546,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_double_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
 
                 break;
             }
@@ -555,7 +555,7 @@ vector<DescriptorInfo*>* DescriptorStream::do_parse() {
 
                 DescriptorInfo* ref = parse_void_type();
 
-                parse_result->push_back(ref);
+                parse_result->add(ref);
 
                 break;
             }
