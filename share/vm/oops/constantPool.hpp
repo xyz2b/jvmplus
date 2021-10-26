@@ -32,11 +32,11 @@ public:
     Array<u1>* tags() const { return _tags; }
 
     ConstantPool(u2 length) : _length(length) {
-        _tags = new (length) Array<u1>(length);
+        _tags = new Array<u1>(length);
     }
 
     ConstantPool(Klass* klass, u2 length) : _klass(klass), _length(length) {
-        _tags = new (length) Array<u1>(length);
+        _tags = new Array<u1>(length);
     }
 
     /**

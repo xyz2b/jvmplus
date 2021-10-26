@@ -15,11 +15,11 @@ private:
 
     size_t     _size;        // the number of array elements
     size_t     _capacity;
-    T         _data[0];       // the array memory
+    T*         _data;       // the array memory
 
 public:
-    void* operator new (size_t size, size_t length) {
-        return Metaspace::allocate(size + length * sizeof(T))->value();
+    void* operator new (size_t size) {
+        return Metaspace::allocate(size)->value();
     }
     void operator delete(void* p) {}
 
@@ -85,6 +85,7 @@ public:
 
 template<typename T>
 Array<T>::Array(): _size(0), _capacity(initCapacity) {
+    _data = (T*) Metaspace::allocate(initCapacity * sizeof(*_data))->value();
 }
 
 template<typename T>
@@ -117,6 +118,7 @@ Array<T> * Array<T>::operator=(const Array<T> *array) {
 
 template<typename T>
 Array<T>::Array(size_t capacity): _size(0), _capacity(capacity) {
+    _data = (T*) Metaspace::allocate(capacity * sizeof(*_data))->value();
 }
 
 template<typename T>
@@ -125,29 +127,29 @@ void Array<T>::insert(size_t index, T value) {
         // index索引非法
         exit(-1);
 
-//    if (_size == _capacity)
-//        resize(2 * _capacity);
+    if (_size == _capacity)
+        resize(2 * _capacity);
 
     *(_data + index) = value;
 
     _size++;
 }
 
-//template<typename T>
-//void Array<T>::resize(size_t newCapacity) {
-//    T* newArray = Metaspace::allocate(newCapacity * sizeof(T*))->value();
-//
-////    memcpy(newArray, _data, (_capacity) * sizeof(T));
-//
-//    for (int i = 0 ; i < _capacity ; ++i) {
-//        *(newArray + i) = *(_data + i);
-//    }
-//
-//    delete _data;
-//
-//    _data = newArray;
-//    _capacity = newCapacity;
-//}
+template<typename T>
+void Array<T>::resize(size_t newCapacity) {
+    T* newArray = (T*) Metaspace::allocate(newCapacity * sizeof(*_data))->value();
+
+//    memcpy(newArray, _data, (_capacity) * sizeof(T));
+
+    for (int i = 0 ; i < _capacity ; ++i) {
+        *(newArray + i) = *(_data + i);
+    }
+
+    delete _data;
+
+    _data = newArray;
+    _capacity = newCapacity;
+}
 
 
 template<typename T>
@@ -201,8 +203,8 @@ T Array<T>::remove(size_t index) {
 
     _size--;
 
-//    if (_size == _capacity / 4 && _capacity /2 != 0)
-//        resize(_capacity / 2);
+    if (_size == _capacity / 4 && _capacity /2 != 0)
+        resize(_capacity / 2);
 
     return ret;
 }

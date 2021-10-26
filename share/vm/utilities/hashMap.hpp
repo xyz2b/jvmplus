@@ -84,7 +84,7 @@ Hashmap<K, V, HashFn>::~Hashmap() {
 
 template<class K, class V, class HashFn >
 Hashmap<K, V, HashFn>::Hashmap(const Hashmap<K, V> *hashMap) {
-    _hashtable = new (hashMap->_M) Array<Map<K, V>*>(hashMap->_M);
+    _hashtable = new Array<Map<K, V>*>(hashMap->_M);
     for (int i = 0 ; i < hashMap->_M; ++i) {
         Map<K, V>* m = hashMap->get(i);
         for(auto iterator = m->begin(); iterator != m->end(); iterator++) {
@@ -95,9 +95,14 @@ Hashmap<K, V, HashFn>::Hashmap(const Hashmap<K, V> *hashMap) {
 }
 
 template<class K, class V, class HashFn >
-Hashmap<K, V, HashFn>::Hashmap(size_t M): _M(M), _size(0) {
-    _hashtable = new (M) Array<Map<K, V>*>(M);
-    for (int i = 0 ; i < M ; ++i) {
+Hashmap<K, V, HashFn>::Hashmap(size_t M): _size(0) {
+    if (M == 0)
+        _M = initCapacity;
+    else
+        _M = M;
+
+    _hashtable = new Array<Map<K, V>*>(_M);
+    for (int i = 0 ; i < _M ; ++i) {
         Map<K, V>* _map = new Map<K, V>();
         _hashtable->insert(i, _map);
     }
@@ -105,7 +110,7 @@ Hashmap<K, V, HashFn>::Hashmap(size_t M): _M(M), _size(0) {
 
 template<class K, class V, class HashFn >
 Hashmap<K, V, HashFn>::Hashmap(): _M(initCapacity), _size(0) {
-    _hashtable = new (initCapacity) Array<Map<K, V>*>(initCapacity);
+    _hashtable = new Array<Map<K, V>*>(initCapacity);
     for (int i = 0 ; i < initCapacity ; ++i) {
         _hashtable->insert(i, new Map<K, V>());
     }
@@ -178,7 +183,7 @@ bool Hashmap<K, V, HashFn>::contains(K key) {
 
 template<class K, class V, class HashFn>
 void Hashmap<K, V, HashFn>::resize(size_t newM) {
-    Array<Map<K, V>*>* newHashTable = new (newM) Array<Map<K, V>*>(newM);
+    Array<Map<K, V>*>* newHashTable = new Array<Map<K, V>*>(newM);
     for (int i = 0 ; i < newM ; ++i) {
         newHashTable->insert(i, new Map<K, V>());
     }

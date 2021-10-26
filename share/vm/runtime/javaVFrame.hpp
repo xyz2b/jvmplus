@@ -23,7 +23,7 @@ private:
 
 public:
     JavaVFrame(int max_locals, Method* method) : _method(method) {
-        _local_variable_table = new (max_locals) Array<StackValue*>(max_locals);
+        _local_variable_table = new Array<StackValue*>(max_locals);
         _operand_stack = new Stack<StackValue*>();
     }
 
