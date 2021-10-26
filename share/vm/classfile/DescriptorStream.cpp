@@ -249,17 +249,28 @@ DescriptorInfo* DescriptorStream::parse_array_type() {
 void DescriptorStream::push_field(jobject o, JavaVFrame* frame) {
     switch (_field->type()) {
         case T_BOOLEAN:
+            frame->push_operand_stack(new StackValue(T_INT, (jint)(*((jboolean*)(&o)))));
+            break;
         case T_SHORT:
+            frame->push_operand_stack(new StackValue(T_INT, (jint)(*((jshort*)(&o)))));
+            break;
         case T_CHAR:
+            frame->push_operand_stack(new StackValue(T_INT, (jint)(*((jchar*)(&o)))));
+            break;
         case T_BYTE:
+            frame->push_operand_stack(new StackValue(T_INT, (jint)(*((jbyte*)(&o)))));
+            break;
         case T_INT:
-            frame->push_operand_stack(new StackValue(T_INT, *((int*)o)));
+            frame->push_operand_stack(new StackValue(T_INT, *((jint*)(&o))));
             break;
         case T_LONG:
-            frame->push_operand_stack(new StackValue(T_LONG, *((long*)o)));
+            frame->push_operand_stack(new StackValue(T_LONG, *((jlong*)(&o))));
+            break;
+        case T_FLOAT:
+            frame->push_operand_stack(new StackValue(T_LONG, *((jfloat*)(&o))));
             break;
         case T_DOUBLE:
-            frame->push_operand_stack(new StackValue(T_DOUBLE, *((double*)o)));
+            frame->push_operand_stack(new StackValue(T_DOUBLE, *((jdouble*)(&o))));
             break;
         case T_OBJECT:
             frame->push_operand_stack(new StackValue(T_OBJECT, o));
@@ -276,17 +287,28 @@ void DescriptorStream::push_field(jobject o, JavaVFrame* frame) {
 void DescriptorStream::push_return_element(jobject o, JavaVFrame* frame) {
     switch (_return_element->type()) {
         case T_BOOLEAN:
+            frame->push_operand_stack(new StackValue(T_INT, (jint)(*((jboolean*)(&o)))));
+            break;
         case T_SHORT:
+            frame->push_operand_stack(new StackValue(T_INT, (jint)(*((jshort*)(&o)))));
+            break;
         case T_CHAR:
+            frame->push_operand_stack(new StackValue(T_INT, (jint)(*((jchar*)(&o)))));
+            break;
         case T_BYTE:
+            frame->push_operand_stack(new StackValue(T_INT, (jint)(*((jbyte*)(&o)))));
+            break;
         case T_INT:
-            frame->push_operand_stack(new StackValue(T_INT, *((int*)o)));
+            frame->push_operand_stack(new StackValue(T_INT, *((jint*)(&o))));
             break;
         case T_LONG:
-            frame->push_operand_stack(new StackValue(T_LONG, *((long*)o)));
+            frame->push_operand_stack(new StackValue(T_LONG, *((jlong*)(&o))));
+            break;
+        case T_FLOAT:
+            frame->push_operand_stack(new StackValue(T_LONG, *((jfloat*)(&o))));
             break;
         case T_DOUBLE:
-            frame->push_operand_stack(new StackValue(T_DOUBLE, *((double *)o)));
+            frame->push_operand_stack(new StackValue(T_DOUBLE, *((jdouble*)(&o))));
             break;
         case T_OBJECT:
             frame->push_operand_stack(new StackValue(T_OBJECT, o));

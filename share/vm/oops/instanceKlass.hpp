@@ -32,6 +32,8 @@ private:
     u2 _this_class;
     u2 _super_class;
 
+    Klass* _super_klass;
+
     u2 _interfaces_count;
     // Interface (Klass*s) this class declares to implement.
     Array<u2>*  _interfaces;
@@ -52,12 +54,17 @@ private:
     int _static_field_size;
 
     int _non_static_filed_count;
+
+    u1 _init_state;
 public:
     int static_field_size() const            { return _static_field_size; }
     void set_static_field_size(int size)     { _static_field_size = size; }
 
     int static_filed_count() { return _static_filed_count; }
     void set_static_filed_count(int count) { _static_filed_count = count; }
+
+    int non_static_filed_count() { return _non_static_filed_count; }
+    void set_non_static_filed_count(int count) { _non_static_filed_count = count; }
 
     FiledInfo* find_field(Symbol* field_name, Symbol* descriptor_name);
 
@@ -135,7 +142,25 @@ public:
     void set_attributes(Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes) { _attributes = attributes; }
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* get_attributes() { return _attributes; }
 
+    void set_super_klass(Klass* klass) { _super_klass = klass; }
+    Klass* get_super_klass() { return _super_klass; }
+
+    void set_init_state(ClassState state) { _init_state = (u1)state; }
+
+    // initialization state
+    bool is_loaded() const                   { return _init_state >= loaded; }
+    bool is_linked() const                   { return _init_state >= linked; }
+    bool is_initialized() const              { return _init_state == fully_initialized; }
+    bool is_not_initialized() const          { return _init_state <  being_initialized; }
+    bool is_being_initialized() const        { return _init_state == being_initialized; }
+    bool is_in_error_state() const           { return _init_state == initialization_error; }
+
+    ClassState  init_state()                 { return (ClassState)_init_state; }
+
     instanceOop allocate_instance(KlassHandle k);
+    int non_static_filed_count(KlassHandle k);
+    void link_class();
+    bool link_class_impl(InstanceKlassHandle this_oop);
 };
 
 

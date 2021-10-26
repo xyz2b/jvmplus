@@ -24,7 +24,7 @@ InstanceKlassHandle ClassLoader::load_classfile(Symbol *h_name) {
         h = parser.parse_class_file(h_name);
 
     } else {
-        ERROR_PRINT("open class file failed");
+        ERROR_PRINT("open class file %s failed", file_name);
         exit(-1);
     }
 

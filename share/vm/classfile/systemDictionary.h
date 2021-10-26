@@ -12,10 +12,12 @@
 
 class SystemDictionary {
 private:
+    // 该类加载器的加载路径，多个路径以分号分隔，只有一个的话，分号可省略。注意路径后面的斜杠不可丢
     static Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>* _dictionary;
 public:
     static Klass* resolve_or_null(Symbol* class_name);
     static Klass* resolve_instance_class_or_null(Symbol *class_name);
+    static void load_super_class(Klass* klass);
 
     static Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>* dictionary() { return _dictionary; }
     static void set_dictionary(Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>* dictionary) { _dictionary = dictionary; }

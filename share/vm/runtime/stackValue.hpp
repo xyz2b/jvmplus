@@ -30,6 +30,11 @@ public:
         *(jlong*)_data = v;
     }
 
+    StackValue(BasicType type, float v) {
+        _type = type;
+        *(float*)_data = v;
+    }
+
     StackValue(BasicType type, double v) {
         _type = type;
         *(double*)_data = v;

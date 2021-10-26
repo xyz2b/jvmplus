@@ -9,10 +9,22 @@ instanceOop InstanceMirrorKlass::allocate_instance(KlassHandle k) {
 
     instanceOop i = (instanceOop) CollectedHeap::obj_allocate(k, size);
 
+    Hashmap<Symbol*, jobject, HashCode<const Symbol*>>* fields = new Hashmap<Symbol*, jobject, HashCode<const Symbol*>>(static_filed_count(k));
+    i->set_fields(fields);
     return i;
 }
 
 int InstanceMirrorKlass::instance_size(KlassHandle k) {
-    // InstanceMirrorKlass storage static fields
     return sizeof(oopDesc);
+}
+
+int InstanceMirrorKlass::static_filed_count(KlassHandle k) {
+    // InstanceMirrorKlass storage static fields
+    InstanceKlass* instance = (InstanceKlass*)k();
+    int static_filed_count = 0;
+    while (instance != nullptr) {
+        static_filed_count += instance->static_filed_count();
+        instance = (InstanceKlass *)(instance->get_super_klass());
+    }
+    return static_filed_count;
 }

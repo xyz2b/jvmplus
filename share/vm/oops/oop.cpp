@@ -8,6 +8,7 @@
 jobject oopDesc::get_field(Symbol* class_name, Symbol* field_name) {
     const char * contact = "#";
     Symbol* field_full_name = *(*class_name + contact) + field_name;
+    INFO_PRINT("field full name: %s", field_full_name->as_C_string());
 
     jobject field_val = _fields->get(field_full_name);
 

@@ -47,7 +47,7 @@ public:
         }
 
         for (int i = 0; i < s->size(); i++) {
-            new_symbol->byte_at_put(i, s->byte_at(i));
+            new_symbol->byte_at_put(i + this->size(), s->byte_at(i));
         }
 
         return new_symbol;
@@ -63,7 +63,7 @@ public:
         }
 
         for (int i = 0; i < strlen(s); i++) {
-            new_symbol->byte_at_put(i, *(s + i));
+            new_symbol->byte_at_put(i + this->size(), *(s + i));
         }
 
         return new_symbol;

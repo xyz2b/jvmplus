@@ -6,6 +6,16 @@
 #include "../../../share/vm/runtime/Threads.hpp"
 
 int main() {
+    // double 转 long 再转double
+//    double d = 2.1;
+//    long l = *((long*)(&d));
+//    double d2 = *(double *)&l;
+
+//    jdouble double_val = 1.1;
+//    jobject field_val = nullptr;
+//    *((jdouble*)(&field_val)) = double_val;
+//    jdouble double_val2 = *((jdouble*)(&field_val));
+
     // 初始化堆内存以及元空间
     Universe::initialize_heap();
     Metaspace::initialize();

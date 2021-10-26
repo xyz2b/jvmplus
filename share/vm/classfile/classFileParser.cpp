@@ -58,6 +58,7 @@ ClassFileParser::parse_class_file(Symbol *name) {
     // 字段列表
     Array<FiledInfo*>* fields = parse_fields(fields_len, &static_filed_count, &non_static_field_count);
     INFO_PRINT("static field count: %d", static_filed_count);
+    INFO_PRINT("non static field count: %d", non_static_field_count);
 
     // 成员方法数量
     u2 methods_len = cfs->get_u2_fast();

@@ -26,6 +26,7 @@ public:
     int instance_size(KlassHandle k);
 
     instanceOop allocate_instance(KlassHandle k);
+    int static_filed_count(KlassHandle k);
 };
 
 
