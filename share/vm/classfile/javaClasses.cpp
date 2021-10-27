@@ -8,7 +8,7 @@
 void java_lang_Class::create_mirror(KlassHandle k) {
     assert(k->java_mirror() == nullptr, "should only assign mirror once");
 
-    Handle mirror = InstanceMirrorKlass::cast(k())->allocate_instance(k);
+    oop mirror = InstanceMirrorKlass::cast(k())->allocate_instance(k);
 
-    k->set_java_mirror(mirror());
+    k->set_java_mirror(mirror);
 }

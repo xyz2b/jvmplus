@@ -58,7 +58,9 @@ struct HashCode<const Symbol*>
 {
     size_t
     operator()(const Symbol* s) const
-    { return hash_string(s->as_C_string()); }
+    {
+        return hash_string(s->as_C_string());
+    }
 };
 
 template<>

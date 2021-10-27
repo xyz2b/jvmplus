@@ -8,16 +8,16 @@
 #include "../../../share/vm/runtime/VFrame.hpp"
 #include "../../../share/vm/utilities/globalDefinitions.hpp"
 #include "../../../share/vm/runtime/Thread.hpp"
-#include "../../../share/vm/utilities/stack.hpp"
+#include "../../../share/vm/utilities/array.hpp"
 
 class JavaThread : public Thread {
 private:
     // 当前线程的虚拟机栈，VFrame是栈帧
-    Stack<VFrame*>* _stack;
+    Array<VFrame*>* _stack;
 
 public:
     JavaThread() {
-        _stack = new Stack<VFrame*>();
+        _stack = new Array<VFrame*>();
     }
 
     VFrame* pop_frame() {

@@ -158,9 +158,14 @@ public:
     ClassState  init_state()                 { return (ClassState)_init_state; }
 
     instanceOop allocate_instance(KlassHandle k);
+    void put_field_to_oop(instanceOop child_oop, InstanceKlassHandle this_klass);
+
     int non_static_filed_count(KlassHandle k);
     void link_class();
     bool link_class_impl(InstanceKlassHandle this_oop);
+
+    void initialize();
+    void initialize_impl(InstanceKlassHandle this_oop);
 };
 
 

@@ -24,12 +24,18 @@ int main() {
 
 //    Array<int>* a = new Array<int>();
 //
-//    for (int i = 0; i < 8; i++) {
+//    for (int i = 0; i < 15; i++) {
 //        a->add(i);
 //    }
 //    int r = a->get(7);
 //    int st = a->size();
 //    int c = a->capacity();
+//    int rp = a->peek();
+//    int rs = a->pop();
+//    for(int i = 0; i < 10; i++) {
+//        int fs = a->pop();
+//    }
+//    int d = a->peek();
 
 //    Hashmap<int ,int>* hp = new Hashmap<int ,int>();
 //    for (int i = 0; i < 8; i++) {
@@ -56,7 +62,7 @@ int main() {
     JavaThread* thread = new JavaThread();
 
     // 将新创建的线程存放到线程管理器中
-    Threads::set_threads(new Vector<Thread*>());
+    Threads::set_threads(new Array<Thread*>());
     Threads::add_thread(thread);
     // 设置线程管理器的当前线程
     Threads::set_current_thread(thread);
@@ -68,7 +74,7 @@ int main() {
 //    InstanceKlassHandle instanceKlassHandle = classLoader->load_classfile(s);
 //    INFO_PRINT("version: %d", instanceKlassHandle->get_major_version());
 
-    SystemDictionary::resolve_or_null(s);
+    InstanceKlass* ins = (InstanceKlass*)SystemDictionary::resolve_or_null(s);
 
 //    const char* class_file = "/home/xyzjiao/Desktop/project/jvm/target/classes/org/xyz/jvm/example/HelloWorld";
 //    Symbol* class_files = new (strlen(class_file)) Symbol(class_file, strlen(class_file));
@@ -76,22 +82,22 @@ int main() {
 //    Klass* r = SystemDictionary::dictionary()->get(class_files);
 //    int i = SystemDictionary::dictionary()->size();
 
-    SystemDictionary::resolve_or_null(s);
+//    SystemDictionary::resolve_or_null(s);
 
 
 
 //    u2 major_version = ((InstanceKlass*) instanceKlassHandle->get_methods()->get_at(0)->get_belong_klass())->get_major_version();
 //    INFO_PRINT("%d", major_version);
 //
-//    const char* method = "main";
-//    const char* descriptor = "([Ljava/lang/String;)V";
-//    Symbol* method_n = new (strlen(method)) Symbol(method, strlen(method));
-//    Symbol* descriptor_n = new (strlen(descriptor)) Symbol(descriptor, strlen(descriptor));
-//
-//    Method* method_info = JavaNativeInterface::get_method(instanceKlassHandle(), method_n, descriptor_n);
-//
+    const char* method = "main";
+    const char* descriptor = "([Ljava/lang/String;)V";
+    Symbol* method_n = new (strlen(method)) Symbol(method, strlen(method));
+    Symbol* descriptor_n = new (strlen(descriptor)) Symbol(descriptor, strlen(descriptor));
+
+    Method* method_info = JavaNativeInterface::get_method(ins, method_n, descriptor_n);
+
 //    instanceKlassHandle->java_mirror();
 //
-//    JavaNativeInterface::call_static_method(instanceKlassHandle(), method_info);
+    JavaNativeInterface::call_static_method(ins, method_info);
     return 0;
 }

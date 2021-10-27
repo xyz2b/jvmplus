@@ -14,9 +14,6 @@ JNIEXPORT jobject JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_loadClassFile
     const char* name = JniTools::getCharsFromJString(class_name, true);
     Symbol* s = new (strlen(name)) Symbol(name, strlen(name));
     Klass* klass = SystemDictionary::resolve_or_null(s);
-
-    INFO_PRINT("AppClassLoader load klass, %s : %p", name, klass);
-
     return JniHandle::klassToHandle(env, klass);
 }
 
@@ -41,6 +38,7 @@ JNIEXPORT void JNICALL Java_org_xyz_jvm_jdk_classes_JniEnv_callStaticVoidMethod
 
     Method* method = JniHandle::handleToMethod(env, method_handle);
     InstanceKlass* instance_klass = (InstanceKlass*) JniHandle::handleToKlass(env, klass_handle);
+    INFO_PRINT("%p, %p", method, instance_klass);
     JavaNativeInterface::call_static_method(instance_klass, method);
-    INFO_PRINT("执行方法%s结束", instance_klass->get_constant_pool()->symbol_at(method->name_index())->as_C_string());
+//    INFO_PRINT("执行方法%s结束", instance_klass->get_constant_pool()->symbol_at(method->name_index())->as_C_string());
 }

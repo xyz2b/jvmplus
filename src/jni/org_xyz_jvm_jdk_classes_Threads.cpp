@@ -21,13 +21,12 @@ JNIEXPORT void JNICALL Java_org_xyz_jvm_jdk_classes_Threads_createVm
     g_env = env;
     Universe::initialize_heap();
     Metaspace::initialize();
-    // TODO: Hashmap不能动态扩容
     SystemDictionary::set_dictionary(new Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>());
 
     // 创建线程，此处仅为模拟
     JavaThread* thread = new JavaThread();
 
-    Threads::set_threads(new Vector<Thread*>());
+    Threads::set_threads(new Array<Thread*>());
     // 将新创建的线程存放到线程管理器中
     Threads::add_thread(thread);
     // 设置线程管理器的当前线程

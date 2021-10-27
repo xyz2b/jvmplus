@@ -11,6 +11,7 @@ instanceOop InstanceMirrorKlass::allocate_instance(KlassHandle k) {
 
     Hashmap<Symbol*, jobject, HashCode<const Symbol*>>* fields = new Hashmap<Symbol*, jobject, HashCode<const Symbol*>>(static_filed_count(k));
     i->set_fields(fields);
+
     return i;
 }
 

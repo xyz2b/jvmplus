@@ -100,7 +100,6 @@ Hashmap<K, V, HashFn>::Hashmap(size_t M): _size(0) {
         _M = initCapacity;
     else
         _M = M;
-
     _hashtable = new Array<Map<K, V>*>(_M);
     for (int i = 0 ; i < _M ; ++i) {
         Map<K, V>* _map = new Map<K, V>();
@@ -118,7 +117,8 @@ Hashmap<K, V, HashFn>::Hashmap(): _M(initCapacity), _size(0) {
 
 template<class K, class V, class HashFn>
 size_t Hashmap<K, V, HashFn>::_hash(K key) {
-    return HashFn()(key) % _M;
+    size_t h = HashFn()(key);
+    return h % _M;
 }
 
 template<class K, class V, class HashFn>

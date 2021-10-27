@@ -19,13 +19,14 @@ public:
     oopDesc(Klass* klass) : _klass(klass) {}
 
     void set_fields(Hashmap<Symbol*, jobject, HashCode<const Symbol*>>* fields) { _fields = fields; }
+    size_t fields_size() { return _fields->size(); }
 
     Klass* klass() const { return _klass; }
     void set_klass(Klass* klass) { _klass = klass; }
 
 
     jobject get_field(Symbol* class_name, Symbol* field_name);
-    void add_field(Symbol* class_name, Symbol* field_name, jobject value);
+    void put_field(Symbol* class_name, Symbol* field_name, jobject value);
 };
 
 

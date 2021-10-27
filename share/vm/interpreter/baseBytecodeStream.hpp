@@ -51,7 +51,7 @@ public:
     }
 
     bool end() {
-        return _current > _code_end;
+        return _current >= _code_end;
     }
 
     void inc(size_t step) {
@@ -59,7 +59,7 @@ public:
     }
 
     void setIndex(size_t index) {
-        _current = _code_end;
+        _current = _code_start;
         _current += index;
     }
 

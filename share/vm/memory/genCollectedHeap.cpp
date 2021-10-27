@@ -17,9 +17,9 @@ void GenCollectedHeap::initialize() {
     _gens = (MemoryChunk **)calloc(sizeof(MemoryChunk *), _n_gens);
 
     // 新生代
-    _gens[0] = _memory_pool->new_chunk(80);
+    _gens[0] = _memory_pool->new_chunk(81920);
     // 老年代
-    _gens[1] = _memory_pool->new_chunk(160);
+    _gens[1] = _memory_pool->new_chunk(81920);
 
     _gch = this;
 }

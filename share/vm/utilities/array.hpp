@@ -33,6 +33,7 @@ public:
     T get(size_t index);
     T get_at(size_t index);
     T remove(size_t index);
+    T removeLast(T value);
     void set(size_t index, T value);
     void add(T value);
     void set_at(size_t index, T value);
@@ -41,7 +42,7 @@ public:
     size_t capacity() { return _capacity; }
     T pop();
     void push(T);
-    T peek();
+    T top();
 
     void insertLast(T value);
     void insertFirst(T value);
@@ -167,7 +168,7 @@ T Array<T>::get_at(size_t index) {
 }
 
 template<typename T>
-T Array<T>::peek() {
+T Array<T>::top() {
     return get_at(_size - 1);
 }
 
@@ -181,7 +182,7 @@ T Array<T>::pop() {
 
 template<typename T>
 void Array<T>::push(T value) {
-    add(value);
+    insertLast(value);
 }
 
 template<typename T>
@@ -191,8 +192,6 @@ T Array<T>::remove(size_t index) {
         exit(-1);
 
     T ret = *(_data + index);
-
-    delete (_data + index);
 
     void *src = (char*)_data + (index + 1) * sizeof(T);
     void *dst = (char*)_data + index * sizeof(T);
@@ -218,7 +217,7 @@ void Array<T>::set(size_t index, T value) {
 
 template<typename T>
 void Array<T>::add(T value) {
-    insert(_size, value);
+    insertLast(value);
 }
 
 template<typename T>
@@ -237,6 +236,11 @@ void Array<T>::insertFirst(T value) {
     insert(0, value);
 }
 
+template<typename T>
+T Array<T>::removeLast(T value) {
+    T res = remove(_size - 1);
+    return res;
+}
 
 
 

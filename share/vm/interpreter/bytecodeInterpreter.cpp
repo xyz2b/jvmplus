@@ -22,10 +22,13 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
 
     JavaVFrame* frame = (JavaVFrame*) current_thread->top_frame();
 
-    stack<StackValue*>* operand_stack = frame->get_operand_stack();
+    Array<StackValue*>* operand_stack = frame->get_operand_stack();
     Array<StackValue*>* local_variable_table = frame->get_local_variable_table();
     Klass* klass = method->get_belong_klass();
     ConstantPool* constant_pool = ((InstanceKlass*)klass)->get_constant_pool();
+
+    INFO_PRINT("run %s::%s", constant_pool->get_class_name_by_class_ref(((InstanceKlass*)klass)->get_this_class())->as_C_string(),constant_pool->symbol_at(method->name_index())->as_C_string());
+
 
     while (!code->end()) {
         u1 opcode = code->get_u1_code();
@@ -79,49 +82,49 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                             case T_BOOLEAN:
                                 {
                                     jboolean bool_val = g_env->GetStaticBooleanField(clazz, field);
-                                    field_val = reinterpret_cast<jobject>(&bool_val);
+                                    *((jboolean*)(&field_val)) = bool_val;
                                 }
                                 break;
                             case T_SHORT:
                                 {
                                     jshort short_val = g_env->GetStaticShortField(clazz, field);
-                                    field_val = reinterpret_cast<jobject>(&short_val);
+                                    *((jshort*)(&field_val)) = short_val;
                                 }
                                 break;
                             case T_CHAR:
                                 {
                                     jchar char_val = g_env->GetStaticCharField(clazz, field);
-                                    field_val = reinterpret_cast<jobject>(&char_val);
+                                    *((jchar*)(&field_val)) = char_val;
                                 }
                                 break;
                             case T_BYTE:
                                 {
                                     jbyte byte_val = g_env->GetStaticByteField(clazz, field);
-                                    field_val = reinterpret_cast<jobject>(&byte_val);
+                                    *((jbyte*)(&field_val)) = byte_val;
                                 }
                                 break;
                             case T_INT:
                                 {
                                     jint int_val = g_env->GetStaticIntField(clazz, field);
-                                    field_val = reinterpret_cast<jobject>(&int_val);
+                                    *((jint*)(&field_val)) = int_val;
                                 }
                                 break;
                             case T_LONG:
                                 {
                                     jlong long_val = g_env->GetStaticLongField(clazz, field);
-                                    field_val = reinterpret_cast<jobject>(&long_val);
+                                    *((jlong*)(&field_val)) = long_val;
                                 }
                                 break;
                             case T_FLOAT:
                                 {
                                     jfloat float_val = g_env->GetStaticFloatField(clazz, field);
-                                    field_val = reinterpret_cast<jobject>(&float_val);
+                                    *((jfloat*)(&field_val)) = float_val;
                                 }
                                 break;
                             case T_DOUBLE:
                                 {
                                     jdouble double_val = g_env->GetStaticDoubleField(clazz, field);
-                                    field_val = reinterpret_cast<jobject>(&double_val);
+                                    *((jdouble*)(&field_val)) = double_val;
                                 }
                                 break;
                             case T_OBJECT:
@@ -135,11 +138,137 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                 exit(-1);
                         }
                     } else {
+                        InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+                        klass->link_class();
+                        klass->initialize();
+
+                        // TODO: 没有在父类中寻找
                         oop mirror = klass->java_mirror();
                         field_val = mirror->get_field(class_name, field_name);
                     }
                     INFO_PRINT("static field: %s, value: %s", field_name->as_C_string(), field_val);
                     descriptor_stream->push_field(field_val, frame);
+                }
+                break;
+            case PUTSTATIC:
+                {
+                    INFO_PRINT("执行指令: putstatic，该指令功能为: 为指定类的静态字段赋值");
+                    // 取出操作数，putstatic指令的操作数是常量池的索引（Fieldref），占两个字节
+                    int operand = code->get_u2_code();
+
+                    Symbol* class_name = constant_pool->get_class_name_by_field_ref(operand);
+                    Symbol* field_name = constant_pool->get_filed_name_by_field_ref(operand);
+                    Symbol* descriptor_name = constant_pool->get_descriptor_by_field_ref(operand);
+
+                    // 解析字段描述符
+                    DescriptorStream* descriptor_stream = new DescriptorStream(descriptor_name);
+                    descriptor_stream->parse_filed();
+
+                    // 从栈中取出对应类型的字段值
+                    jobject value = descriptor_stream->get_field_val(frame);
+
+                    if (class_name->start_with("java")) {
+                        // 获取类元信息
+                        jclass clazz = g_env->FindClass(class_name->as_C_string());
+                        if (nullptr == clazz) {
+                            ERROR_PRINT("获取clazz出错")
+                            exit(-1);
+                        }
+
+                        // 2.获取属性信息
+                        jfieldID field = g_env->GetStaticFieldID(clazz, field_name->as_C_string(), descriptor_name->as_C_string());
+                        if (nullptr == field) {
+                            ERROR_PRINT("获取field出错了")
+                            exit(-1);
+                        }
+
+                        // 3.读属性值（静态属性值在Class对象中）
+                        switch (descriptor_stream->get_field_type()) {
+                            case T_BOOLEAN:
+                                {
+                                    jboolean field_val = *((jboolean *)(&value));
+                                    g_env->SetStaticBooleanField(clazz, field, field_val);
+                                }
+                                break;
+                            case T_SHORT:
+                                {
+                                    jshort field_val = *((jshort *)(&value));
+                                    g_env->SetStaticShortField(clazz, field, field_val);
+                                }
+                                break;
+                            case T_CHAR:
+                                {
+                                    jchar field_val = *((jchar *)(&value));
+                                    g_env->SetStaticCharField(clazz, field, field_val);
+                                }
+                                break;
+                            case T_BYTE:
+                                {
+                                    jbyte field_val = *((jbyte*)(&value));
+                                    g_env->SetStaticByteField(clazz, field, field_val);
+                                }
+                                break;
+                            case T_INT:
+                                {
+                                    jint field_val = *((jint*)(&value));
+                                    g_env->SetStaticIntField(clazz, field, field_val);
+                                }
+                                break;
+                            case T_LONG:
+                                {
+                                    jlong field_val = *((jlong*)(&value));
+                                    g_env->SetStaticLongField(clazz, field, field_val);
+                                }
+                                break;
+                            case T_FLOAT:
+                                {
+                                    jfloat field_val = *((jfloat*)(&value));
+                                    g_env->SetStaticFloatField(clazz, field, field_val);
+                                }
+                                break;
+                            case T_DOUBLE:
+                                {
+                                    jdouble field_val = *((jdouble*)(&value));
+                                    g_env->SetStaticDoubleField(clazz, field, field_val);
+                                }
+                                break;
+                            case T_OBJECT:
+                                {
+                                    g_env->SetStaticObjectField(clazz, field, value);
+                                }
+                                break;
+                            default:
+                                ERROR_PRINT("无法识别的field类型%s", descriptor_name->as_C_string());
+                                exit(-1);
+                        }
+                    } else {
+                        InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+                        klass->link_class();
+                        klass->initialize();
+
+                        // TODO: 没有处理设置父类静态变量
+                        oop mirror = klass->java_mirror();
+                        mirror->put_field(class_name, field_name, value);
+                    }
+                }
+                break;
+            case LDC2_W:
+                {
+                    INFO_PRINT("执行指令: ldc2_w，该指令功能为: 从运行时常量池中提取long或double数据并压入操作数栈（宽索引）中");
+                    // 取出操作数，两个无符号byte类型整数，合并之后的值就是 运行时常量池中的索引号，占两个字节
+                    int operand = code->get_u2_code();
+
+                    ConstantTag tag = constant_pool->tag_at(operand);
+
+                    if (tag.is_long()) {
+                        long l = constant_pool->get_long_by_long_ref(operand);
+                        frame->push_operand_stack(new StackValue(T_LONG, l));
+                    } else if (tag.is_double()) {
+                        double d = constant_pool->get_double_by_double_ref(operand);
+                        frame->push_operand_stack(new StackValue(T_DOUBLE, d));
+                    } else {
+                        ERROR_PRINT("无法识别的格式: %d", tag.value());
+                    }
                 }
                 break;
             case LDC:
@@ -193,14 +322,6 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     }
                 }
                 break;
-            case RETURN:
-                {
-                    INFO_PRINT("执行指令: return，该指令功能为: 从方法中返回void，恢复调用者的栈帧，并且把程序的控制权交回调用者");
-                    // pop出栈帧
-                    current_thread->pop_frame();
-                    INFO_PRINT("剩余栈帧数量: %d", current_thread->frame_size());
-                }
-                break;
             case NEW:
                 {
                     INFO_PRINT("执行指令: new，该指令功能为: 创建一个对象，并将其引用压入栈顶");
@@ -224,14 +345,18 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                             exit(-1);
                         }
 
-                        // not call construct
-                        jobject object = g_env->AllocObject(clazz);
+                        // call construct
+                        jobject object = g_env->NewObject(clazz, construct);
 
                         frame->push_operand_stack(new StackValue(T_OBJECT, object));
                     } else {
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+                        klass->link_class();
+                        klass->initialize();
 
+                        INFO_PRINT("生成oop实例")
                         instanceOop oop = klass->allocate_instance(klass);
+
 
                         frame->push_operand_stack(new StackValue(T_OBJECT, (jobject)oop));
                     }
@@ -291,7 +416,6 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     frame->push_operand_stack(value);
                 }
                 break;
-
             case BIPUSH:
                 {
                     INFO_PRINT("执行指令: bipush，该指令功能为: 将立即数byte带符号扩展为一个int类型的值，然后压入操作数栈中");
@@ -305,6 +429,14 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     INFO_PRINT("执行指令: pop，该指令功能为: 将栈顶元素出栈");
                     frame->pop_operand_stack();
                 }
+                break;
+            case RETURN:
+            {
+                INFO_PRINT("执行指令: return，该指令功能为: 从方法中返回void，恢复调用者的栈帧，并且把程序的控制权交回调用者");
+                // pop出栈帧
+                current_thread->pop_frame();
+                INFO_PRINT("剩余栈帧数量: %d", current_thread->frame_size());
+            }
                 break;
             case IRETURN:
                 {
@@ -408,7 +540,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     } else {
                         INFO_PRINT("set object field value, %s.%s = %ld", class_name->as_C_string(), field_name->as_C_string(), (jlong)value);
                         instanceOop instance_oop = (instanceOop)obj;
-                        instance_oop->add_field(class_name, field_name, value);
+                        instance_oop->put_field(class_name, field_name, value);
                         INFO_PRINT("set object field value success")
                     }
                 }
@@ -516,6 +648,11 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 break;
             case INVOKESPECIAL:
                 {
+//                    if (strcmp(constant_pool->symbol_at(method->name_index())->as_C_string(), "<init>") == 0 &&
+//                        strcmp(constant_pool->get_class_name_by_class_ref(((InstanceKlass*)klass)->get_this_class())->as_C_string(),
+//                               "org/xyz/jvm/example/Father") == 0)
+//                        return;
+
                     INFO_PRINT("执行指令: invokespecial，该指令功能为: 调用实例方法，专门用来调用父类方法、私有方法和实例初始化方法");
                     // 取出操作数，invokestatic指令的操作数是常量池的索引（Methodref），占两个字节
                     int operand = code->get_u2_code();
@@ -532,6 +669,8 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
 
                     // 系统加载的类走JNI
                     if (class_name->start_with("java")) {
+                        // 调用java包下的父类构造方法，不做处理
+                        break;
                         // 获取类元信息
                         jclass clazz = g_env->FindClass(class_name->as_C_string());
                         if (nullptr == clazz) {
@@ -552,7 +691,10 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         // 从操作数栈中弹出 被调方法所属类的对象，即this指针
                         jobject obj = (jobject)frame->pop_operand_stack()->data();
 
-                       g_env->CallVoidMethodA(obj, method, params);
+                        if (params == nullptr)
+                            g_env->CallNonvirtualVoidMethod(obj, clazz, method);
+                        else
+                            g_env->CallNonvirtualVoidMethodA(obj, clazz, method, params);
                     } else {
 
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
@@ -713,4 +855,6 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 exit(-1);
         }
     }
+
+    INFO_PRINT("byte code run success");
 }

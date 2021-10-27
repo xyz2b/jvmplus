@@ -326,6 +326,10 @@ void DescriptorStream::push_return_element(jobject o, JavaVFrame* frame) {
  * @return 实参值列表
  * */
 jvalue* DescriptorStream::get_params_val(JavaVFrame* frame) {
+    if (_method_params_size == 0) {
+        return nullptr;
+    }
+
     jvalue* params_value = (jvalue*)calloc(parameters()->size(), sizeof(jvalue));
 
     for (int i = 0; i < method_params_size(); i++) {
