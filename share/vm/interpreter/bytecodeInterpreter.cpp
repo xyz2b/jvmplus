@@ -146,7 +146,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         oop mirror = klass->java_mirror();
                         field_val = mirror->get_field(class_name, field_name);
                     }
-                    INFO_PRINT("static field: %s, value: %s", field_name->as_C_string(), field_val);
+                    INFO_PRINT("static field: %s, value: %p", field_name->as_C_string(), field_val);
                     descriptor_stream->push_field(field_val, frame);
                 }
                 break;
@@ -376,6 +376,20 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     frame->set_local_variable_table(1, value);
                 }
                 break;
+            case ISTORE_2:
+                {
+                    INFO_PRINT("执行指令: istore_2，该指令功能为: 将操作数栈栈顶的int类型的元素存入局部变量表中索引为2的位置");
+                    StackValue* value = frame->pop_operand_stack();
+                    frame->set_local_variable_table(2, value);
+                }
+                break;
+            case ISTORE_3:
+            {
+                INFO_PRINT("执行指令: istore_3，该指令功能为: 将操作数栈栈顶的int类型的元素存入局部变量表中索引为3的位置");
+                StackValue* value = frame->pop_operand_stack();
+                frame->set_local_variable_table(3, value);
+            }
+                break;
             case ALOAD_0:
                 {
                     INFO_PRINT("执行指令: aload_0，该指令功能为: 将局部变量表中索引为0的值（引用类型）压入操作数栈中");
@@ -394,12 +408,28 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     frame->push_operand_stack(value);
                 }
                 break;
+            case ILOAD_2:
+            {
+                INFO_PRINT("执行指令: iload_2，该指令功能为: 将局部变量表中索引为2的值（int类型）压入操作数栈中");
+                // 从局部变量表中索引为1的值
+                StackValue* value = frame->get_local_variable_table(2);
+                // 压入操作数栈中
+                frame->push_operand_stack(value);
+            }
+                break;
             case ICONST_1:
                 {
                     INFO_PRINT("执行指令: iconst_1，该指令功能为: 将int类型的常量1压入操作数栈中");
                     // 将1（int）压入操作数栈中
                     frame->push_operand_stack(new StackValue(T_INT, 1));
                 }
+                break;
+            case ICONST_2:
+            {
+                INFO_PRINT("执行指令: iconst_2，该指令功能为: 将int类型的常量2压入操作数栈中");
+                // 将1（int）压入操作数栈中
+                frame->push_operand_stack(new StackValue(T_INT, 2));
+            }
                 break;
             case ALOAD:
                 {
