@@ -310,6 +310,9 @@ void InstanceKlass::initialize() {
  * */
 void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
     this_oop->link_class();
+
+    // TODO: locked
+
     this_oop->set_init_state(ClassState::being_initialized);
     // 执行<clinit>方法
     const char* name = "<clinit>";
@@ -328,6 +331,7 @@ void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
         return;
     }
 
+    // call <clinit>
     Method* method = JavaNativeInterface::get_method(this_oop(), method_name, method_descriptor);
     if (method == nullptr) {
         INFO_PRINT("class %s 不存在<clinit>方法，跳过", class_name->as_C_string());
