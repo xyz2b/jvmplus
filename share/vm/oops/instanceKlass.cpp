@@ -155,6 +155,7 @@ bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
         return true;
     }
 
+    // link this class
     for(int index = 0; index < fields->size(); index++) {
         FiledInfo* f = fields->get_at(index);
         Symbol* f_name = constant_pool->symbol_at(f->name_index());
@@ -250,6 +251,7 @@ bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
             }
         }
     }
+
     this_oop->set_init_state(ClassState::linked);
 
     // link super class
@@ -332,7 +334,7 @@ void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
         return;
     }
 
-    // call <clinit>
+    // call this class <clinit>
     Method* method = JavaNativeInterface::get_method(this_oop(), method_name, method_descriptor);
     if (method == nullptr) {
         INFO_PRINT("class %s 不存在<clinit>方法，跳过", class_name->as_C_string());
