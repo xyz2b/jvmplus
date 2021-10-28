@@ -317,6 +317,10 @@ void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
     }
 
     Method* method = JavaNativeInterface::get_method(this_oop(), method_name, method_descriptor);
+    if (method == nullptr) {
+        INFO_PRINT("class %s 不存在<clinit>方法，跳过", class_name->as_C_string());
+        return;
+    }
     JavaNativeInterface::call_method(this_oop(), method);
 
     this_oop->set_init_state(ClassState::fully_initialized);
