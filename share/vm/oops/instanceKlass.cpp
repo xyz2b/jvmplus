@@ -162,6 +162,7 @@ bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
 
     INFO_PRINT("link class: %s", class_name->as_C_string());
 
+    // TODO: 没有处理继承java包下的类的情况，如果需要link java包下的类需要用JNI设置各个属性的初值
     if (class_name->start_with("java")) {
         INFO_PRINT("不link java包的类");
         return true;
@@ -311,6 +312,7 @@ void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
 
     INFO_PRINT("class name: %s", class_name->as_C_string());
 
+    // TODO: 没有处理继承java包下的类的情况，如果需要加载java包下的类需要用JNI调用<clinit>方法
     if (class_name->start_with("java")) {
         INFO_PRINT("不初始化 java包的类");
         return;

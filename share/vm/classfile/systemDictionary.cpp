@@ -51,6 +51,8 @@ void SystemDictionary::load_super_class(Klass* klass) {
     Symbol* super_class_name = instance->get_constant_pool()->get_class_name_by_class_ref(index);
     Symbol* class_name = instance->get_constant_pool()->get_class_name_by_class_ref(instance->get_this_class());
     INFO_PRINT("%s super_class_name: %s", class_name->as_C_string(), super_class_name->as_C_string());
+
+    // TODO: 没有处理继承java包下的类的情况，如果需要加载java包下的类需要用JNI获取klass，FindClass函数
     if (super_class_name->start_with("java")) {
         INFO_PRINT("不加载java包的类");
         return;
