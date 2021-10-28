@@ -56,7 +56,14 @@ private:
     int _non_static_filed_count;
 
     u1 _init_state;
+
+    Hashmap<Symbol*, Method*, HashCode<const Symbol*>>* _vtable;
+    Hashmap<Symbol*, Method*, HashCode<const Symbol*>>* _itable;
 public:
+
+    Hashmap<Symbol*, Method*, HashCode<const Symbol*>>* vtable() { return _vtable; }
+    Hashmap<Symbol*, Method*, HashCode<const Symbol*>>* itable() { return _itable; }
+
     int static_field_size() const            { return _static_field_size; }
     void set_static_field_size(int size)     { _static_field_size = size; }
 

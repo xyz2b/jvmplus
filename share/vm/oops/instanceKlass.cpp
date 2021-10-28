@@ -251,11 +251,33 @@ bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
         }
     }
     this_oop->set_init_state(ClassState::linked);
+
+    // link super class
     Klass* super_klass = this_oop->get_super_klass();
     if (super_klass == nullptr) return true;
     InstanceKlassHandle super_oop(super_klass);
+    link_class_impl(super_oop);
 
-    return link_class_impl(super_oop);
+    // TODO: link interface
+
+
+
+    // other thread is already linked this klass
+    if (this_oop->is_linked()) {
+        return true;
+    }
+
+    // TODO: verification and rewrite
+    // rewrite: rewrite constant_pool such as class index -> klass
+    // rewrite class
+    // rewrite method
+    // constant_pool_cache
+
+
+    // TODO: initialize_vtable          inherit
+    // TODO: initialize_itable          interface
+
+    return true;
 }
 
 int InstanceKlass::non_static_filed_count(KlassHandle k) {

@@ -465,6 +465,15 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 frame->push_operand_stack(value);
             }
                 break;
+            case ILOAD_3:
+            {
+                INFO_PRINT("执行指令: iload_3，该指令功能为: 将局部变量表中索引为3的值（int类型）压入操作数栈中");
+                // 从局部变量表中索引为1的值
+                StackValue* value = frame->get_local_variable_table(3);
+                // 压入操作数栈中
+                frame->push_operand_stack(value);
+            }
+                break;
             case ICONST_1:
                 {
                     INFO_PRINT("执行指令: iconst_1，该指令功能为: 将int类型的常量1压入操作数栈中");
