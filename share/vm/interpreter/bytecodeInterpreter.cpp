@@ -139,7 +139,6 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         }
                     } else {
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
-                        klass->link_class();
                         klass->initialize();
 
                         while (klass != nullptr) {
@@ -261,7 +260,6 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         }
                     } else {
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
-                        klass->link_class();
                         klass->initialize();
 
                         while (klass != nullptr) {
@@ -385,7 +383,6 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         frame->push_operand_stack(new StackValue(T_OBJECT, object));
                     } else {
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
-                        klass->link_class();
                         klass->initialize();
 
                         INFO_PRINT("生成oop实例")
@@ -661,8 +658,8 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         INFO_PRINT("set object field value, %s.%s = %ld", class_name->as_C_string(), field_name->as_C_string(), (jlong)value);
                         instanceOop instance_oop = (instanceOop)obj;
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
-                        klass->link_class();
-                        klass->initialize();
+//                        klass->link_class();
+//                        klass->initialize();
 
                         while (klass != nullptr) {
                             ConstantPool* constant_pool = klass->get_constant_pool();
@@ -781,8 +778,8 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     } else {
                         instanceOop instance_oop = (instanceOop)obj;
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
-                        klass->link_class();
-                        klass->initialize();
+//                        klass->link_class();
+//                        klass->initialize();
 
                         while (klass != nullptr) {
                             ConstantPool* constant_pool = klass->get_constant_pool();
@@ -1121,6 +1118,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         }
                     } else {
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+                        klass->initialize();
 
                         // 在对应的类中找到对应的方法
                         Method* method = JavaNativeInterface::get_method(klass, method_name, descriptor_name);

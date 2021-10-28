@@ -309,6 +309,7 @@ void InstanceKlass::initialize() {
   - 启动类（main函数所在的类）
  * */
 void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
+    this_oop->link_class();
     this_oop->set_init_state(ClassState::being_initialized);
     // 执行<clinit>方法
     const char* name = "<clinit>";
