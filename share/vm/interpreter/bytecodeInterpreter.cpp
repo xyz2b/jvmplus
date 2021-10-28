@@ -142,9 +142,27 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         klass->link_class();
                         klass->initialize();
 
-                        // TODO: 没有在父类中寻找
-                        oop mirror = klass->java_mirror();
-                        field_val = mirror->get_field(class_name, field_name);
+                        while (klass != nullptr) {
+                            ConstantPool* constant_pool = klass->get_constant_pool();
+                            Symbol* class_name = constant_pool->get_class_name_by_class_ref(klass->get_this_class());
+
+
+                            if (class_name->start_with("java")) {
+                                INFO_PRINT("不在 java包的类中查找静态变量");
+                                return;
+                            }
+
+                            oop mirror = klass->java_mirror();
+
+                            if (mirror->find_field(class_name, field_name)) {
+                                field_val = mirror->get_field(class_name, field_name);
+                                INFO_PRINT("找到了 field %s.%s = %p", class_name->as_C_string(), field_name->as_C_string(), field_val);
+                                break;
+                            }
+
+                            klass = (InstanceKlass*)klass->get_super_klass();
+                        }
+
                     }
                     INFO_PRINT("static field: %s, value: %p", field_name->as_C_string(), field_val);
                     descriptor_stream->push_field(field_val, frame);
@@ -246,9 +264,25 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         klass->link_class();
                         klass->initialize();
 
-                        // TODO: 没有处理设置父类静态变量
-                        oop mirror = klass->java_mirror();
-                        mirror->put_field(class_name, field_name, value);
+                        while (klass != nullptr) {
+                            ConstantPool* constant_pool = klass->get_constant_pool();
+                            Symbol* class_name = constant_pool->get_class_name_by_class_ref(klass->get_this_class());
+
+                            if (class_name->start_with("java")) {
+                                INFO_PRINT("不在 java包的类中查找静态变量");
+                                return;
+                            }
+
+                            oop mirror = klass->java_mirror();
+
+                            if (mirror->find_field(class_name, field_name)) {
+                                INFO_PRINT("找到了 field %s.%s", class_name->as_C_string(), field_name->as_C_string());
+                                mirror->put_field(class_name, field_name, value);
+                                break;
+                            }
+
+                            klass = (InstanceKlass*)klass->get_super_klass();
+                        }
                     }
                 }
                 break;
@@ -570,7 +604,27 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     } else {
                         INFO_PRINT("set object field value, %s.%s = %ld", class_name->as_C_string(), field_name->as_C_string(), (jlong)value);
                         instanceOop instance_oop = (instanceOop)obj;
-                        instance_oop->put_field(class_name, field_name, value);
+                        InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+                        klass->link_class();
+                        klass->initialize();
+
+                        while (klass != nullptr) {
+                            ConstantPool* constant_pool = klass->get_constant_pool();
+                            Symbol* class_name = constant_pool->get_class_name_by_class_ref(klass->get_this_class());
+
+                            if (class_name->start_with("java")) {
+                                INFO_PRINT("不在 java包的类中查找静态变量");
+                                return;
+                            }
+
+                            if (instance_oop->find_field(class_name, field_name)) {
+                                INFO_PRINT("找到了 field %s.%s", class_name->as_C_string(), field_name->as_C_string());
+                                instance_oop->put_field(class_name, field_name, value);
+                                break;
+                            }
+
+                            klass = (InstanceKlass*)klass->get_super_klass();
+                        }
                         INFO_PRINT("set object field value success")
                     }
                 }
@@ -670,7 +724,27 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         }
                     } else {
                         instanceOop instance_oop = (instanceOop)obj;
-                        field_val = instance_oop->get_field(class_name, field_name);
+                        InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+                        klass->link_class();
+                        klass->initialize();
+
+                        while (klass != nullptr) {
+                            ConstantPool* constant_pool = klass->get_constant_pool();
+                            Symbol* class_name = constant_pool->get_class_name_by_class_ref(klass->get_this_class());
+
+                            if (class_name->start_with("java")) {
+                                INFO_PRINT("不在 java包的类中查找静态变量");
+                                return;
+                            }
+
+                            if (instance_oop->find_field(class_name, field_name)) {
+                                field_val = instance_oop->get_field(class_name, field_name);
+                                INFO_PRINT("找到了 field %s.%s = %p, ", class_name->as_C_string(), field_name->as_C_string(), field_val);
+                                break;
+                            }
+
+                            klass = (InstanceKlass*)klass->get_super_klass();
+                        }
                     }
                     INFO_PRINT("static field: %s, value: %p", field_name->as_C_string(), field_val);
                     descriptor_stream->push_field(field_val, frame);

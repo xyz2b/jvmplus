@@ -115,7 +115,6 @@ void InstanceKlass::put_field_to_oop(instanceOop child_oop, InstanceKlassHandle 
                     *((jdouble*)(&field_val)) = 0.0;
                     child_oop->put_field(class_name, f_name, field_val);
                     break;
-                    break;
                 }
                 default: {
                     ERROR_PRINT("无法识别的元素类型: %c", *(f_descriptor->as_C_string()));

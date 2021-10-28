@@ -27,6 +27,7 @@ public:
 
     jobject get_field(Symbol* class_name, Symbol* field_name);
     void put_field(Symbol* class_name, Symbol* field_name, jobject value);
+    bool find_field(Symbol* class_name, Symbol* field_name);
 };
 
 
