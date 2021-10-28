@@ -314,6 +314,7 @@ void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
     // TODO: locked
 
     this_oop->set_init_state(ClassState::being_initialized);
+
     // 执行<clinit>方法
     const char* name = "<clinit>";
     const char* descriptor = "()V";
@@ -341,6 +342,7 @@ void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
 
     this_oop->set_init_state(ClassState::fully_initialized);
 
+    // initialize super class
     Klass* super_klass = this_oop->get_super_klass();
     if (super_klass == nullptr) return;
     InstanceKlassHandle super_oop(super_klass);
