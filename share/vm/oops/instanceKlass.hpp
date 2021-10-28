@@ -66,8 +66,6 @@ public:
     int non_static_filed_count() { return _non_static_filed_count; }
     void set_non_static_filed_count(int count) { _non_static_filed_count = count; }
 
-    FiledInfo* find_field(Symbol* field_name, Symbol* descriptor_name);
-
     enum ClassState {
         allocated,
         loaded,
@@ -158,7 +156,7 @@ public:
     ClassState  init_state()                 { return (ClassState)_init_state; }
 
     instanceOop allocate_instance(KlassHandle k);
-    void put_field_to_oop(instanceOop child_oop, InstanceKlassHandle this_klass);
+    void put_non_static_field_to_oop(instanceOop child_oop, InstanceKlassHandle this_klass);
 
     int non_static_filed_count(KlassHandle k);
     void link_class();

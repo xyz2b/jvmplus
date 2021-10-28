@@ -13,11 +13,11 @@ instanceOop InstanceKlass::allocate_instance(KlassHandle k) {
 
     InstanceKlass* klass = (InstanceKlass*) i->klass();
     InstanceKlassHandle this_klass(klass);
-    put_field_to_oop(i, this_klass);
+    put_non_static_field_to_oop(i, this_klass);
     return i;
 }
 
-void InstanceKlass::put_field_to_oop(instanceOop child_oop, InstanceKlassHandle this_klass) {
+void InstanceKlass::put_non_static_field_to_oop(instanceOop child_oop, InstanceKlassHandle this_klass) {
     // 将非静态变量存储到oop对象中
     ConstantPool* constant_pool = this_klass->get_constant_pool();
     Array<FiledInfo*>* fields = this_klass->get_fields();
@@ -129,20 +129,7 @@ void InstanceKlass::put_field_to_oop(instanceOop child_oop, InstanceKlassHandle 
     if (super_klass == nullptr) return;
     InstanceKlassHandle super_oop(super_klass);
 
-    return put_field_to_oop(child_oop, super_oop);
-}
-
-
-FiledInfo* InstanceKlass::find_field(Symbol* field_name, Symbol* descriptor_name) {
-    for (int index = 0; index < _fields->size(); index++) {
-        FiledInfo* f = _fields->get(index);
-
-        if (*(f->name()) == field_name && *(f->descriptor()) == descriptor_name) {
-            return f;
-        }
-    }
-
-    return nullptr;
+    return put_non_static_field_to_oop(child_oop, super_oop);
 }
 
 void InstanceKlass::link_class() {
