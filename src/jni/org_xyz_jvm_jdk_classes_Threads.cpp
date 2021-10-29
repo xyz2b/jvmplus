@@ -18,6 +18,7 @@ JNIEnv* g_env;
  */
 JNIEXPORT void JNICALL Java_org_xyz_jvm_jdk_classes_Threads_createVm
         (JNIEnv *env, jclass clazz) {
+    // 初始化堆内存和元空间
     g_env = env;
     Universe::initialize_heap();
     Metaspace::initialize();
