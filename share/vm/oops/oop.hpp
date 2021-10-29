@@ -13,8 +13,8 @@ class Klass;
 class oopDesc {
 private:
     Klass* _klass;
-    // 静态属性存储在各个类的mirror class的oop对象中
-    // 而子父类的非静态属性都存储在子类对象oop中，因为不会创建父类对象
+    // 静态属性存储在各个类的mirror class的oop对象的实例数据中，即这里的_fields
+    // 而子父类的非静态属性都存储在子类oop对象的实例数据中，因为不会创建父类对象
     Hashmap<Symbol*, jobject, HashCode<const Symbol*>>* _fields;
 
 public:
