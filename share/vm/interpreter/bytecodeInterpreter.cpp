@@ -827,7 +827,9 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     // 系统加载的类走JNI
                     if (class_name->start_with("java")) {
                         // 调用java包下的父类构造方法，不做处理
-                        break;
+                        if (method_name->start_with("<init>")) {
+                            break;
+                        }
                         // 获取类元信息
                         jclass clazz = g_env->FindClass(class_name->as_C_string());
                         if (nullptr == clazz) {
@@ -848,10 +850,80 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         // 从操作数栈中弹出 被调方法所属类的对象，即this指针
                         jobject obj = (jobject)frame->pop_operand_stack()->data();
 
-                        if (params == nullptr)
-                            g_env->CallNonvirtualVoidMethod(obj, clazz, method);
-                        else
-                            g_env->CallNonvirtualVoidMethodA(obj, clazz, method, params);
+                        jobject return_val;
+                        switch (descriptor_stream->return_element_type()) {
+                            case T_BOOLEAN:
+                            {
+                                jboolean bool_val = g_env->CallBooleanMethodA(obj, method, params);
+                                *((jboolean*)(&return_val)) = bool_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_SHORT:
+                            {
+                                jshort short_val = g_env->CallShortMethodA(obj, method, params);
+                                *((jshort*)(&return_val)) = short_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_CHAR:
+                            {
+                                jchar char_val = g_env->CallCharMethodA(obj, method, params);
+                                *((jchar*)(&return_val)) = char_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_BYTE:
+                            {
+                                jbyte byte_val = g_env->CallByteMethodA(obj, method, params);
+                                *((jbyte*)(&return_val)) = byte_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_INT:
+                            {
+                                jint int_val = g_env->CallIntMethodA(obj, method, params);
+                                *((jint*)(&return_val)) = int_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_LONG:
+                            {
+                                jlong long_val = g_env->CallLongMethodA(obj, method, params);
+                                *((jlong*)(&return_val)) = long_val;
+                                frame->push_operand_stack(new StackValue(T_LONG, return_val));
+                            }
+                                break;
+                            case T_FLOAT:
+                            {
+                                jfloat float_val = g_env->CallFloatMethodA(obj, method, params);
+                                *((jfloat*)(&return_val)) = float_val;
+                                frame->push_operand_stack(new StackValue(T_FLOAT, return_val));
+                            }
+                                break;
+                            case T_DOUBLE:
+                            {
+                                jdouble double_val = g_env->CallDoubleMethodA(obj, method, params);
+                                *((jdouble*)(&return_val)) = double_val;
+                                frame->push_operand_stack(new StackValue(T_DOUBLE, return_val));
+                            }
+                                break;
+                            case T_OBJECT:
+                            {
+                                jobject object_val = g_env->CallObjectMethodA(obj, method, params);
+                                return_val = object_val;
+                                frame->push_operand_stack(new StackValue(T_OBJECT, return_val));
+                            }
+                                break;
+                            case T_VOID:
+                            {
+                                g_env->CallVoidMethodA(obj, method, params);
+                            }
+                                break;
+                            default:
+                                ERROR_PRINT("无法识别的return类型%d", descriptor_stream->return_element_type());
+                                exit(-1);
+                        }
                     } else {
 
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
