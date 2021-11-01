@@ -830,6 +830,8 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         if (method_name->start_with("<init>")) {
                             break;
                         }
+                        // TODO: 调用java包下的父类的实例方法，不做处理，因为用子类对象调用父类方法，jni不支持
+
                         // 获取类元信息
                         jclass clazz = g_env->FindClass(class_name->as_C_string());
                         if (nullptr == clazz) {
