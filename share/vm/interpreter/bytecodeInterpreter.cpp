@@ -400,6 +400,13 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     frame->push_operand_stack(value);
                 }
                 break;
+            case ASTORE_0:
+                {
+                    INFO_PRINT("执行指令: astore_0，该指令功能为: 将操作数栈栈顶的引用类型的元素存入局部变量表中索引为0的位置");
+                    StackValue* value = frame->pop_operand_stack();
+                    frame->set_local_variable_table(0, value);
+                }
+                break;
             case ASTORE_1:
                 {
                     INFO_PRINT("执行指令: astore_1，该指令功能为: 将操作数栈栈顶的引用类型的元素存入局部变量表中索引为1的位置");
@@ -408,18 +415,25 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 }
                 break;
             case ASTORE_2:
-            {
-                INFO_PRINT("执行指令: astore_2，该指令功能为: 将操作数栈栈顶的引用类型的元素存入局部变量表中索引为2的位置");
-                StackValue* value = frame->pop_operand_stack();
-                frame->set_local_variable_table(2, value);
-            }
+                {
+                    INFO_PRINT("执行指令: astore_2，该指令功能为: 将操作数栈栈顶的引用类型的元素存入局部变量表中索引为2的位置");
+                    StackValue* value = frame->pop_operand_stack();
+                    frame->set_local_variable_table(2, value);
+                }
+                break;
+            case ASTORE_3:
+                {
+                    INFO_PRINT("执行指令: astore_3，该指令功能为: 将操作数栈栈顶的引用类型的元素存入局部变量表中索引为3的位置");
+                    StackValue* value = frame->pop_operand_stack();
+                    frame->set_local_variable_table(3, value);
+                }
                 break;
             case ISTORE_1:
-            {
-                INFO_PRINT("执行指令: istore_1，该指令功能为: 将操作数栈栈顶的int类型的元素存入局部变量表中索引为1的位置");
-                StackValue* value = frame->pop_operand_stack();
-                frame->set_local_variable_table(1, value);
-            }
+                {
+                    INFO_PRINT("执行指令: istore_1，该指令功能为: 将操作数栈栈顶的int类型的元素存入局部变量表中索引为1的位置");
+                    StackValue* value = frame->pop_operand_stack();
+                    frame->set_local_variable_table(1, value);
+                }
                 break;
             case ISTORE_2:
                 {
@@ -429,20 +443,20 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 }
                 break;
             case ISTORE_3:
-            {
-                INFO_PRINT("执行指令: istore_3，该指令功能为: 将操作数栈栈顶的int类型的元素存入局部变量表中索引为3的位置");
-                StackValue* value = frame->pop_operand_stack();
-                frame->set_local_variable_table(3, value);
-            }
+                {
+                    INFO_PRINT("执行指令: istore_3，该指令功能为: 将操作数栈栈顶的int类型的元素存入局部变量表中索引为3的位置");
+                    StackValue* value = frame->pop_operand_stack();
+                    frame->set_local_variable_table(3, value);
+                }
                 break;
             case ILOAD_0:
-            {
-                INFO_PRINT("执行指令: iload_0，该指令功能为: 将局部变量表中索引为0的值（int类型）压入操作数栈中");
-                // 从局部变量表中索引为1的值
-                StackValue* value = frame->get_local_variable_table(0);
-                // 压入操作数栈中
-                frame->push_operand_stack(value);
-            }
+                {
+                    INFO_PRINT("执行指令: iload_0，该指令功能为: 将局部变量表中索引为0的值（int类型）压入操作数栈中");
+                    // 从局部变量表中索引为1的值
+                    StackValue* value = frame->get_local_variable_table(0);
+                    // 压入操作数栈中
+                    frame->push_operand_stack(value);
+                }
                 break;
             case ILOAD_1:
                 {
@@ -454,22 +468,36 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 }
                 break;
             case ILOAD_2:
-            {
-                INFO_PRINT("执行指令: iload_2，该指令功能为: 将局部变量表中索引为2的值（int类型）压入操作数栈中");
-                // 从局部变量表中索引为1的值
-                StackValue* value = frame->get_local_variable_table(2);
-                // 压入操作数栈中
-                frame->push_operand_stack(value);
-            }
+                {
+                    INFO_PRINT("执行指令: iload_2，该指令功能为: 将局部变量表中索引为2的值（int类型）压入操作数栈中");
+                    // 从局部变量表中索引为1的值
+                    StackValue* value = frame->get_local_variable_table(2);
+                    // 压入操作数栈中
+                    frame->push_operand_stack(value);
+                }
                 break;
             case ILOAD_3:
-            {
-                INFO_PRINT("执行指令: iload_3，该指令功能为: 将局部变量表中索引为3的值（int类型）压入操作数栈中");
-                // 从局部变量表中索引为1的值
-                StackValue* value = frame->get_local_variable_table(3);
-                // 压入操作数栈中
-                frame->push_operand_stack(value);
-            }
+                {
+                    INFO_PRINT("执行指令: iload_3，该指令功能为: 将局部变量表中索引为3的值（int类型）压入操作数栈中");
+                    // 从局部变量表中索引为1的值
+                    StackValue* value = frame->get_local_variable_table(3);
+                    // 压入操作数栈中
+                    frame->push_operand_stack(value);
+                }
+                break;
+            case ICONST_M1:
+                {
+                    INFO_PRINT("执行指令: iconst_m1，该指令功能为: 将int类型的常量-1压入操作数栈中");
+                    // 将1（int）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_INT, -1));
+                }
+                break;
+            case ICONST_0:
+                {
+                    INFO_PRINT("执行指令: iconst_0，该指令功能为: 将int类型的常量0压入操作数栈中");
+                    // 将1（int）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_INT, 0));
+                }
                 break;
             case ICONST_1:
                 {
@@ -479,11 +507,32 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 }
                 break;
             case ICONST_2:
-            {
-                INFO_PRINT("执行指令: iconst_2，该指令功能为: 将int类型的常量2压入操作数栈中");
-                // 将1（int）压入操作数栈中
-                frame->push_operand_stack(new StackValue(T_INT, 2));
-            }
+                {
+                    INFO_PRINT("执行指令: iconst_2，该指令功能为: 将int类型的常量2压入操作数栈中");
+                    // 将1（int）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_INT, 2));
+                }
+                break;
+            case ICONST_3:
+                {
+                    INFO_PRINT("执行指令: iconst_3，该指令功能为: 将int类型的常量3压入操作数栈中");
+                    // 将1（int）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_INT, 3));
+                }
+                break;
+            case ICONST_4:
+                {
+                    INFO_PRINT("执行指令: iconst_4，该指令功能为: 将int类型的常量4压入操作数栈中");
+                    // 将1（int）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_INT, 4));
+                }
+                break;
+            case ICONST_5:
+                {
+                    INFO_PRINT("执行指令: iconst_5，该指令功能为: 将int类型的常量5压入操作数栈中");
+                    // 将1（int）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_INT, 5));
+                }
                 break;
             case ALOAD:
                 {
@@ -494,31 +543,40 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 }
                 break;
             case ALOAD_0:
-            {
-                INFO_PRINT("执行指令: aload_0，该指令功能为: 将局部变量表中索引为0的值（引用类型）压入操作数栈中");
-                // 从局部变量表中索引为0的值
-                StackValue* value = frame->get_local_variable_table(0);
-                // 压入操作数栈中
-                frame->push_operand_stack(value);
-            }
+                {
+                    INFO_PRINT("执行指令: aload_0，该指令功能为: 将局部变量表中索引为0的值（引用类型）压入操作数栈中");
+                    // 从局部变量表中索引为0的值
+                    StackValue* value = frame->get_local_variable_table(0);
+                    // 压入操作数栈中
+                    frame->push_operand_stack(value);
+                }
                 break;
             case ALOAD_1:
-            {
-                INFO_PRINT("执行指令: aload_1，该指令功能为: 将局部变量表中索引为1的值（引用类型）压入操作数栈中");
-                // 从局部变量表中索引为0的值
-                StackValue* value = frame->get_local_variable_table(1);
-                // 压入操作数栈中
-                frame->push_operand_stack(value);
-            }
+                {
+                    INFO_PRINT("执行指令: aload_1，该指令功能为: 将局部变量表中索引为1的值（引用类型）压入操作数栈中");
+                    // 从局部变量表中索引为0的值
+                    StackValue* value = frame->get_local_variable_table(1);
+                    // 压入操作数栈中
+                    frame->push_operand_stack(value);
+                }
                 break;
             case ALOAD_2:
-            {
-                INFO_PRINT("执行指令: aload_2，该指令功能为: 将局部变量表中索引为2的值（引用类型）压入操作数栈中");
-                // 从局部变量表中索引为0的值
-                StackValue* value = frame->get_local_variable_table(2);
-                // 压入操作数栈中
-                frame->push_operand_stack(value);
-            }
+                {
+                    INFO_PRINT("执行指令: aload_2，该指令功能为: 将局部变量表中索引为2的值（引用类型）压入操作数栈中");
+                    // 从局部变量表中索引为0的值
+                    StackValue* value = frame->get_local_variable_table(2);
+                    // 压入操作数栈中
+                    frame->push_operand_stack(value);
+                }
+                break;
+            case ALOAD_3:
+                {
+                    INFO_PRINT("执行指令: aload_3，该指令功能为: 将局部变量表中索引为3的值（引用类型）压入操作数栈中");
+                    // 从局部变量表中索引为0的值
+                    StackValue* value = frame->get_local_variable_table(3);
+                    // 压入操作数栈中
+                    frame->push_operand_stack(value);
+                }
                 break;
             case BIPUSH:
                 {
@@ -535,12 +593,12 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 }
                 break;
             case RETURN:
-            {
-                INFO_PRINT("执行指令: return，该指令功能为: 从方法中返回void，恢复调用者的栈帧，并且把程序的控制权交回调用者");
-                // pop出栈帧
-                current_thread->pop_frame();
-                INFO_PRINT("剩余栈帧数量: %d", current_thread->frame_size());
-            }
+                {
+                    INFO_PRINT("执行指令: return，该指令功能为: 从方法中返回void，恢复调用者的栈帧，并且把程序的控制权交回调用者");
+                    // pop出栈帧
+                    current_thread->pop_frame();
+                    INFO_PRINT("剩余栈帧数量: %d", current_thread->frame_size());
+                }
                 break;
             case IRETURN:
                 {
@@ -556,17 +614,17 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 }
                 break;
             case ARETURN:
-            {
-                INFO_PRINT("执行指令: areturn，该指令功能为: 从方法中返回引用类型数据，恢复调用者的栈帧，并且把程序的控制权交回调用者");
-                StackValue* ret = frame->pop_operand_stack();
+                {
+                    INFO_PRINT("执行指令: areturn，该指令功能为: 从方法中返回引用类型数据，恢复调用者的栈帧，并且把程序的控制权交回调用者");
+                    StackValue* ret = frame->pop_operand_stack();
 
-                // pop出当前栈帧
-                current_thread->pop_frame();
-                INFO_PRINT("剩余栈帧数量: %d", current_thread->frame_size());
+                    // pop出当前栈帧
+                    current_thread->pop_frame();
+                    INFO_PRINT("剩余栈帧数量: %d", current_thread->frame_size());
 
-                // 将返回值压入调用者栈帧
-                ((JavaVFrame*) current_thread->top_frame())->push_operand_stack(ret);
-            }
+                    // 将返回值压入调用者栈帧
+                    ((JavaVFrame*) current_thread->top_frame())->push_operand_stack(ret);
+                }
                 break;
             case PUTFIELD:
                 {
@@ -1065,7 +1123,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         klass->initialize();
 
                         // 在对应的类中找到对应的方法
-                        Method* method = JavaNativeInterface::get_method(klass, method_name, descriptor_name);
+                        Method* method = JavaNativeInterface::get_vmethod(klass, method_name, descriptor_name);
                         if (nullptr == method) {
                             ERROR_PRINT("不存在的方法: %s#%s", method_name->as_C_string(), descriptor_name->as_C_string());
                             exit(-1);

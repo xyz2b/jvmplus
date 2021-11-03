@@ -26,7 +26,7 @@ public:
     Array();
     ~Array();
     Array(size_t capacity);
-    Array(Array<T> *array);
+//    Array(Array<T> *array);
     Array* operator=(const Array<T> *array);
     void insert(size_t index, T value);
     void resize(size_t newCapacity);
@@ -94,12 +94,13 @@ Array<T>::~Array() {
 
 }
 
-template<typename T>
-Array<T>::Array(Array<T> *array) {
-    for (int i = 0; i < array->_size; ++i) {
-        *(_data + i) = array->get(i);
-    }
-}
+//template<typename T>
+//Array<T>::Array(Array<T> *array) {
+//    _size = 0;
+//    for (int i = 0; i < array->_size; ++i) {
+//        this->add(array->get(i));
+//    }
+//}
 
 template<typename T>
 Array<T> * Array<T>::operator=(const Array<T> *array) {

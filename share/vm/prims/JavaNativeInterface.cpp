@@ -141,3 +141,19 @@ void JavaNativeInterface::call_method(InstanceKlass *klass, Method *method) {
     // 执行方法的任务交给字节码解释器
     BytecodeInterpreter::run(current_thread, method);
 }
+
+Method *JavaNativeInterface::get_vmethod(InstanceKlass *klass, Symbol *method_name, Symbol *descriptor_name) {
+    Array<Method*>* methods = klass->vtable();
+    Method* ret = nullptr;
+
+    for (int i = 0; i < methods->size(); ++i) {
+        Method* tmp = methods->get_at(i);
+
+        INFO_PRINT("============%p", tmp);
+        if ((*tmp->name() == method_name) &&
+        (*tmp->descriptor()->descriptor_info() == descriptor_name)) {
+            ret = tmp;
+        }
+    }
+    return ret;
+}

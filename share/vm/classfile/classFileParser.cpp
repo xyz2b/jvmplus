@@ -356,7 +356,7 @@ Array<Method*>* ClassFileParser::parse_methods(int length) {
         descriptorStream->parse_method();
         INFO_PRINT("Method, 第%d项, name: %s, name_index: %X，signature_index: %X, attributes_count: %d", index, _cp->symbol_at(name_index)->as_C_string(), name_index, signature_index, method_attributes_count);
 
-        Method* method = new Method(access_flag, name_index, signature_index, method_attributes_count);
+        Method* method = new Method(access_flag, name_index, signature_index, method_attributes_count, method_name);
         method->set_descriptor(descriptorStream);
 
         if (method_attributes_count > 0) {

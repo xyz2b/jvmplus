@@ -135,12 +135,11 @@ void InstanceKlass::put_non_static_field_to_oop(instanceOop child_oop, InstanceK
 
 void InstanceKlass::link_class() {
     if (!this->is_linked()) {
-        InstanceKlassHandle this_oop(this);
-        link_class_impl(this_oop);
+        link_class_impl(this);
     }
 }
 
-bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
+bool InstanceKlass::link_class_impl(InstanceKlass* this_oop) {
     if (this_oop->is_in_error_state()) {
         ERROR_PRINT("link class出错");
         exit(-1);
@@ -151,10 +150,58 @@ bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
         return true;
     }
 
+    // 触发父类加载
+    if (this_oop->get_super_klass() == nullptr)  {
+        Symbol* super_class_name = this_oop->get_constant_pool()->get_class_name_by_class_ref(this_oop->get_super_class());
+
+        if (super_class_name->start_with("java")) {
+            WARNING_PRINT("不link java包的类: %s", super_class_name->as_C_string());
+
+            initialize_static_filed(this_oop);
+
+            this_oop->initialize_vtable();
+
+            return true;
+        }
+
+        INFO_PRINT("触发父类的加载: %s", super_class_name->as_C_string());
+
+        InstanceKlass* instanceKlass = (InstanceKlass*) SystemDictionary::resolve_or_null(super_class_name);
+
+        this_oop->set_super_klass(instanceKlass);
+
+        link_class_impl(instanceKlass);
+    }
+
+    initialize_static_filed(this_oop);
+
+    // TODO: 触发接口加载
 
 
+    // vtable
+    this_oop->initialize_vtable();
+
+    // itable
+    this_oop->initialize_itable();
 
 
+    // other thread is already linked this klass
+    if (this_oop->is_linked()) {
+        return true;
+    }
+
+    // TODO: verification and rewrite
+    // rewrite: rewrite constant_pool such as class index -> klass
+    // rewrite class
+    // rewrite method
+    // constant_pool_cache
+
+    // 设置状态
+    this_oop->set_init_state(ClassState::linked);
+    return true;
+}
+
+void InstanceKlass::initialize_static_filed(InstanceKlass* this_oop) {
     // 为静态变量分配内存、赋初值（零值）
     // 将静态变量存储到InstanceMirrorKlass对象中
     ConstantPool* constant_pool = this_oop->get_constant_pool();
@@ -163,12 +210,6 @@ bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
     oop mirror = this_oop->java_mirror();
 
     INFO_PRINT("link class: %s", class_name->as_C_string());
-
-    // TODO: 没有处理继承java包下的类的情况，如果需要link java包下的类需要用JNI设置各个属性的初值
-    if (class_name->start_with("java")) {
-        INFO_PRINT("不link java包的类");
-        return true;
-    }
 
     // link this class
     for(int index = 0; index < fields->size(); index++) {
@@ -266,52 +307,6 @@ bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
             }
         }
     }
-
-    // 触发父类加载
-    if (this_oop->get_super_klass() == nullptr)  {
-        Symbol* super_class_name = this_oop->get_constant_pool()->get_class_name_by_class_ref(this_oop->get_super_class());
-
-        if (super_class_name->start_with("java")) {
-            WARNING_PRINT("不link java包的类: %s", super_class_name->as_C_string());
-
-            this_oop->initialize_vtable();
-
-            return true;
-        }
-
-        INFO_PRINT("触发父类的加载: %s", super_class_name->as_C_string());
-
-        InstanceKlass* instanceKlass = (InstanceKlass*) SystemDictionary::resolve_or_null(super_class_name);
-
-        this_oop->set_super_klass(instanceKlass);
-
-        link_class_impl(instanceKlass);
-    }
-
-    // TODO: 触发接口加载
-
-
-    // vtable
-    this_oop->initialize_vtable();
-
-    // itable
-    this_oop->initialize_itable();
-
-
-    // other thread is already linked this klass
-    if (this_oop->is_linked()) {
-        return true;
-    }
-
-    // TODO: verification and rewrite
-    // rewrite: rewrite constant_pool such as class index -> klass
-    // rewrite class
-    // rewrite method
-    // constant_pool_cache
-
-    // 设置状态
-    this_oop->set_init_state(ClassState::linked);
-    return true;
 }
 
 int InstanceKlass::non_static_filed_count(KlassHandle k) {
@@ -327,9 +322,7 @@ int InstanceKlass::non_static_filed_count(KlassHandle k) {
 
 void InstanceKlass::initialize() {
     if (this->is_not_initialized()) {
-        InstanceKlassHandle this_oop(this);
-
-        initialize_impl(this_oop);
+        initialize_impl(this);
     }
 
 }
@@ -342,7 +335,7 @@ void InstanceKlass::initialize() {
   - 初始化一个类的子类会去加载其父类
   - 启动类（main函数所在的类）
  * */
-void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
+void InstanceKlass::initialize_impl(InstanceKlass* this_oop) {
     this_oop->link_class();
 
     // TODO: locked
@@ -367,28 +360,106 @@ void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
     }
 
     // call this class <clinit>
-    Method* method = JavaNativeInterface::get_method(this_oop(), method_name, method_descriptor);
+    Method* method = JavaNativeInterface::get_method(this_oop, method_name, method_descriptor);
     if (method == nullptr) {
         INFO_PRINT("class %s 不存在<clinit>方法，跳过", class_name->as_C_string());
         return;
     }
-    JavaNativeInterface::call_method(this_oop(), method);
+    JavaNativeInterface::call_method(this_oop, method);
 
     this_oop->set_init_state(ClassState::fully_initialized);
 
     // initialize super class
-    Klass* super_klass = this_oop->get_super_klass();
+    InstanceKlass* super_klass = (InstanceKlass*)this_oop->get_super_klass();
     if (super_klass == nullptr) return;
-    InstanceKlassHandle super_oop(super_klass);
-    initialize_impl(super_oop);
+    initialize_impl(super_klass);
 
     // 判断缓存中是否已经存在了，没有存在就解析，并存入缓存
 }
 
 void InstanceKlass::initialize_vtable() {
+    this->initialize_super_vtable(this);
 
+    ConstantPool* constant_pool = this->get_constant_pool();
+
+    Array<Method*>* methods = this->get_methods();
+    for (int i = 0; i < methods->size(); i++) {
+        Method* method = methods->get_at(i);
+
+        // protected/public and non-static/non-final method
+        if (method->access_flags().is_protected() || method->access_flags().is_public()) {
+            // skip <init> / <clinit> method
+            if (constant_pool->symbol_at(method->name_index())->start_with("<init>") ||
+            constant_pool->symbol_at(method->name_index())->start_with("<clinit>")) {
+                INFO_PRINT("skip <init> / <clinit> method");
+                continue;
+            }
+
+            // skip final / static method
+            if (method->access_flags().is_final() || method->access_flags().is_static()) {
+                INFO_PRINT("skip final / static method");
+                continue;
+            }
+
+            // add to vtable
+            INFO_PRINT("add to vtable method: %s", constant_pool->symbol_at(method->name_index())->as_C_string());
+            this->vtable()->add(method);
+            INFO_PRINT("============%p", method);
+        } else {
+            INFO_PRINT("not add to vatble method: %s", constant_pool->symbol_at(method->name_index())->as_C_string());
+        }
+    }
 }
 
 void InstanceKlass::initialize_itable() {
 
+}
+
+void InstanceKlass::initialize_super_vtable(InstanceKlass* klass) {
+    InstanceKlass* super_klass = (InstanceKlass*) klass->get_super_klass();
+
+    // if super klass is Object, the super_klass is null, because java package class not link
+    if (super_klass == nullptr) {
+        ConstantPool* constant_pool = klass->get_constant_pool();
+        INFO_PRINT("%s not have super class", constant_pool->get_class_name_by_class_ref(this->get_this_class())->as_C_string());
+        return;
+    } else {
+        ConstantPool* constant_pool = super_klass->get_constant_pool();
+
+        if (super_klass->get_super_klass() != nullptr) {
+            INFO_PRINT("%s also have super class",constant_pool->get_class_name_by_class_ref(super_klass->get_this_class())->as_C_string());
+            this->initialize_super_vtable(super_klass);
+        } else {
+            INFO_PRINT("%s not have super class",constant_pool->get_class_name_by_class_ref(super_klass->get_this_class())->as_C_string());
+        }
+    }
+
+    ConstantPool* constant_pool = super_klass->get_constant_pool();
+    Array<Method*>* methods = super_klass->get_methods();
+    for (int i = 0; i < methods->size(); i++) {
+        Method* method = methods->get_at(i);
+
+        // protected/public and non-static/non-final method
+        if (method->access_flags().is_protected() || method->access_flags().is_public()) {
+            // skip <init> / <clinit> method
+            if (constant_pool->symbol_at(method->name_index())->start_with("<init>") ||
+                constant_pool->symbol_at(method->name_index())->start_with("<clinit>")) {
+                INFO_PRINT("skip <init> / <clinit> method");
+                continue;
+            }
+
+            // skip final / static method
+            if (method->access_flags().is_final() || method->access_flags().is_static()) {
+                INFO_PRINT("skip final / static method");
+                continue;
+            }
+
+            // add to vtable
+            INFO_PRINT("add to vtable method: %s", constant_pool->symbol_at(method->name_index())->as_C_string());
+            this->vtable()->add(method);
+            INFO_PRINT("============%p", method);
+        } else {
+            INFO_PRINT("not add to vatble method: %s", constant_pool->symbol_at(method->name_index())->as_C_string());
+        }
+    }
 }

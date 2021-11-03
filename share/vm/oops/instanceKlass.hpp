@@ -95,7 +95,10 @@ public:
                   u2 methods_count, Array<Method*>* methods, u2 attributes_count, Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* attributes, int static_filed_count, int non_static_filed_count):
                   Klass(nullptr), _magic(magic), _minor_version(minor_version), _major_version(major_version), _constant_pool(constant_pool), _access_flags(access_flags),
                   _this_class(this_class), _super_class(super_class), _interfaces_count(interfaces_count), _interfaces(interfaces), _fields_count(fields_count),
-                  _fields(fields), _methods_count(methods_count), _methods(methods), _attributes_count(attributes_count), _attributes(attributes), _static_filed_count(static_filed_count), _non_static_filed_count(non_static_filed_count) {}
+                  _fields(fields), _methods_count(methods_count), _methods(methods), _attributes_count(attributes_count), _attributes(attributes), _static_filed_count(static_filed_count), _non_static_filed_count(non_static_filed_count) {
+        _vtable = new Array<Method*>();
+        _itable = new Array<Method*>();
+    }
 
     static InstanceKlass* allocate_instance_klass() {
         return new InstanceKlass();
@@ -174,12 +177,14 @@ public:
 
     int non_static_filed_count(KlassHandle k);
     void link_class();
-    bool link_class_impl(InstanceKlassHandle this_oop);
+    bool link_class_impl(InstanceKlass* this_oop);
+    void initialize_static_filed(InstanceKlass* this_oop);
 
     void initialize();
-    void initialize_impl(InstanceKlassHandle this_oop);
+    void initialize_impl(InstanceKlass* this_oop);
 
     void initialize_vtable();
+    void initialize_super_vtable(InstanceKlass* klass);
     void initialize_itable();
 };
 

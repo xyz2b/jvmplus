@@ -20,6 +20,7 @@ private:
     AccessFlags _access_flags;
     u2 _name_index;
     u2 _signature_index;
+    Symbol* _name;
     // 方法描述符
     DescriptorStream* _descriptor;
     // Back pointer to the Klass*
@@ -27,10 +28,13 @@ private:
     Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>* _attributes;
 
 public:
+    Symbol* name() { return _name; }
+    void set_name(Symbol* name) { _name = name; }
+
     DescriptorStream* descriptor() { return _descriptor; }
     void set_descriptor(DescriptorStream* stream) { _descriptor = stream; }
 
-    Method(AccessFlags access_flags, u2 name_index, u2 signature_index, u2 attributes_count) : _access_flags(access_flags), _name_index(name_index), _signature_index(signature_index) {
+    Method(AccessFlags access_flags, u2 name_index, u2 signature_index, u2 attributes_count, Symbol* name) : _access_flags(access_flags), _name_index(name_index), _signature_index(signature_index), _name(name) {
         _attributes = new Hashmap<Symbol*, AttributeInfo*, HashCode<const Symbol*>>(attributes_count);
     }
 

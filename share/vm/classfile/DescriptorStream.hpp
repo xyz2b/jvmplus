@@ -66,6 +66,8 @@ public:
         return _field->type();
     }
 
+    Symbol* descriptor_info() { return _descriptor_info; }
+
     int method_params_size() { return _method_params_size; }
     Array<DescriptorInfo*>* parameters() { return _parameters; }
 

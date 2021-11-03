@@ -67,7 +67,7 @@ int main() {
     // 设置线程管理器的当前线程
     Threads::set_current_thread(thread);
 
-    const char* file = "org/xyz/jvm/example/function/Invoke";
+    const char* file = "org/xyz/jvm/example/HelloWorld";
     Symbol* s = new (strlen(file)) Symbol(file, strlen(file));
 
 //    ClassLoader* classLoader = new ClassLoader();
