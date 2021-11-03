@@ -37,7 +37,7 @@ Klass* SystemDictionary::resolve_instance_class_or_null(Symbol *class_name) {
 
     ((InstanceKlass*)klass)->set_init_state(InstanceKlass::ClassState::loaded);
 
-    load_super_class(klass);
+//    load_super_class(klass);
 
     dictionary()->put(class_name, klass);
 

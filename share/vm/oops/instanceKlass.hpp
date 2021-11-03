@@ -57,12 +57,19 @@ private:
 
     u1 _init_state;
 
-    Hashmap<Symbol*, Method*, HashCode<const Symbol*>>* _vtable;
-    Hashmap<Symbol*, Method*, HashCode<const Symbol*>>* _itable;
+    Array<Method*>* _vtable;
+    Array<Method*>* _itable;
 public:
 
-    Hashmap<Symbol*, Method*, HashCode<const Symbol*>>* vtable() { return _vtable; }
-    Hashmap<Symbol*, Method*, HashCode<const Symbol*>>* itable() { return _itable; }
+    Array<Method*>* vtable() { return _vtable; }
+    Array<Method*>* itable() { return _itable; }
+
+    void set_vtable(Array<Method*>* vtable) { _vtable = vtable; }
+    void set_itable(Array<Method*>* itable) { _itable = itable; }
+
+    void add_virtual_method(Method* method) { _vtable->add(method); }
+    void add_interface_method(Method* method) { _itable->add(method); }
+
 
     int static_field_size() const            { return _static_field_size; }
     void set_static_field_size(int size)     { _static_field_size = size; }
@@ -171,6 +178,9 @@ public:
 
     void initialize();
     void initialize_impl(InstanceKlassHandle this_oop);
+
+    void initialize_vtable();
+    void initialize_itable();
 };
 
 

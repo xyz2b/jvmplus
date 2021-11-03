@@ -4,6 +4,7 @@
 
 #include "instanceKlass.hpp"
 #include "../../../share/vm/prims/JavaNativeInterface.hpp"
+#include "../../../share/vm/classfile/systemDictionary.h"
 
 instanceOop InstanceKlass::allocate_instance(KlassHandle k) {
     instanceOop i = (instanceOop) CollectedHeap::obj_allocate(k, sizeof(instanceOopDesc));
@@ -140,6 +141,20 @@ void InstanceKlass::link_class() {
 }
 
 bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
+    if (this_oop->is_in_error_state()) {
+        ERROR_PRINT("link class出错");
+        exit(-1);
+    }
+
+    if (this_oop->is_linked()) {
+        INFO_PRINT("已完成link");
+        return true;
+    }
+
+
+
+
+
     // 为静态变量分配内存、赋初值（零值）
     // 将静态变量存储到InstanceMirrorKlass对象中
     ConstantPool* constant_pool = this_oop->get_constant_pool();
@@ -252,16 +267,35 @@ bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
         }
     }
 
-    this_oop->set_init_state(ClassState::linked);
+    // 触发父类加载
+    if (this_oop->get_super_klass() == nullptr)  {
+        Symbol* super_class_name = this_oop->get_constant_pool()->get_class_name_by_class_ref(this_oop->get_super_class());
 
-    // link super class
-    Klass* super_klass = this_oop->get_super_klass();
-    if (super_klass == nullptr) return true;
-    InstanceKlassHandle super_oop(super_klass);
-    link_class_impl(super_oop);
+        if (super_class_name->start_with("java")) {
+            WARNING_PRINT("不link java包的类: %s", super_class_name->as_C_string());
 
-    // TODO: link interface
+            this_oop->initialize_vtable();
 
+            return true;
+        }
+
+        INFO_PRINT("触发父类的加载: %s", super_class_name->as_C_string());
+
+        InstanceKlass* instanceKlass = (InstanceKlass*) SystemDictionary::resolve_or_null(super_class_name);
+
+        this_oop->set_super_klass(instanceKlass);
+
+        link_class_impl(instanceKlass);
+    }
+
+    // TODO: 触发接口加载
+
+
+    // vtable
+    this_oop->initialize_vtable();
+
+    // itable
+    this_oop->initialize_itable();
 
 
     // other thread is already linked this klass
@@ -275,10 +309,8 @@ bool InstanceKlass::link_class_impl(InstanceKlassHandle this_oop) {
     // rewrite method
     // constant_pool_cache
 
-
-    // TODO: initialize_vtable          inherit
-    // TODO: initialize_itable          interface
-
+    // 设置状态
+    this_oop->set_init_state(ClassState::linked);
     return true;
 }
 
@@ -351,4 +383,12 @@ void InstanceKlass::initialize_impl(InstanceKlassHandle this_oop) {
     initialize_impl(super_oop);
 
     // 判断缓存中是否已经存在了，没有存在就解析，并存入缓存
+}
+
+void InstanceKlass::initialize_vtable() {
+
+}
+
+void InstanceKlass::initialize_itable() {
+
 }

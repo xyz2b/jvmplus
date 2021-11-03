@@ -1062,6 +1062,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         }
                     } else {
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+                        klass->initialize();
 
                         // 在对应的类中找到对应的方法
                         Method* method = JavaNativeInterface::get_method(klass, method_name, descriptor_name);
