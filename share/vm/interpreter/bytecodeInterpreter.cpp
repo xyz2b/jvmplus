@@ -344,7 +344,10 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                     }
                                     operand_stack->push(new StackValue(T_OBJECT, clazz));
                                 } else {
-                                    operand_stack->push(new StackValue(T_OBJECT, (jobject)klass->java_mirror()));
+                                    InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+                                    klass->initialize();
+
+                                    operand_stack->push(new StackValue(T_OBJECT, (jobject)klass));
                                 }
                             }
                             break;
@@ -398,6 +401,16 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     INFO_PRINT("执行指令: dup，该指令功能为: 复制操作数栈顶的值，并插入到栈顶（不弹出栈顶的值）");
                     StackValue* value = frame->top_operand_stack();
                     frame->push_operand_stack(value);
+                }
+                break;
+            case ASTORE:
+                {
+                    INFO_PRINT("执行指令: astore，该指令功能为: 将操作数栈栈顶的引用类型的元素存入局部变量表中对应索引（索引通过操作数给出）的位置");
+                    // 取出操作数，无符号byte类型整数，标识局部变量表中的索引号，占一个字节
+                    int index = code->get_u1_code();
+
+                    StackValue* value = frame->pop_operand_stack();
+                    frame->set_local_variable_table(index, value);
                 }
                 break;
             case ASTORE_0:
@@ -509,29 +522,57 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
             case ICONST_2:
                 {
                     INFO_PRINT("执行指令: iconst_2，该指令功能为: 将int类型的常量2压入操作数栈中");
-                    // 将1（int）压入操作数栈中
+                    // 将2（int）压入操作数栈中
                     frame->push_operand_stack(new StackValue(T_INT, 2));
                 }
                 break;
             case ICONST_3:
                 {
                     INFO_PRINT("执行指令: iconst_3，该指令功能为: 将int类型的常量3压入操作数栈中");
-                    // 将1（int）压入操作数栈中
+                    // 将3（int）压入操作数栈中
                     frame->push_operand_stack(new StackValue(T_INT, 3));
                 }
                 break;
             case ICONST_4:
                 {
                     INFO_PRINT("执行指令: iconst_4，该指令功能为: 将int类型的常量4压入操作数栈中");
-                    // 将1（int）压入操作数栈中
+                    // 将4（int）压入操作数栈中
                     frame->push_operand_stack(new StackValue(T_INT, 4));
                 }
                 break;
             case ICONST_5:
                 {
                     INFO_PRINT("执行指令: iconst_5，该指令功能为: 将int类型的常量5压入操作数栈中");
-                    // 将1（int）压入操作数栈中
+                    // 将5（int）压入操作数栈中
                     frame->push_operand_stack(new StackValue(T_INT, 5));
+                }
+                break;
+            case LCONST_0:
+                {
+                    INFO_PRINT("执行指令: lconst_0，该指令功能为: 将long类型的常量0压入操作数栈中");
+                    // 将0（long）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_LONG, (long)0));
+                }
+                break;
+            case LCONST_1:
+                {
+                    INFO_PRINT("执行指令: lconst_1，该指令功能为: 将long类型的常量1压入操作数栈中");
+                    // 将1（long）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_LONG, (long)1));
+                }
+                break;
+            case FCONST_0:
+                {
+                    INFO_PRINT("执行指令: fconst_0，该指令功能为: 将float类型的常量0压入操作数栈中");
+                    // 将0（float）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_FLOAT, (float)0));
+                }
+                break;
+            case FCONST_1:
+                {
+                    INFO_PRINT("执行指令: fconst_1，该指令功能为: 将float类型的常量1压入操作数栈中");
+                    // 将1（float）压入操作数栈中
+                    frame->push_operand_stack(new StackValue(T_FLOAT, (float)1));
                 }
                 break;
             case ALOAD:
@@ -716,8 +757,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                         INFO_PRINT("set object field value, %s.%s = %ld", class_name->as_C_string(), field_name->as_C_string(), (jlong)value);
                         instanceOop instance_oop = (instanceOop)obj;
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
-//                        klass->link_class();
-//                        klass->initialize();
+                        klass->initialize();
 
                         while (klass != nullptr) {
                             ConstantPool* constant_pool = klass->get_constant_pool();
@@ -836,8 +876,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                     } else {
                         instanceOop instance_oop = (instanceOop)obj;
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
-//                        klass->link_class();
-//                        klass->initialize();
+                        klass->initialize();
 
                         while (klass != nullptr) {
                             ConstantPool* constant_pool = klass->get_constant_pool();
@@ -985,8 +1024,8 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                 exit(-1);
                         }
                     } else {
-
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+                        klass->initialize();
 
                         // 在对应的类中找到对应的方法
                         Method* method = JavaNativeInterface::get_method(klass, method_name, descriptor_name);
@@ -1273,7 +1312,151 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                 break;
             case INVOKEINTERFACE:
                 {
-                    // TODO: i_table v_table
+                    INFO_PRINT("执行指令: invokeinterface，该指令功能为: 调用接口方法");
+                    // 取出操作数，invokeinterface指令的操作数是常量池的索引（InterfaceMethodref），占两个字节
+                    int operand = code->get_u2_code();
+                    code->get_u1_code();
+                    code->get_u1_code();
+
+                    Symbol* class_name = constant_pool->get_class_name_by_interface_method_ref(operand);
+                    Symbol* method_name = constant_pool->get_method_name_by_interface_method_ref(operand);
+                    Symbol* descriptor_name = constant_pool->get_method_descriptor_by_interface_method_ref(operand);
+
+                    // 解析描述符
+                    DescriptorStream* descriptor_stream = new DescriptorStream(descriptor_name, method_name);
+                    descriptor_stream->parse_method();
+
+                    // 系统加载的类走JNI
+                    if (class_name->start_with("java")) {
+                        // TODO: 接口实现类为java包下的类暂时不做处理
+                        break;
+                        // params
+                        jvalue* params = descriptor_stream->get_params_val(frame);
+
+                        // 从操作数栈中弹出 被调方法所属类的对象，即this指针
+                        jobject obj = (jobject)frame->pop_operand_stack()->data();
+
+                        // 获取类元信息
+                        jclass clazz = g_env->GetObjectClass(obj);
+                        if (nullptr == clazz) {
+                            ERROR_PRINT("获取clz出错")
+                            exit(-1);
+                        }
+
+                        // 获取方法
+                        jmethodID method = g_env->GetMethodID(clazz, method_name->as_C_string(), descriptor_name->as_C_string());
+                        if (nullptr == method) {
+                            ERROR_PRINT("获取方法出错")
+                            exit(-1);
+                        }
+
+                        jobject return_val;
+                        switch (descriptor_stream->return_element_type()) {
+                            case T_BOOLEAN:
+                            {
+                                jboolean bool_val = g_env->CallBooleanMethodA(obj, method, params);
+                                *((jboolean*)(&return_val)) = bool_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_SHORT:
+                            {
+                                jshort short_val = g_env->CallShortMethodA(obj, method, params);
+                                *((jshort*)(&return_val)) = short_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_CHAR:
+                            {
+                                jchar char_val = g_env->CallCharMethodA(obj, method, params);
+                                *((jchar*)(&return_val)) = char_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_BYTE:
+                            {
+                                jbyte byte_val = g_env->CallByteMethodA(obj, method, params);
+                                *((jbyte*)(&return_val)) = byte_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_INT:
+                            {
+                                jint int_val = g_env->CallIntMethodA(obj, method, params);
+                                *((jint*)(&return_val)) = int_val;
+                                frame->push_operand_stack(new StackValue(T_INT, return_val));
+                            }
+                                break;
+                            case T_LONG:
+                            {
+                                jlong long_val = g_env->CallLongMethodA(obj, method, params);
+                                *((jlong*)(&return_val)) = long_val;
+                                frame->push_operand_stack(new StackValue(T_LONG, return_val));
+                            }
+                                break;
+                            case T_FLOAT:
+                            {
+                                jfloat float_val = g_env->CallFloatMethodA(obj, method, params);
+                                *((jfloat*)(&return_val)) = float_val;
+                                frame->push_operand_stack(new StackValue(T_FLOAT, return_val));
+                            }
+                                break;
+                            case T_DOUBLE:
+                            {
+                                jdouble double_val = g_env->CallDoubleMethodA(obj, method, params);
+                                *((jdouble*)(&return_val)) = double_val;
+                                frame->push_operand_stack(new StackValue(T_DOUBLE, return_val));
+                            }
+                                break;
+                            case T_OBJECT:
+                            {
+                                jobject object_val = g_env->CallObjectMethodA(obj, method, params);
+                                return_val = object_val;
+                                frame->push_operand_stack(new StackValue(T_OBJECT, return_val));
+                            }
+                                break;
+                            case T_VOID:
+                            {
+                                g_env->CallVoidMethodA(obj, method, params);
+                            }
+                                break;
+                            default:
+                                ERROR_PRINT("无法识别的return类型%d", descriptor_stream->return_element_type());
+                                exit(-1);
+                        }
+                    } else {
+                        // TODO: 在栈中的object属于的类中找实现方法，栈中还有参数
+                        Array<StackValue*>* params = nullptr;
+                        if (descriptor_stream->method_params_size() != 0) {
+                            params = new Array<StackValue*>(descriptor_stream->method_params_size());
+                            for (int i = 0; i < descriptor_stream->method_params_size(); i ++) {
+                                params->add(frame->pop_operand_stack());
+                            }
+                        }
+
+                        oop obj = (oop)frame->top_operand_stack()->data();
+
+                        InstanceKlass* klass = (InstanceKlass*)obj->klass();
+                        klass->initialize();
+
+                        INFO_PRINT("执行方法: %s:%s#%s", klass->get_constant_pool()->get_class_name_by_class_ref(klass->get_this_class())->as_C_string(), method_name->as_C_string(), descriptor_name->as_C_string());
+
+                        // 在对应的类中找到对应的方法
+                        Method* method = JavaNativeInterface::get_imethod(klass, method_name, descriptor_name);
+                        if (nullptr == method) {
+                            ERROR_PRINT("不存在的方法: %s#%s", method_name->as_C_string(), descriptor_name->as_C_string());
+                            exit(-1);
+                        }
+
+                        // 同一个方法重复调用问题: 该方法的程序计数器如果没有重置，会导致下一次调用是从上一次调用完之后的指令位置开始，导致出错
+                        // 调用某一个方法之前，需要重置该方法的程序计数器，避免上面所说的重复调用的问题
+                        Symbol* c = new (strlen(JVM_ATTRIBUTE_Code)) Symbol(JVM_ATTRIBUTE_Code, strlen(JVM_ATTRIBUTE_Code));
+                        CodeAttribute* code_attribute = (CodeAttribute*) method->get_attribute(c);
+                        // 重置程序计数器
+                        code_attribute->code_stream()->reset();
+
+                        JavaNativeInterface::call_method(klass, method, params);
+                    }
                 }
                 break;
             default:

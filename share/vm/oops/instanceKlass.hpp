@@ -37,6 +37,7 @@ private:
     u2 _interfaces_count;
     // Interface (Klass*s) this class declares to implement.
     Array<u2>*  _interfaces;
+    Array<InstanceKlass*>* _interfaces_klass;
 
     u2 _fields_count;
     // Instance and static variable information.
@@ -60,6 +61,8 @@ private:
     Array<Method*>* _vtable;
     Array<Method*>* _itable;
 public:
+    void set_interfaces_klass(Array<InstanceKlass*>* interface) { _interfaces_klass = interface; }
+    Array<InstanceKlass*>* get_interface_klass() { return _interfaces_klass; }
 
     Array<Method*>* vtable() { return _vtable; }
     Array<Method*>* itable() { return _itable; }
@@ -186,6 +189,9 @@ public:
     void initialize_vtable();
     void initialize_super_vtable(InstanceKlass* klass);
     void initialize_itable();
+    void initialize_super_itable(InstanceKlass* klass, Array<InstanceKlass*>*);
+
+    void load_interface(InstanceKlass* this_oop);
 };
 
 

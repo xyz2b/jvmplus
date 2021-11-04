@@ -157,9 +157,16 @@ bool InstanceKlass::link_class_impl(InstanceKlass* this_oop) {
         if (super_class_name->start_with("java")) {
             WARNING_PRINT("不link java包的类: %s", super_class_name->as_C_string());
 
+            INFO_PRINT("link: %s", this_oop->get_constant_pool()->get_class_name_by_class_ref(this_oop->get_this_class())->as_C_string());
             initialize_static_filed(this_oop);
 
+            this_oop->load_interface(this_oop);
+
             this_oop->initialize_vtable();
+
+            this_oop->initialize_itable();
+
+            this_oop->set_init_state(ClassState::linked);
 
             return true;
         }
@@ -175,8 +182,8 @@ bool InstanceKlass::link_class_impl(InstanceKlass* this_oop) {
 
     initialize_static_filed(this_oop);
 
-    // TODO: 触发接口加载
-
+    // 触发接口加载
+    this_oop->load_interface(this_oop);
 
     // vtable
     this_oop->initialize_vtable();
@@ -199,6 +206,30 @@ bool InstanceKlass::link_class_impl(InstanceKlass* this_oop) {
     // 设置状态
     this_oop->set_init_state(ClassState::linked);
     return true;
+}
+
+void InstanceKlass::load_interface(InstanceKlass* this_oop) {
+    if (this_oop->get_interfaces_count() == 0) {
+        INFO_PRINT("没有实现接口，不需要load");
+        return;
+    }
+
+    ConstantPool* constant_pool = this_oop->get_constant_pool();
+    Array<u2>* interfaces = this_oop->get_interfaces();
+
+    Array<InstanceKlass*>* interfaces_klass= new Array<InstanceKlass*>(this_oop->get_interfaces_count());
+
+    for (int i = 0; i < interfaces->size(); i++) {
+        Symbol* class_name = constant_pool->get_class_name_by_class_ref(interfaces->get_at(i));
+
+        InstanceKlass* instanceKlass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
+
+        link_class_impl(instanceKlass);
+
+        interfaces_klass->add(instanceKlass);
+    }
+
+    this_oop->set_interfaces_klass(interfaces_klass);
 }
 
 void InstanceKlass::initialize_static_filed(InstanceKlass* this_oop) {
@@ -404,15 +435,10 @@ void InstanceKlass::initialize_vtable() {
             // add to vtable
             INFO_PRINT("add to vtable method: %s", constant_pool->symbol_at(method->name_index())->as_C_string());
             this->vtable()->add(method);
-            INFO_PRINT("============%p", method);
         } else {
             INFO_PRINT("not add to vatble method: %s", constant_pool->symbol_at(method->name_index())->as_C_string());
         }
     }
-}
-
-void InstanceKlass::initialize_itable() {
-
 }
 
 void InstanceKlass::initialize_super_vtable(InstanceKlass* klass) {
@@ -434,7 +460,6 @@ void InstanceKlass::initialize_super_vtable(InstanceKlass* klass) {
         }
     }
 
-    ConstantPool* constant_pool = super_klass->get_constant_pool();
     Array<Method*>* methods = super_klass->get_methods();
     for (int i = 0; i < methods->size(); i++) {
         Method* method = methods->get_at(i);
@@ -442,8 +467,8 @@ void InstanceKlass::initialize_super_vtable(InstanceKlass* klass) {
         // protected/public and non-static/non-final method
         if (method->access_flags().is_protected() || method->access_flags().is_public()) {
             // skip <init> / <clinit> method
-            if (constant_pool->symbol_at(method->name_index())->start_with("<init>") ||
-                constant_pool->symbol_at(method->name_index())->start_with("<clinit>")) {
+            if (method->name()->start_with("<init>") ||
+                    method->name()->start_with("<clinit>")) {
                 INFO_PRINT("skip <init> / <clinit> method");
                 continue;
             }
@@ -455,11 +480,131 @@ void InstanceKlass::initialize_super_vtable(InstanceKlass* klass) {
             }
 
             // add to vtable
-            INFO_PRINT("add to vtable method: %s", constant_pool->symbol_at(method->name_index())->as_C_string());
+            INFO_PRINT("add to vtable method: %s", method->name()->as_C_string());
             this->vtable()->add(method);
-            INFO_PRINT("============%p", method);
         } else {
-            INFO_PRINT("not add to vatble method: %s", constant_pool->symbol_at(method->name_index())->as_C_string());
+            INFO_PRINT("not add to vatble method: %s", method->name()->as_C_string());
         }
     }
 }
+
+
+void InstanceKlass::initialize_itable() {
+    Array<InstanceKlass*>* super_class_interfaces= new Array<InstanceKlass*>();
+    this->initialize_super_itable(this, super_class_interfaces);
+
+    INFO_PRINT("initialize_itable: %s", this->get_constant_pool()->get_class_name_by_class_ref(this->get_this_class())->as_C_string());
+
+    if (this->get_interfaces_count() == 0 && super_class_interfaces->size() == 0) {
+        INFO_PRINT("没有实现接口，不需要初始化itable");
+        return;
+    }
+
+    Array<Method*>* methods = this->get_methods();
+
+    for (int i = 0; i < methods->size(); i++) {
+        Method* method = methods->get_at(i);
+
+        for (int j = 0; j < super_class_interfaces->size(); j++) {
+            InstanceKlass* interface = super_class_interfaces->get_at(j);
+
+            Array<Method*>* interface_methods = interface->get_methods();
+
+            for (int k = 0; k < interface_methods->size(); k ++) {
+                Method* interface_method = interface_methods->get_at(k);
+                if (*method->name() == interface_method->name() && *method->descriptor()->descriptor_info() == interface_method->descriptor()->descriptor_info()) {
+                    INFO_PRINT("add to itable method: %s", method->name()->as_C_string());
+                    this->itable()->add(method);
+                    goto next;
+                }
+            }
+        }
+
+        for (int j = 0; j < this->get_interfaces_count(); j++) {
+            InstanceKlass* interface = this->get_interface_klass()->get_at(j);
+
+            Array<Method*>* interface_methods = interface->get_methods();
+
+            for (int k = 0; k < interface_methods->size(); k ++) {
+                Method* interface_method = interface_methods->get_at(k);
+                if (*method->name() == interface_method->name() && *method->descriptor()->descriptor_info() == interface_method->descriptor()->descriptor_info()) {
+                    INFO_PRINT("add to itable method: %s", method->name()->as_C_string());
+                    this->itable()->add(method);
+                    goto next;
+                }
+            }
+        }
+
+        next:
+        {}
+    }
+}
+
+void InstanceKlass::initialize_super_itable(InstanceKlass *klass, Array<InstanceKlass*>* super_class_interfaces) {
+    INFO_PRINT("initialize_itable: %s", klass->get_constant_pool()->get_class_name_by_class_ref(klass->get_this_class())->as_C_string());
+
+    InstanceKlass* super_klass = (InstanceKlass*) klass->get_super_klass();
+
+    // if super klass is Object, the super_klass is null, because java package class not link
+    if (super_klass == nullptr) {
+        ConstantPool* constant_pool = klass->get_constant_pool();
+        INFO_PRINT("%s not have super class", constant_pool->get_class_name_by_class_ref(this->get_this_class())->as_C_string());
+        return;
+    } else {
+        INFO_PRINT("initialize_itable: %s", super_klass->get_constant_pool()->get_class_name_by_class_ref(super_klass->get_this_class())->as_C_string());
+
+        ConstantPool* constant_pool = super_klass->get_constant_pool();
+
+        if (super_klass->get_super_klass() != nullptr) {
+            INFO_PRINT("%s also have super class",constant_pool->get_class_name_by_class_ref(super_klass->get_this_class())->as_C_string());
+            this->initialize_super_itable(super_klass, super_class_interfaces);
+        } else {
+            INFO_PRINT("%s not have super class",constant_pool->get_class_name_by_class_ref(super_klass->get_this_class())->as_C_string());
+        }
+    }
+
+    Array<Method*>* methods = super_klass->get_methods();
+    for (int i = 0; i < methods->size(); i++) {
+        Method* method = methods->get_at(i);
+
+        for (int j = 0; j < super_class_interfaces->size(); j++) {
+            InstanceKlass* interface = super_class_interfaces->get_at(j);
+
+            Array<Method*>* interface_methods = interface->get_methods();
+
+            for (int k = 0; k < interface_methods->size(); k ++) {
+                Method* interface_method = interface_methods->get_at(k);
+                if (*method->name() == interface_method->name() && *method->descriptor()->descriptor_info() == interface_method->descriptor()->descriptor_info()) {
+                    INFO_PRINT("add to itable method: %s", method->name()->as_C_string());
+                    this->itable()->add(method);
+                    goto next;
+                }
+            }
+        }
+
+        for (int j = 0; j < super_klass->get_interfaces_count(); j++) {
+            InstanceKlass* interface = super_klass->get_interface_klass()->get_at(j);
+
+            Array<Method*>* interface_methods = interface->get_methods();
+
+            for (int k = 0; k < interface_methods->size(); k ++) {
+                Method* interface_method = interface_methods->get_at(k);
+                if (*method->name() == interface_method->name() && *method->descriptor()->descriptor_info() == interface_method->descriptor()->descriptor_info()) {
+                    INFO_PRINT("add to itable method: %s", method->name()->as_C_string());
+                    this->itable()->add(method);
+                    goto next;
+                }
+            }
+        }
+
+        next:
+        {}
+    }
+
+    for (int j = 0; j < super_klass->get_interfaces_count(); j++) {
+        InstanceKlass* interface = super_klass->get_interface_klass()->get_at(j);
+        super_class_interfaces->add(interface);
+    }
+
+}
+

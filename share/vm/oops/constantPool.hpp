@@ -242,6 +242,11 @@ public:
         return *int_at_adr(which);
     }
 
+    jint interface_method_at(int which) {
+        assert(tag_at(which).is_interface_method(), "Corrupted constant pool");
+        return *int_at_adr(which);
+    }
+
     double get_int_by_int_ref(int which) {
         return int_at(which);
     }
@@ -351,6 +356,36 @@ public:
         jint class_index = data >> 16;
 
         return get_class_name_by_class_ref(class_index);
+    }
+
+    Symbol* get_class_name_by_interface_method_ref(int index) {
+        // 获取 InterfaceMethodref 在常量池中的信息(class_index + nameAndType_index)
+        jint data = interface_method_at(index);
+
+        // 获取 class_index，int的前2个字节
+        jint class_index = data >> 16;
+
+        return get_class_name_by_class_ref(class_index);
+    }
+
+    Symbol* get_method_name_by_interface_method_ref(int index) {
+        // 获取 InterfaceMethodref 在常量池中的信息(class_index + nameAndType_index)
+        jint data = interface_method_at(index);
+
+        // 获取 nameAndType_index，int的后2个字节
+        jint name_and_type_index = data & 0xFF;
+
+        return get_name_by_name_and_type_ref(name_and_type_index);
+    }
+
+    Symbol* get_method_descriptor_by_interface_method_ref(int index) {
+        // 获取 InterfaceMethodref 在常量池中的信息(class_index + nameAndType_index)
+        jint data = interface_method_at(index);
+
+        // 获取 nameAndType_index，int的后2个字节
+        jint name_and_type_index = data & 0xFF;
+
+        return get_descriptor_by_name_and_type_ref(name_and_type_index);
     }
 };
 

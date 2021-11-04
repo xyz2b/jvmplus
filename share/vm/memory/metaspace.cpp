@@ -7,7 +7,7 @@
 void SpaceManager::initialize() {
     _memory_pool = new MemoryPool;
 
-    _metaspace = _memory_pool->new_chunk(181920);
+    _metaspace = _memory_pool->new_chunk(1819200);
 }
 
 MetaWord *SpaceManager::allocate_work(size_t size) {
