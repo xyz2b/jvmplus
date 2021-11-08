@@ -23,6 +23,7 @@ public:
     }
     void operator delete(void* p) {}
 
+    T* data() { return _data; }
     Array();
     ~Array();
     Array(size_t capacity);

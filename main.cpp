@@ -4,8 +4,22 @@
 #include "share/vm/prims/JavaNativeInterface.hpp"
 #include "share/vm/classfile/systemDictionary.h"
 #include "../../../share/vm/runtime/Threads.hpp"
+#include "../../../share/vm/utilities/array.hpp"
 
 int main() {
+    int out;
+    int out2;
+    Array<int>* a = new Array<int>(10);
+    a->push(1);
+    a->push(2);
+
+    __asm__ (
+            "push %%r8 \r\n"
+            "movq %%rsp, %%r8 \r\n"
+            "movq %2, %%rax \r\n"
+            :"=r"(out), "=r"(out2):"r" (a->data())
+            );
+
     // double 转 long 再转double
 //    double d = 2.1;
 //    long l = *((long*)(&d));
