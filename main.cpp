@@ -7,19 +7,6 @@
 #include "../../../share/vm/utilities/array.hpp"
 
 int main() {
-    int out;
-    int out2;
-    Array<int>* a = new Array<int>(10);
-    a->push(1);
-    a->push(2);
-
-    __asm__ (
-            "push %%r8 \r\n"
-            "movq %%rsp, %%r8 \r\n"
-            "movq %2, %%rax \r\n"
-            :"=r"(out), "=r"(out2):"r" (a->data())
-            );
-
     // double 转 long 再转double
 //    double d = 2.1;
 //    long l = *((long*)(&d));
@@ -35,6 +22,39 @@ int main() {
     Universe::initialize_heap();
     Metaspace::initialize();
     SystemDictionary::set_dictionary(new Hashmap<Symbol*, Klass*, HashCode<const Symbol*>>);
+
+    int out;
+    int out2;
+    Array<int>* a = new Array<int>(10);
+    a->push(1);
+    a->push(2);
+
+    __asm__ (
+    "push %%r8 \r\n"
+
+    "movq %%rsp, %%r8 \r\n"
+
+    "movq %2, %%rax \r\n"
+
+    "movq %%rax, %%rsp \r\n"
+
+    "subq $4, %%rsp \r\n"
+    "movl (%%rsp), %%eax \r\n"
+
+    "movl %%eax, %0 \r\n"
+
+    "subq $4, %%rsp \r\n"
+    "movl (%%rsp), %%eax \r\n"
+
+    "movl %%eax, %1 \r\n"
+
+    "movq %%r8, %%rsp \r\n"
+    "pop %%r8 \r\n"
+
+    :"=r"(out), "=r"(out2):"r"(a->data())
+    );
+
+    printf("out: %d, out2: %d\n", out, out2);
 
 //    Array<int>* a = new Array<int>();
 //
