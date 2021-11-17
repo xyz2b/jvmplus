@@ -40,9 +40,14 @@ void CollectedHeap::post_allocation_setup_obj(KlassHandle klass, HeapWord *obj, 
 
 void CollectedHeap::post_allocation_setup_common(KlassHandle klass, HeapWord *obj) {
     post_allocation_install_obj_klass(klass, (oop)(obj->value()));
+    post_allocation_setup_no_klass_install(klass, (oop)(obj->value()));
 }
 
 void CollectedHeap::post_allocation_install_obj_klass(KlassHandle klass, oop obj) {
     obj->set_klass(klass());
+}
+
+void CollectedHeap::post_allocation_setup_no_klass_install(KlassHandle klass, oop obj) {
+
 }
 

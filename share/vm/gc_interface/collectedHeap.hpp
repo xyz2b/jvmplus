@@ -22,6 +22,8 @@ public:
     static void post_allocation_setup_common(KlassHandle handle, HeapWord *pWord);
 
     static void post_allocation_install_obj_klass(KlassHandle handle, oopDesc *pDesc);
+
+    static void post_allocation_setup_no_klass_install(KlassHandle klass, oop obj);
 };
 
 
