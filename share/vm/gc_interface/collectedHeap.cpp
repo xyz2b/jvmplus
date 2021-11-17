@@ -48,6 +48,7 @@ void CollectedHeap::post_allocation_install_obj_klass(KlassHandle klass, oop obj
 }
 
 void CollectedHeap::post_allocation_setup_no_klass_install(KlassHandle klass, oop obj) {
-
+    // set mark
+    // obj->set_mark(klass);
 }
 
