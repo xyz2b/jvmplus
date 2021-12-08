@@ -138,7 +138,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                 exit(-1);
                         }
                     } else {
-                        // 可能存在只是去操作父类静态变量的情况，此时子类不需要初始化，父类需要初始化
+                        // 可能存在只是去操作父类静态变量的情况，此时子类不需要初始化(加载、链接即可)，父类需要初始化
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
                         klass->link_class();
 //                        klass->initialize();
@@ -263,7 +263,7 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                 exit(-1);
                         }
                     } else {
-                        // 可能存在只是去操作父类静态变量的情况，此时子类不需要初始化，父类需要初始化
+                        // 可能存在只是去操作父类静态变量的情况，此时子类不需要初始化(加载、链接即可)，父类需要初始化
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
                         klass->link_class();
 //                        klass->initialize();
