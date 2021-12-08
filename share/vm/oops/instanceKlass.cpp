@@ -133,6 +133,13 @@ void InstanceKlass::put_non_static_field_to_oop(instanceOop child_oop, InstanceK
     return put_non_static_field_to_oop(child_oop, super_oop);
 }
 
+// 这里的链接阶段，包含了验证、准备、解析
+/**
+ * 何时解析？
+    答: 并不是加载之后就立刻解析，用的时候才会去解析。
+    JVM没有触发解析的机制，只有触发初始化的机制，通过触发初始化阶段从而触发解析阶段。
+    在初始化之前会去检测这个类有没有被解析（借助缓存判断），没有就会去解析。
+ * */
 void InstanceKlass::link_class() {
     if (!this->is_linked()) {
         link_class_impl(this);
