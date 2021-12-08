@@ -138,8 +138,10 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                 exit(-1);
                         }
                     } else {
+                        // 可能存在只是去操作父类静态变量的情况，此时子类不需要初始化，父类需要初始化
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
-                        klass->initialize();
+                        klass->link_class();
+//                        klass->initialize();
 
                         while (klass != nullptr) {
                             ConstantPool* constant_pool = klass->get_constant_pool();
@@ -154,6 +156,8 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                             oop mirror = klass->java_mirror();
 
                             if (mirror->find_field(class_name, field_name)) {
+                                // 找到了这个静态变量属于哪个父类，此时需要初始化父类，执行父类的clinit方法，不然后面获取到的值可能不对
+                                klass->initialize();
                                 field_val = mirror->get_field(class_name, field_name);
                                 INFO_PRINT("找到了 field %s.%s = %p", class_name->as_C_string(), field_name->as_C_string(), field_val);
                                 break;
@@ -259,8 +263,10 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                                 exit(-1);
                         }
                     } else {
+                        // 可能存在只是去操作父类静态变量的情况，此时子类不需要初始化，父类需要初始化
                         InstanceKlass* klass = (InstanceKlass*) SystemDictionary::resolve_or_null(class_name);
-                        klass->initialize();
+                        klass->link_class();
+//                        klass->initialize();
 
                         while (klass != nullptr) {
                             ConstantPool* constant_pool = klass->get_constant_pool();
@@ -274,6 +280,8 @@ void BytecodeInterpreter::run(JavaThread* current_thread, Method* method) {
                             oop mirror = klass->java_mirror();
 
                             if (mirror->find_field(class_name, field_name)) {
+                                // 找到了这个静态变量属于哪个父类，此时需要初始化父类，执行父类的clinit方法
+                                klass->initialize();
                                 INFO_PRINT("找到了 field %s.%s", class_name->as_C_string(), field_name->as_C_string());
                                 mirror->put_field(class_name, field_name, value);
                                 break;
